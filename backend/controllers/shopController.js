@@ -1,4 +1,4 @@
-const { Shop, ShopImage, SubCategory, Category, User } = require('../models');
+const { Shop, ShopImage, SubCategory, Category, User, sequelize } = require('../models');
 const { Op } = require('sequelize');
 const sharp = require('sharp');
 const slugify = require('../utils/slugify');
@@ -29,7 +29,11 @@ exports.getAllShops = async (req, res) => {
         if (cached) return res.json(cached);
 
         let whereClause = { isActive: true };
-        if (search) whereClause.name = { [Op.iLike]: `%${search}%` };
+        if (search) {
+            const isSqlite = sequelize.getDialect() === 'sqlite';
+            const likeOp = isSqlite ? Op.like : Op.iLike;
+            whereClause.name = { [likeOp]: `%${search}%` };
+        }
         if (category) whereClause.CategoryId = category;
 
         // Filter by subcategory at DB level — avoids sending all shops to the client

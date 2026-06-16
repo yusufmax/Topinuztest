@@ -1,4 +1,4 @@
-const { Product, Shop, Category, SubCategory } = require('../models');
+const { Product, Shop, Category, SubCategory, sequelize } = require('../models');
 const { Op } = require('sequelize');
 const sharp = require('sharp');
 const crypto = require('crypto');
@@ -29,10 +29,12 @@ exports.getAllProducts = async (req, res) => {
         
         // Search filter (full text search mockup on name & tags)
         if (search) {
+            const isSqlite = sequelize.getDialect() === 'sqlite';
+            const likeOp = isSqlite ? Op.like : Op.iLike;
             whereClause[Op.or] = [
-                { name: { [Op.iLike || Op.like]: `%${search}%` } },
-                { description: { [Op.iLike || Op.like]: `%${search}%` } },
-                { tags: { [Op.iLike || Op.like]: `%${search}%` } }
+                { name: { [likeOp]: `%${search}%` } },
+                { description: { [likeOp]: `%${search}%` } },
+                { tags: { [likeOp]: `%${search}%` } }
             ];
         }
 
