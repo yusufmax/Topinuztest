@@ -1,7 +1,13 @@
-const { sequelize, Shop, Category, Product } = require('./database');
+const { sequelize, Shop, Category, Product } = require('./models');
 
 async function seed() {
+    if (sequelize.getDialect() === 'sqlite') {
+        await sequelize.query('PRAGMA foreign_keys = false;');
+    }
     await sequelize.sync({ force: true }); // Reset database
+    if (sequelize.getDialect() === 'sqlite') {
+        await sequelize.query('PRAGMA foreign_keys = true;');
+    }
 
     // Seed Categories
     const categories = [
