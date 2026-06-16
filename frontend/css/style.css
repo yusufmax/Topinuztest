@@ -723,6 +723,21 @@ select {
     max-height: 90vh;
     overflow: hidden;
     position: relative;
+    transition: max-height 0.35s cubic-bezier(.4, 0, .2, 1), border-radius 0.35s;
+}
+
+.modal-sheet.expanded {
+    max-height: 100vh;
+    border-radius: 0;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+}
+
+@media (max-width: 600px) {
+    .modal-sheet.expanded .modal-body {
+        max-height: calc(100vh - 46px);
+    }
 }
 
 @media (min-width: 600px) {

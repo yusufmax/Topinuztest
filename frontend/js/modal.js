@@ -250,12 +250,93 @@ function openShopModal(shopId) {
         overlay.style.display = 'flex';
         document.body.style.overflow = 'hidden';
         
-        // Reset scroll position and navigation flag
+        // Reset sheet layout and scroll position
+        const sheet = document.getElementById('modalSheet');
+        if (sheet) {
+            sheet.classList.remove('expanded');
+        }
+        
         const modalBody = overlay.querySelector('.modal-body');
         if (modalBody) {
             modalBody.scrollTop = 0;
         }
         _navigatingToStore = false;
+
+        // Fetch and render the store's products inside the bottom sheet
+        _loadModalProducts(shop.id, shop.slug, shop.name, shop.currency || 'UZS');
+    }
+}
+
+async function _loadModalProducts(shopId, shopSlug, shopName, shopCurrency) {
+    const container = document.getElementById('modalProductsSection');
+    const grid = document.getElementById('modalProductsGrid');
+    if (!container || !grid) return;
+
+    container.style.display = 'block';
+    // Render placeholders
+    grid.innerHTML = Array(4).fill().map(() => `
+        <div class="skeleton-card" style="height: 220px; border-radius: var(--radius); background: var(--surface2); animation: pulse 1.5s infinite; opacity: 0.6;"></div>
+    `).join('');
+
+    try {
+        const res = await fetch(`/api/shops/${shopId}/products?limit=24`);
+        if (!res.ok) throw new Error();
+        const json = await res.json();
+        const products = json.data || [];
+
+        if (products.length === 0) {
+            container.style.display = 'none';
+            return;
+        }
+
+        grid.innerHTML = products.map(prod => {
+            const hasAr = prod.glbUrl || prod.usdzUrl;
+            const arBadge = hasAr ? `
+                <div class="product-card-ar-badge">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                        <polyline points="2 17 12 22 22 17"></polyline>
+                        <polyline points="2 12 17 12 22 12"></polyline>
+                    </svg>
+                    3D / AR
+                </div>
+            ` : '';
+
+            const currency = shopCurrency || 'UZS';
+            const priceStr = prod.price 
+                ? `${parseFloat(prod.price).toLocaleString()} ${currency}`
+                : (currentLang === 'ru' ? 'Цена по запросу' : 'Narx soʻrov boʻyicha');
+                
+            const oldPriceHtml = prod.salePrice
+                ? `<span class="product-card-old-price">${parseFloat(prod.price).toLocaleString()} ${currency}</span>`
+                : '';
+                
+            const displayPriceStr = prod.salePrice
+                ? `${parseFloat(prod.salePrice).toLocaleString()} ${currency}`
+                : priceStr;
+
+            const imageUrl = prod.imageUrl || 'img/placeholder.png';
+
+            return `
+                <a href="/stores/${shopSlug}/products/${prod.slug}" class="product-card" style="margin: 0;">
+                    <div class="product-card-img-wrap">
+                        <img src="${cloudinaryOptimize(imageUrl)}" alt="${escHtml(prod.name)}" class="product-card-img" loading="lazy">
+                        ${arBadge}
+                    </div>
+                    <div class="product-card-content">
+                        <span class="product-card-shop">${escHtml(shopName)}</span>
+                        <h3 class="product-card-name" style="font-size: 13px; height: 34px; line-height: 1.3;">${escHtml(prod.name)}</h3>
+                        <div class="product-card-price-row">
+                            <span class="product-card-price" style="font-size: 13px; ${prod.salePrice ? 'color: var(--red);' : ''}">${displayPriceStr}</span>
+                            ${oldPriceHtml}
+                        </div>
+                    </div>
+                </a>
+            `;
+        }).join('');
+    } catch (e) {
+        console.error('Error loading modal products:', e);
+        container.style.display = 'none';
     }
 }
 
@@ -263,6 +344,10 @@ function closeShopModal() {
     _stopCarousel();
     const overlay = document.getElementById('shopModal');
     if (overlay) overlay.style.display = 'none';
+    
+    const sheet = document.getElementById('modalSheet');
+    if (sheet) sheet.classList.remove('expanded');
+    
     document.body.style.overflow = '';
 }
 
@@ -274,19 +359,19 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-// Auto-navigate to store on mobile scroll down
+// Auto-expand/collapse bottom sheet on mobile scroll
 function initModalScrollRedirect() {
     const modalBody = document.querySelector('#shopModal .modal-body');
     if (modalBody) {
         modalBody.addEventListener('scroll', () => {
             // Check if mobile view (e.g. width < 600px)
             if (window.innerWidth < 600) {
-                // If they scroll down by more than 20px
-                if (modalBody.scrollTop > 20 && !_navigatingToStore) {
-                    const storeBtn = document.getElementById('modalStoreBtn');
-                    if (storeBtn && storeBtn.href && storeBtn.style.display !== 'none' && !storeBtn.href.endsWith('#')) {
-                        _navigatingToStore = true;
-                        window.location.href = storeBtn.href;
+                const sheet = document.getElementById('modalSheet');
+                if (sheet) {
+                    if (modalBody.scrollTop > 15) {
+                        sheet.classList.add('expanded');
+                    } else if (modalBody.scrollTop <= 0) {
+                        sheet.classList.remove('expanded');
                     }
                 }
             }
