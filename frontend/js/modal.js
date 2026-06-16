@@ -359,7 +359,7 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-// Auto-expand/collapse bottom sheet on mobile scroll
+// Auto-expand/collapse bottom sheet on mobile scroll and auto-forward
 function initModalScrollRedirect() {
     const modalBody = document.querySelector('#shopModal .modal-body');
     if (modalBody) {
@@ -372,6 +372,16 @@ function initModalScrollRedirect() {
                         sheet.classList.add('expanded');
                     } else if (modalBody.scrollTop <= 0) {
                         sheet.classList.remove('expanded');
+                    }
+                }
+
+                // Auto forward to store page on scroll down
+                const reachedBottom = modalBody.scrollTop + modalBody.clientHeight >= modalBody.scrollHeight - 10;
+                if ((modalBody.scrollTop > 100 || reachedBottom) && !_navigatingToStore) {
+                    const storeBtn = document.getElementById('modalStoreBtn');
+                    if (storeBtn && storeBtn.href && storeBtn.style.display !== 'none' && !storeBtn.href.endsWith('#')) {
+                        _navigatingToStore = true;
+                        window.location.href = storeBtn.href;
                     }
                 }
             }
