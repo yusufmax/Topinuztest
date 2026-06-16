@@ -280,7 +280,7 @@
             }
         }
     </style>
-    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('houz_theme') || 'light');</script>
+    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('houz_theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));</script>
 </head>
 <body>
 

@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-title" content="Topin">
     <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
     <link rel="stylesheet" href="css/style.css?v=2.8">
-    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('houz_theme') || 'light');</script>
+    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('houz_theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));</script>
 </head>
 
 <body>

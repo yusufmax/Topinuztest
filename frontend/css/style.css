@@ -1115,10 +1115,8 @@ select {
 }
 
 /* Dark mode adjust for the custom select arrow */
-@media (prefers-color-scheme: dark) {
-    .form-row select {
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='rgba(255, 255, 255, 0.55)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-    }
+[data-theme="dark"] .form-row select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='rgba(255, 255, 255, 0.55)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
 }
 
 .btn-login {
@@ -1690,31 +1688,29 @@ select {
 
 /* ─── Unified Theme System ────────────────────────────────── */
 /* ─── Unified Theme System ────────────────────────────────── */
-@media (prefers-color-scheme: dark) {
-    :root {
-        /* iOS DARK Theme overrides */
-        --bg: #000000;
-        --bg2: #1C1C1E;
-        --surface: #1C1C1E;
-        --surface2: #2C2C2E;
-        --border: rgba(255, 255, 255, 0.15);
-        --border2: rgba(255, 255, 255, 0.2);
-        --text: #FFFFFF;
-        --text2: rgba(235, 235, 245, 0.6);
-        --text3: rgba(235, 235, 245, 0.3);
-        --shadow: 0 4px 32px rgba(0, 0, 0, 0.8);
-    }
+[data-theme="dark"] {
+    /* iOS DARK Theme overrides */
+    --bg: #000000;
+    --bg2: #1C1C1E;
+    --surface: #1C1C1E;
+    --surface2: #2C2C2E;
+    --border: rgba(255, 255, 255, 0.15);
+    --border2: rgba(255, 255, 255, 0.2);
+    --text: #FFFFFF;
+    --text2: rgba(235, 235, 245, 0.6);
+    --text3: rgba(235, 235, 245, 0.3);
+    --shadow: 0 4px 32px rgba(0, 0, 0, 0.8);
+}
 
-    .site-header {
-        background: rgba(0, 0, 0, 0.85);
-    }
+[data-theme="dark"] .site-header {
+    background: rgba(0, 0, 0, 0.85);
+}
 
-    .logo {
-        background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
+[data-theme="dark"] .logo {
+    background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 /* Element-specific adjustments for themes */
@@ -1991,21 +1987,19 @@ body {
 /* ─── Consolidated Dark Mode Overrides ────────────────── */
 /* Base Variables already handled above */
 
-/* Component Overrides for Dark Mode (Media Query) */
-@media (prefers-color-scheme: dark) {
-    .site-header {
-        background: rgba(17, 17, 19, 0.8);
-    }
+/* Component Overrides for Dark Mode (Attribute) */
+[data-theme="dark"] .site-header {
+    background: rgba(17, 17, 19, 0.8);
+}
 
-    .logo-text-top {
-        color: #ffffff;
-    }
+[data-theme="dark"] .logo-text-top {
+    color: #ffffff;
+}
 
-    .home-card-img {
-        filter: brightness(0.9);
-        mix-blend-mode: normal;
-        /* Avoid multiply on dark bg */
-    }
+[data-theme="dark"] .home-card-img {
+    filter: brightness(0.9);
+    mix-blend-mode: normal;
+    /* Avoid multiply on dark bg */
 }
 
 /* Component Overrides for Manual Dark Mode Class */
@@ -2114,9 +2108,9 @@ body {
 [data-theme="dark"] .theme-icon-sun { opacity: 1; }
 [data-theme="dark"] .theme-icon-moon { opacity: 0; }
 [data-theme="light"] .theme-icon-sun,
-:root .theme-icon-sun { opacity: 0; }
+html:not([data-theme="dark"]) .theme-icon-sun { opacity: 0; }
 [data-theme="light"] .theme-icon-moon,
-:root .theme-icon-moon { opacity: 1; }
+html:not([data-theme="dark"]) .theme-icon-moon { opacity: 1; }
 
 /* ─── Markets Screen Redesign (shops.html) ───────────── */
 

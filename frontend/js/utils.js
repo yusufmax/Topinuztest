@@ -1,7 +1,7 @@
 // ─── Theme Management ──────────────────────────────────
 (function initTheme() {
     const saved = localStorage.getItem('houz_theme');
-    const theme = saved || 'light';
+    const theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     document.documentElement.setAttribute('data-theme', theme);
 })();
 
