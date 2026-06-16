@@ -490,14 +490,9 @@
                 </div>
             `).join('');
 
-            // If product has 3D models, insert a cube 3D trigger button as the final thumb
+            // If product has 3D models, enable the AR trigger button
             const has3D = product.glbUrl || product.usdzUrl;
             if (has3D) {
-                thumbHtml += `
-                    <div class="thumb-item ar-thumb-btn" onclick="triggerARFlow()" title="Просмотр в 3D">
-                        📦
-                    </div>
-                `;
                 document.getElementById('btnAR').style.display = 'flex';
             }
             thumbsEl.innerHTML = thumbHtml;
