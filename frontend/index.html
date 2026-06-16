@@ -20,56 +20,15 @@
     <!-- Header -->
     <header class="site-header">
         <div class="header-inner" style="padding: 0 16px;">
-            <a href="index.html" class="home-logo" style="margin-right: auto;">
+            <a href="index.html" class="home-logo">
                 <span class="logo-text-top">TOP</span><span class="logo-text-in">IN</span>
             </a>
 
             <!-- Header Search Bar -->
-            <div class="search-wrap" style="margin-right: 20px;">
+            <div class="search-wrap">
                 <span class="search-icon">🔍</span>
                 <input type="text" id="headerSearchInput" placeholder="Поиск магазинов и товаров..." aria-label="Search">
             </div>
-
-            <!-- Language Switcher -->
-            <div class="lang-wrap" id="langWrap">
-                <button class="lang-switch-btn" id="langBtn" aria-label="Change Language">
-                    <svg class="lang-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="2" y1="12" x2="22" y2="12"></line>
-                        <path
-                            d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
-                        </path>
-                    </svg>
-                    <span class="lang-text">UZ</span>
-                    <svg class="lang-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
-                </button>
-                <div class="lang-dropdown" id="langDropdown">
-                    <div class="lang-option" data-lang="uz">
-                        O'zbek
-                        <svg class="lang-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                    </div>
-                    <div class="lang-option selected" data-lang="ru">
-                        Русский
-                        <svg class="lang-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Theme Toggle -->
-            <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" aria-label="Toggle theme">
-                <span class="theme-icon theme-icon-sun">☀️</span>
-                <span class="theme-icon theme-icon-moon">🌙</span>
-            </button>
         </div>
     </header>
 
@@ -116,8 +75,52 @@
     </main>
 
     <!-- Footer -->
-    <footer class="site-footer" style="margin-top: auto; padding: 20px; text-align: center; border-top: 1px solid var(--border);">
-        © 2026 Topin · Toshkent, O'zbekiston
+    <footer class="site-footer" style="margin-top: auto; padding: 20px; text-align: center; border-top: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; gap: 16px;">
+        <div class="footer-controls" style="display: flex; align-items: center; justify-content: center; gap: 20px;">
+            <!-- Language Switcher -->
+            <div class="lang-wrap" id="langWrap" style="margin: 0; position: relative;">
+                <button class="lang-switch-btn" id="langBtn" aria-label="Change Language">
+                    <svg class="lang-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path
+                            d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
+                        </path>
+                    </svg>
+                    <span class="lang-text">UZ</span>
+                    <svg class="lang-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+                <div class="lang-dropdown" id="langDropdown" style="bottom: 100%; top: auto; margin-bottom: 8px; margin-top: 0;">
+                    <div class="lang-option" data-lang="uz">
+                        O'zbek
+                        <svg class="lang-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </div>
+                    <div class="lang-option selected" data-lang="ru">
+                        Русский
+                        <svg class="lang-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Theme Toggle -->
+            <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" aria-label="Toggle theme">
+                <span class="theme-icon theme-icon-sun">☀️</span>
+                <span class="theme-icon theme-icon-moon">🌙</span>
+            </button>
+        </div>
+        <div style="font-size: 13px; color: var(--text3);">
+            © 2026 Topin · Toshkent, O'zbekiston
+        </div>
     </footer>
 
     <script src="js/config.js?v=2.8"></script>

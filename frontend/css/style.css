@@ -3070,3 +3070,12 @@ body {
     white-space: nowrap;
     box-shadow: 0 4px 12px rgba(15, 169, 134, 0.4);
 }
+
+/* Mobile Search Bar Expansion */
+@media (max-width: 600px) {
+    .site-header .search-wrap {
+        max-width: none !important;
+        margin-right: 0 !important;
+        flex: 1 !important;
+    }
+}
