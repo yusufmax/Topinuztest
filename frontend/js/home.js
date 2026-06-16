@@ -333,21 +333,54 @@ function setupSearch() {
         }
     }
 
+    let searchDebounceTimeout;
+    function handleSearchInput(val) {
+        clearTimeout(searchDebounceTimeout);
+        const query = val.trim();
+        if (!query) {
+            if (headerInput) headerInput.value = '';
+            if (heroInput) heroInput.value = '';
+            homeView.style.display = 'block';
+            searchView.style.display = 'none';
+            return;
+        }
+        searchDebounceTimeout = setTimeout(() => {
+            performSearch(query);
+        }, 300);
+    }
+
+    function handleSearchImmediate(val) {
+        clearTimeout(searchDebounceTimeout);
+        const query = val.trim();
+        if (!query) {
+            homeView.style.display = 'block';
+            searchView.style.display = 'none';
+            return;
+        }
+        performSearch(query);
+    }
+
     if (headerInput) {
+        headerInput.addEventListener('input', (e) => {
+            handleSearchInput(e.target.value);
+        });
         headerInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') performSearch(headerInput.value);
+            if (e.key === 'Enter') handleSearchImmediate(headerInput.value);
         });
     }
 
     if (heroInput) {
+        heroInput.addEventListener('input', (e) => {
+            handleSearchInput(e.target.value);
+        });
         heroInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') performSearch(heroInput.value);
+            if (e.key === 'Enter') handleSearchImmediate(heroInput.value);
         });
     }
 
     if (heroBtn) {
         heroBtn.addEventListener('click', () => {
-            performSearch(heroInput.value);
+            handleSearchImmediate(heroInput.value);
         });
     }
 
