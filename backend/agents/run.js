@@ -8,6 +8,12 @@ const uploaderAgent = require('./uploaderAgent');
 // In-memory sessions to store scraped data between scrape and upload phases
 const sessions = new Map();
 
+// Parse allowed chat IDs from config
+const allowedChatIds = (config.telegramChatId || '')
+    .split(',')
+    .map(id => parseInt(id.trim(), 10))
+    .filter(id => !isNaN(id));
+
 /**
  * Handle incoming Telegram messages
  */
@@ -15,6 +21,13 @@ async function handleMessage(message) {
     const chatId = message.chat.id;
     const text = message.text || '';
     
+    // Authorization Check
+    if (allowedChatIds.length > 0 && !allowedChatIds.includes(chatId)) {
+        console.warn(`[Telegram Bot Security] Unauthorized access attempt from chatId ${chatId}`);
+        await telegram.sendMessage(chatId, `❌ Unauthorized. Your Chat ID is: <code>${chatId}</code>.`);
+        return;
+    }
+
     console.log(`[Telegram Bot] Message from ${chatId}: "${text}"`);
 
     if (text === '/start' || text === '/help') {
@@ -120,6 +133,13 @@ async function handleCallbackQuery(callbackQuery) {
     const messageId = callbackQuery.message.message_id;
     const data = callbackQuery.data;
     const queryId = callbackQuery.id;
+
+    // Authorization Check
+    if (allowedChatIds.length > 0 && !allowedChatIds.includes(chatId)) {
+        console.warn(`[Telegram Bot Security] Unauthorized callback query attempt from chatId ${chatId}`);
+        await telegram.answerCallbackQuery(callbackQuery.id, 'Unauthorized access', true);
+        return;
+    }
 
     console.log(`[Telegram Bot] Callback query: "${data}"`);
 
