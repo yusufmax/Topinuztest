@@ -1,6 +1,7 @@
 let _carouselTimer = null;
 let _carouselIdx = 0;
 let _carouselCount = 0;
+let _navigatingToStore = false;
 
 function _buildCarousel(images) {
     _stopCarousel();
@@ -248,6 +249,13 @@ function openShopModal(shopId) {
     if (overlay) {
         overlay.style.display = 'flex';
         document.body.style.overflow = 'hidden';
+        
+        // Reset scroll position and navigation flag
+        const modalBody = overlay.querySelector('.modal-body');
+        if (modalBody) {
+            modalBody.scrollTop = 0;
+        }
+        _navigatingToStore = false;
     }
 }
 
@@ -265,3 +273,29 @@ document.addEventListener('keydown', (e) => {
       if (typeof closeShopForm === 'function') closeShopForm();
     }
 });
+
+// Auto-navigate to store on mobile scroll down
+function initModalScrollRedirect() {
+    const modalBody = document.querySelector('#shopModal .modal-body');
+    if (modalBody) {
+        modalBody.addEventListener('scroll', () => {
+            // Check if mobile view (e.g. width < 600px)
+            if (window.innerWidth < 600) {
+                // If they scroll down by more than 20px
+                if (modalBody.scrollTop > 20 && !_navigatingToStore) {
+                    const storeBtn = document.getElementById('modalStoreBtn');
+                    if (storeBtn && storeBtn.href && storeBtn.style.display !== 'none' && !storeBtn.href.endsWith('#')) {
+                        _navigatingToStore = true;
+                        window.location.href = storeBtn.href;
+                    }
+                }
+            }
+        });
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initModalScrollRedirect);
+} else {
+    initModalScrollRedirect();
+}
