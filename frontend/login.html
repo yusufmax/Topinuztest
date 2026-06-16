@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | Topin</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0FA986">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Topin">
+    <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+    <link rel="stylesheet" href="css/style.css?v=2.5">
+    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('houz_theme') || 'light');</script>
+</head>
+
+<body>
+
+    <div class="login-page">
+        <div class="login-card">
+            <div class="login-logo home-logo" style="justify-content: center; margin-bottom: 20px;">
+                <span class="logo-text-top">TOP</span><span class="logo-text-in">IN</span>
+            </div>
+            <div class="login-subtitle">Admin paneliga kirish</div>
+
+            <form id="loginForm" novalidate>
+                <div class="form-field">
+                    <label for="username">Foydalanuvchi nomi</label>
+                    <input type="text" id="username" name="username" autocomplete="username" placeholder="admin"
+                        required>
+                </div>
+
+                <div class="form-field">
+                    <label for="password">Parol</label>
+                    <input type="password" id="password" name="password" autocomplete="current-password"
+                        placeholder="••••••••" required>
+                </div>
+
+                <button type="submit" class="btn-login" id="loginBtn">Kirish</button>
+
+                <div class="login-error" id="loginError">
+                    ❌ Login yoki parol noto'g'ri. Qayta urinib ko'ring.
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+</body>
+
+</html>

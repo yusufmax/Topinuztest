@@ -1,0 +1,12 @@
+# Node dependencies
+backend/node_modules/
+
+# Local database
+backend/database.sqlite
+
+# Private environment variables (contains tokens and secrets)
+backend/.env
+
+# OS files
+.DS_Store
+Thumbs.db

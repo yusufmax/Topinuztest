@@ -1,0 +1,279 @@
+/* Design A - Figma Replica */
+
+:root {
+    --bg-color: #F8F8F8;
+    /* Default background for Design A */
+    --card-bg: #FFFFFF;
+    --text-color: #000000;
+    --accent-color: #0088FF;
+    --border-radius: 20px;
+    --font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-family);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    overflow-x: hidden;
+}
+
+.page-wrapper {
+    width: 100%;
+    max-width: 430px;
+    /* iPhone Pro Max width approx */
+    background: #FFFFFF;
+    position: relative;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Status Bar Mockup */
+.status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 24px 10px;
+    background: #FFFFFF;
+    height: 47px;
+    /* 62px total with interaction area */
+}
+
+.time {
+    font-weight: 600;
+    font-size: 17px;
+}
+
+.status-icons {
+    display: flex;
+    gap: 7px;
+}
+
+.status-icon {
+    width: 18px;
+    height: 12px;
+    background-color: black;
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+}
+
+/* Header */
+header {
+    padding: 0 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: #FFFFFF;
+    padding-bottom: 10px;
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 54px;
+}
+
+.logo-section svg {
+    height: 32px;
+    width: auto;
+}
+
+.lang-switch {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px;
+    background: transparent;
+    border: none;
+    font-size: 16px;
+}
+
+/* Categories Scroll (Frame 2351) */
+.categories-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    padding: 0 15px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE */
+    margin-bottom: 15px;
+    height: 60px;
+}
+
+.categories-container::-webkit-scrollbar {
+    display: none;
+}
+
+.category-card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 12px 13px;
+    height: 41px;
+    background: #F1F1F1;
+    border-radius: 29px;
+    white-space: nowrap;
+    text-decoration: none;
+    color: #000000;
+    font-size: 14px;
+    font-weight: 510;
+    transition: background 0.2s;
+}
+
+.category-card.active,
+.category-card:active {
+    background: #1E1E1E;
+    color: #FFFFFF;
+}
+
+/* Shops List (Frame 2355 container) */
+.content-area {
+    background: #F8F8F8;
+    /* Slight contrast for content area */
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    flex: 1;
+    padding: 20px 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.section-title {
+    font-size: 16px;
+    font-weight: 510;
+    color: #1E1E1E;
+    opacity: 0.5;
+    display: flex;
+    gap: 5px;
+}
+
+.section-count {
+    color: #1E1E1E;
+    opacity: 1;
+}
+
+.filter-btn {
+    font-size: 16px;
+    font-weight: 510;
+    color: #0088FF;
+    /* Active Blue */
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.companies-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Shop Card (Frame 2363 etc) */
+.company-card {
+    background: #FFFFFF;
+    /* Or F1F1F1 based on Figma 'bg' */
+    background-color: #F1F1F1;
+    border-radius: 20px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    position: relative;
+    cursor: pointer;
+}
+
+.shop-main-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.shop-logo {
+    width: 66px;
+    height: 66px;
+    border-radius: 35px;
+    background-color: #ddd;
+    background-size: cover;
+    background-position: center;
+    flex-shrink: 0;
+}
+
+.shop-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    /* Figma says 8px for frame gap, but visual looks tighter */
+}
+
+.shop-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.shop-name {
+    font-family: 'SF Pro Display';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 24px;
+    color: #000000;
+}
+
+.verified-icon {
+    width: 24px;
+    height: 24px;
+    background-color: #000;
+    /* Placeholder for verified tick */
+    mask: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>');
+    -webkit-mask: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>');
+}
+
+.shop-description {
+    font-family: 'SF Pro Display';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 17px;
+    color: #000000;
+    opacity: 0.6;
+}
+
+/* Home Indicator */
+.home-indicator {
+    position: fixed;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 139px;
+    height: 5px;
+    background: #000000;
+    border-radius: 100px;
+    z-index: 999;
+}

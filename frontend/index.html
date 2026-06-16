@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Topin</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0FA986">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Topin">
+    <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+    <link rel="stylesheet" href="css/style.css?v=2.8">
+    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('houz_theme') || 'light');</script>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="site-header">
+        <div class="header-inner" style="padding: 0 16px;">
+            <a href="index.html" class="home-logo" style="margin-right: auto;">
+                <span class="logo-text-top">TOP</span><span class="logo-text-in">IN</span>
+            </a>
+
+            <!-- Header Search Bar -->
+            <div class="search-wrap" style="margin-right: 20px;">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="headerSearchInput" placeholder="Поиск магазинов и товаров..." aria-label="Search">
+            </div>
+
+            <!-- Language Switcher -->
+            <div class="lang-wrap" id="langWrap">
+                <button class="lang-switch-btn" id="langBtn" aria-label="Change Language">
+                    <svg class="lang-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path
+                            d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
+                        </path>
+                    </svg>
+                    <span class="lang-text">UZ</span>
+                    <svg class="lang-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+                <div class="lang-dropdown" id="langDropdown">
+                    <div class="lang-option" data-lang="uz">
+                        O'zbek
+                        <svg class="lang-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </div>
+                    <div class="lang-option selected" data-lang="ru">
+                        Русский
+                        <svg class="lang-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Theme Toggle -->
+            <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" aria-label="Toggle theme">
+                <span class="theme-icon theme-icon-sun">☀️</span>
+                <span class="theme-icon theme-icon-moon">🌙</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="home-layout">
+        <!-- Main Home View -->
+        <div id="homeView">
+
+
+
+
+
+
+            <!-- Product Categories Grid -->
+            <section class="categories-section" style="margin-bottom: 40px;">
+                <h2 class="section-title">Категории каталога</h2>
+                <div class="home-grid" id="homeGrid" style="margin-top: 20px;">
+                    <!-- Categories injected via JS -->
+                </div>
+            </section>
+
+
+
+
+        </div>
+
+        <!-- Search Results View -->
+        <div id="searchView" style="display: none;">
+            <div class="search-results-header">
+                <h2 class="search-results-title">Результаты поиска для "<span id="searchQueryVal"></span>"</h2>
+                <button class="close-search-btn" id="closeSearchBtn">✕ Закрыть поиск</button>
+            </div>
+            
+            <div class="search-tabs" style="margin-top: 20px;">
+                <button class="search-tab-btn active" id="searchTabProducts">Товары (<span id="searchCountProducts">0</span>)</button>
+                <button class="search-tab-btn" id="searchTabShops">Магазины (<span id="searchCountShops">0</span>)</button>
+            </div>
+            
+            <div class="search-results-content" style="margin-top: 20px;">
+                <div class="products-grid" id="searchProductsGrid"></div>
+                <div class="shops-grid" id="searchShopsGrid" style="display: none; grid-template-columns: repeat(2, 1fr); gap: 16px;"></div>
+                <div class="no-results-msg" id="noResultsMsg" style="display: none;">Ничего не найдено</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer" style="margin-top: auto; padding: 20px; text-align: center; border-top: 1px solid var(--border);">
+        © 2026 Topin · Toshkent, O'zbekiston
+    </footer>
+
+    <script src="js/config.js?v=2.8"></script>
+    <script src="js/utils.js?v=2.8"></script>
+    <script src="js/home.js?v=2.8"></script>
+
+</body>
+
+</html>

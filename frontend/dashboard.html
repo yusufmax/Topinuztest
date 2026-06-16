@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Dashboard | Topin</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0FA986">
+    <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css?v=3.2">
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+        /* Sidebar Layout */
+        .sidebar {
+            width: 260px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            flex-shrink: 0;
+        }
+        .sidebar-logo {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--accent);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .menu-item-btn {
+            width: 100%;
+            background: none;
+            border: none;
+            color: var(--text3);
+            text-align: left;
+            padding: 14px 16px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s;
+        }
+        .menu-item-btn:hover, .menu-item-btn.active {
+            color: #fff;
+            background: var(--surface2);
+        }
+        .menu-item-btn.active {
+            color: var(--accent);
+            border-left: 4px solid var(--accent);
+            border-radius: 0 12px 12px 0;
+        }
+        .main-content {
+            flex-grow: 1;
+            padding: 40px;
+            overflow-y: auto;
+            max-width: 1200px;
+        }
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .dashboard-title {
+            font-size: 28px;
+            font-weight: 800;
+            margin: 0;
+        }
+        .card-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: var(--shadow);
+        }
+        .stat-val {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--accent);
+        }
+        .stat-lbl {
+            font-size: 14px;
+            color: var(--text3);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        /* Form Grids */
+        .form-container {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: var(--shadow);
+        }
+        .form-grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .full-width-field {
+            grid-column: 1 / -1;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .form-group label {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text2);
+        }
+        .form-control-dashboard {
+            background: var(--surface2);
+            border: 1px solid var(--border2);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: var(--text);
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .form-control-dashboard:focus {
+            border-color: var(--accent);
+        }
+        
+        /* Drag and Drop Zone */
+        .drop-zone-dashboard {
+            border: 2px dashed var(--border2);
+            border-radius: 16px;
+            height: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text3);
+            cursor: pointer;
+            transition: border-color 0.2s;
+            position: relative;
+            overflow: hidden;
+            background: var(--surface2);
+        }
+        .drop-zone-dashboard:hover {
+            border-color: var(--accent);
+        }
+        .drop-zone-dashboard img {
+            max-height: 100%;
+            max-width: 100%;
+            object-fit: contain;
+        }
+        .drop-zone-dashboard input {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        /* Products Table */
+        .dashboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: var(--surface);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        .dashboard-table th, .dashboard-table td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        .dashboard-table th {
+            background: var(--surface2);
+            font-weight: 700;
+            color: var(--text2);
+        }
+        .product-thumb-dashboard {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: var(--surface2);
+        }
+        .action-icon-btn {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+        .action-icon-btn:hover {
+            background: var(--surface2);
+        }
+        
+        /* Modal Sheets */
+        .modal-overlay-dashboard {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-sheet-dashboard {
+            background: var(--surface);
+            border-radius: 24px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        
+        /* Image upload slots */
+        .image-gallery-manager {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+        }
+        .gallery-item-dash {
+            width: 100%;
+            height: 100px;
+            border-radius: 12px;
+            border: 1px solid var(--border2);
+            position: relative;
+            overflow: hidden;
+            background: var(--surface2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .gallery-item-dash img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .gallery-item-del-btn {
+            position: absolute;
+            top: 4px; right: 4px;
+            background: rgba(255, 84, 62, 0.9);
+            color: #fff;
+            border: none;
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .working-hours-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .day-config-card {
+            background: var(--surface2);
+            border-radius: 12px;
+            padding: 12px;
+            border: 1px solid var(--border2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+        }
+        .day-config-card input[type="time"] {
+            width: 100%;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            border-radius: 6px;
+            padding: 4px;
+            font-size: 11px;
+            text-align: center;
+        }
+        .progress-bar-container {
+            width: 100%;
+            height: 6px;
+            background: var(--border2);
+            border-radius: 3px;
+            overflow: hidden;
+            display: none;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--accent);
+            transition: width 0.2s;
+        }
+        
+        @media (max-width: 992px) {
+            body {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+                box-sizing: border-box;
+                padding: 20px;
+            }
+            .sidebar-menu {
+                flex-direction: row;
+                overflow-x: auto;
+                padding-bottom: 6px;
+            }
+            .main-content {
+                padding: 20px;
+            }
+            .card-stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('houz_theme') || 'light');</script>
+</head>
+<body>
+
+    <!-- Sidebar menu -->
+    <div class="sidebar">
+        <a href="/" class="sidebar-logo">
+            <span>TOP</span><span style="color:var(--text)">IN</span>
+        </a>
+        <ul class="sidebar-menu">
+            <li><button class="menu-item-btn active" id="menuAnalytics" onclick="switchView('analytics')">📊 Аналитика</button></li>
+            <li><button class="menu-item-btn" id="menuProfile" onclick="switchView('profile')">🏪 Профиль магазина</button></li>
+            <li><button class="menu-item-btn" id="menuProducts" onclick="switchView('products')">📦 Товары</button></li>
+            <li style="margin-top:auto; display:flex; align-items:center; gap:10px; padding:8px 16px; font-size:14px; color:var(--text2);">
+                ☀️ / 🌙
+                <button class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle theme">
+                    <span class="theme-icon theme-icon-sun">☀️</span>
+                    <span class="theme-icon theme-icon-moon">🌙</span>
+                </button>
+            </li>
+            <li><button class="menu-item-btn" style="color:var(--red);" onclick="vendorLogout()">Выйти</button></li>
+        </ul>
+    </div>
+
+    <!-- Main Workspace -->
+    <div class="main-content">
+        <!-- View 1: Analytics -->
+        <div id="analyticsView">
+            <div class="dashboard-header">
+                <h1 class="dashboard-title">Аналитика</h1>
+                <select id="analyticsRange" class="form-control-dashboard" style="width:200px;" onchange="loadAnalytics()">
+                    <option value="7">За последние 7 дней</option>
+                    <option value="30" selected>За последние 30 дней</option>
+                    <option value="90">За последние 90 дней</option>
+                </select>
+            </div>
+            
+            <div class="card-stats-grid">
+                <div class="stat-card">
+                    <span class="stat-lbl">Всего товаров</span>
+                    <span class="stat-val" id="statTotalProducts">-</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-lbl">Активные товары</span>
+                    <span class="stat-val" id="statActiveProducts">-</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-lbl">Всего просмотров</span>
+                    <span class="stat-val" id="statTotalViews">-</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-lbl">Просмотры товаров</span>
+                    <span class="stat-val" id="statProductViews">-</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-lbl">Просмотры профиля</span>
+                    <span class="stat-val" id="statProfileViews">-</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-lbl">Загрузки AR-моделей</span>
+                    <span class="stat-val" id="statArLoads">-</span>
+                </div>
+            </div>
+            
+            <div style="display:grid; grid-template-columns: 2fr 1fr; gap:20px; margin-bottom: 30px;">
+                <div class="form-container">
+                    <h3 style="margin-top:0; margin-bottom: 20px;">График просмотров (Teal) и AR-кликов (Gold)</h3>
+                    <canvas id="analyticsChart" style="width:100%; height:260px; display:block;"></canvas>
+                </div>
+                
+                <div class="form-container" style="display:flex; flex-direction:column; gap:20px;">
+                    <h3 style="margin-top:0;">Устройства и источники</h3>
+                    <div>
+                        <h4 style="margin:0 0 10px 0; font-size:13px; color:var(--text2);">Типы устройств</h4>
+                        <div id="deviceBreakdownList" style="display:flex; flex-direction:column; gap:8px;"></div>
+                    </div>
+                    <div>
+                        <h4 style="margin:0 0 10px 0; font-size:13px; color:var(--text2);">Источники трафика</h4>
+                        <div id="referrerBreakdownList" style="display:flex; flex-direction:column; gap:8px;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-bottom: 30px;">
+                <div class="form-container">
+                    <h3 style="margin-top:0; margin-bottom: 16px;">Популярные товары (Топ-10)</h3>
+                    <table class="dashboard-table" style="margin-top:0; font-size:13px;">
+                        <thead>
+                            <tr>
+                                <th>Товар</th>
+                                <th style="text-align:right;">Просмотры</th>
+                            </tr>
+                        </thead>
+                        <tbody id="topProductsTable"></tbody>
+                    </table>
+                </div>
+                
+                <div class="form-container">
+                    <h3 style="margin-top:0; margin-bottom: 16px;">Популярные в AR (Топ-10)</h3>
+                    <table class="dashboard-table" style="margin-top:0; font-size:13px;">
+                        <thead>
+                            <tr>
+                                <th>Товар</th>
+                                <th style="text-align:right;">Загрузки</th>
+                            </tr>
+                        </thead>
+                        <tbody id="topArTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- View 2: Store Profile Editor -->
+        <div id="profileView" style="display: none;">
+            <div class="dashboard-header">
+                <h1 class="dashboard-title">Профиль магазина</h1>
+                <button class="btn-save" onclick="saveStoreProfile()">Сохранить профиль</button>
+            </div>
+            <div class="form-container">
+                <div class="form-grid-layout">
+                    <div class="form-group">
+                        <label>Название магазина *</label>
+                        <input type="text" id="pName" class="form-control-dashboard" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Ссылка / Slug (например: kuka-home)</label>
+                        <input type="text" id="pSlug" class="form-control-dashboard">
+                    </div>
+                    <div class="form-group">
+                        <label>Телефон магазина</label>
+                        <input type="tel" id="pPhone" class="form-control-dashboard">
+                    </div>
+                    <div class="form-group">
+                        <label>Валюта товаров</label>
+                        <select id="pCurrency" class="form-control-dashboard">
+                            <option value="UZS">UZS (сум)</option>
+                            <option value="USD">USD ($)</option>
+                            <option value="EUR">EUR (€)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full-width-field">
+                        <label>Краткое описание (tagline, до 250 симв.)</label>
+                        <input type="text" id="pTagline" class="form-control-dashboard" maxlength="250">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ссылка на Telegram</label>
+                        <input type="url" id="pTelegram" class="form-control-dashboard" placeholder="https://t.me/username">
+                    </div>
+                    <div class="form-group">
+                        <label>Ссылка на Instagram</label>
+                        <input type="url" id="pInstagram" class="form-control-dashboard" placeholder="https://instagram.com/username">
+                    </div>
+                    <div class="form-group">
+                        <label>Официальный сайт</label>
+                        <input type="url" id="pWebsite" class="form-control-dashboard" placeholder="https://example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Физический адрес</label>
+                        <input type="text" id="pAddress" class="form-control-dashboard" placeholder="Ташкент, Юнусабад...">
+                    </div>
+                    <div class="form-group full-width-field">
+                        <label>Ссылка на геолокацию (Google Maps / Yandex / 2GIS)</label>
+                        <input type="url" id="pLocationLink" class="form-control-dashboard">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Логотип магазина</label>
+                        <div class="drop-zone-dashboard" id="logoDropZone">
+                            <span id="lblLogoText">📁 Перетащите логотип или нажмите</span>
+                            <input type="file" id="logoFile" accept="image/*" onchange="uploadProfileMedia('logo')">
+                        </div>
+                        <input type="hidden" id="pLogoUrl">
+                    </div>
+                    <div class="form-group">
+                        <label>Баннер магазина</label>
+                        <div class="drop-zone-dashboard" id="bannerDropZone">
+                            <span id="lblBannerText">📁 Перетащите баннер или нажмите</span>
+                            <input type="file" id="bannerFile" accept="image/*" onchange="uploadProfileMedia('banner')">
+                        </div>
+                        <input type="hidden" id="pBannerUrl">
+                    </div>
+
+                    <div class="form-group full-width-field">
+                        <label>Подробное описание (О компании)</label>
+                        <textarea id="pDescription" class="form-control-dashboard" style="height: 120px; resize:vertical;"></textarea>
+                    </div>
+
+                    <div class="form-group full-width-field">
+                        <label>Рабочие часы</label>
+                        <div class="working-hours-grid" id="workingHoursGrid">
+                            <!-- Populated in JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- View 3: Products Catalog -->
+        <div id="productsView" style="display: none;">
+            <div class="dashboard-header">
+                <h1 class="dashboard-title">Управление товарами</h1>
+                <button class="btn-add" onclick="openProductModal()">＋ Добавить товар</button>
+            </div>
+            
+            <div class="form-container">
+                <table class="dashboard-table">
+                    <thead>
+                        <tr>
+                            <th>Фото</th>
+                            <th>Название</th>
+                            <th>Цена</th>
+                            <th>Наличие</th>
+                            <th>Статус</th>
+                            <th>AR 3D</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsTableBody">
+                        <!-- Populated dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Creation/Editing Modal Sheet -->
+    <div class="modal-overlay-dashboard" id="productModal">
+        <div class="modal-sheet-dashboard">
+            <h2 id="modalProductTitle" style="margin:0;">Добавить товар</h2>
+            <input type="hidden" id="productId">
+
+            <div class="form-grid-layout">
+                <div class="form-group">
+                    <label>Название товара *</label>
+                    <input type="text" id="fProdName" class="form-control-dashboard" required>
+                </div>
+                <div class="form-group">
+                    <label>Ссылка / Slug (автогенерация)</label>
+                    <input type="text" id="fProdSlug" class="form-control-dashboard">
+                </div>
+                <div class="form-group">
+                    <label>Цена *</label>
+                    <input type="number" id="fProdPrice" class="form-control-dashboard" required>
+                </div>
+                <div class="form-group">
+                    <label>Цена со скидкой (необязательно)</label>
+                    <input type="number" id="fProdSalePrice" class="form-control-dashboard">
+                </div>
+                <div class="form-group">
+                    <label>Категория (фильтр) *</label>
+                    <select id="fProdSubcat" class="form-control-dashboard" required>
+                        <option value="">Выберите категорию...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Наличие *</label>
+                    <select id="fProdStock" class="form-control-dashboard" required>
+                        <option value="In Stock">В наличии</option>
+                        <option value="Out of Stock">Нет в наличии</option>
+                        <option value="Pre-order">Под заказ / Предоплата</option>
+                        <option value="Made to Order">Под индивидуальный заказ</option>
+                    </select>
+                </div>
+
+                <div class="form-group full-width-field">
+                    <label>Краткое описание товара (до 300 симв.)</label>
+                    <input type="text" id="fProdShortDesc" class="form-control-dashboard" maxlength="300">
+                </div>
+
+                <div class="form-group full-width-field">
+                    <label>Полное описание</label>
+                    <textarea id="fProdDesc" class="form-control-dashboard" style="height: 100px; resize:vertical;"></textarea>
+                </div>
+
+                <!-- Product image upload gallery slots -->
+                <div class="form-group full-width-field">
+                    <label>Фотогалерея товара (до 10 фото, первая - главная)</label>
+                    <div class="image-gallery-manager" id="prodGallery">
+                        <!-- Loaded list -->
+                    </div>
+                    <label class="btn-secondary-contact" style="width: max-content; padding: 10px 16px; margin-top:10px; cursor:pointer;">
+                        ➕ Добавить фото
+                        <input type="file" id="prodGalleryInput" accept="image/*" multiple style="display:none;" onchange="uploadProductPhotos()">
+                    </label>
+                </div>
+
+                <!-- AR GLB / USDZ file uploads -->
+                <div class="form-group">
+                    <label>Android 3D модель (.glb)</label>
+                    <div class="drop-zone-dashboard" id="glbDropZone">
+                        <span id="lblGlbText">📁 Нажмите для выбора .glb</span>
+                        <input type="file" id="glbFileInput" accept=".glb" onchange="uploadARModel('glb')">
+                    </div>
+                    <input type="hidden" id="fGlbUrl">
+                    <div class="progress-bar-container" id="glbProgress"><div class="progress-bar-fill" id="glbFill"></div></div>
+                </div>
+                <div class="form-group">
+                    <label>iOS 3D модель (.usdz)</label>
+                    <div class="drop-zone-dashboard" id="usdzDropZone">
+                        <span id="lblUsdzText">📁 Нажмите для выбора .usdz</span>
+                        <input type="file" id="usdzFileInput" accept=".usdz" onchange="uploadARModel('usdz')">
+                    </div>
+                    <input type="hidden" id="fUsdzUrl">
+                    <div class="progress-bar-container" id="usdzProgress"><div class="progress-bar-fill" id="usdzFill"></div></div>
+                </div>
+                
+                <!-- SEO overrides -->
+                <div class="form-group">
+                    <label>SEO Заголовок (Title)</label>
+                    <input type="text" id="fProdSeoTitle" class="form-control-dashboard">
+                </div>
+                <div class="form-group">
+                    <label>SEO Описание (Meta Description)</label>
+                    <input type="text" id="fProdSeoDesc" class="form-control-dashboard">
+                </div>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:20px;">
+                <button class="btn-cancel" onclick="closeProductModal()" style="padding:12px 24px;">Отмена</button>
+                <button class="btn-save" onclick="saveProduct()" style="padding:12px 24px;">Сохранить товар</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast UI element -->
+    <div class="toast" id="toast"></div>
+
+    <script src="js/config.js?v=3.2"></script>
+    <script src="js/utils.js?v=3.2"></script>
+    <script>
+        // Token auth check on load
+        const token = localStorage.getItem(TOKEN_KEY);
+        if (!token) {
+            window.location.href = 'login.html';
+        }
+
+        let vendorShop = null;
+        let vendorProducts = [];
+        let productGalleryImages = [];
+
+        async function initDashboard() {
+            // Decrypt / Fetch profile for this vendor
+            // A vendor user belongs to a Shop. We get this by calling a special profile API
+            try {
+                // We'll decode the token to get shop info, or check profile endpoints
+                // Let's create a special GET /api/shops/my-shop endpoint or fetch shop details by user session
+                const res = await fetch(`/api/shops/profile`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) throw new Error();
+                const json = await res.json();
+                vendorShop = json.data;
+            } catch(e) {
+                // If user is actually superadmin, redirect them to admin.html
+                // We'll read the token role (simplest method: fetch shops, if it fails session expired)
+                localStorage.removeItem(TOKEN_KEY);
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Init Profile forms
+            document.getElementById('pName').value = vendorShop.name || '';
+            document.getElementById('pSlug').value = vendorShop.slug || '';
+            document.getElementById('pPhone').value = vendorShop.phone || '';
+            document.getElementById('pCurrency').value = vendorShop.currency || 'UZS';
+            document.getElementById('pTagline').value = vendorShop.description || '';
+            document.getElementById('pTelegram').value = vendorShop.telegram || '';
+            document.getElementById('pInstagram').value = vendorShop.instagram || '';
+            document.getElementById('pWebsite').value = vendorShop.website || '';
+            document.getElementById('pAddress').value = vendorShop.location || '';
+            document.getElementById('pLocationLink').value = vendorShop.locationLink || '';
+            document.getElementById('pDescription').value = vendorShop.description_ru || '';
+            document.getElementById('pLogoUrl').value = vendorShop.logoUrl || '';
+            document.getElementById('pBannerUrl').value = vendorShop.bannerUrl || '';
+
+            if (vendorShop.logoUrl) {
+                document.getElementById('logoDropZone').innerHTML = `<img src="${vendorShop.logoUrl}"><input type="file" id="logoFile" accept="image/*" onchange="uploadProfileMedia('logo')">`;
+            }
+            if (vendorShop.bannerUrl) {
+                document.getElementById('bannerDropZone').innerHTML = `<img src="${vendorShop.bannerUrl}"><input type="file" id="bannerFile" accept="image/*" onchange="uploadProfileMedia('banner')">`;
+            }
+
+            // Working hours rendering
+            renderWorkingHoursGrid(vendorShop.workingHours);
+
+            // Fetch and load products list
+            await Promise.all([
+                loadProducts(),
+                loadSubcategoriesFilter(),
+                loadAnalytics()
+            ]);
+        }
+
+
+        function renderWorkingHoursGrid(hoursJson) {
+            const grid = document.getElementById('workingHoursGrid');
+            let hours = {};
+            if (hoursJson) {
+                try { hours = JSON.parse(hoursJson); } catch(e) {}
+            }
+            
+            const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+            const labels = currentLang === 'ru' 
+                ? ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
+                : ['Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sha', 'Ya'];
+
+            grid.innerHTML = days.map((day, i) => {
+                const isActive = hours[day]?.isActive ? 'checked' : '';
+                const from = hours[day]?.from || '09:00';
+                const to = hours[day]?.to || '18:00';
+                return `
+                    <div class="day-config-card">
+                        <span style="font-weight:700;">${labels[i]}</span>
+                        <input type="checkbox" id="hours_${day}_active" ${isActive}>
+                        <input type="time" id="hours_${day}_from" value="${from}">
+                        <input type="time" id="hours_${day}_to" value="${to}">
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function loadSubcategoriesFilter() {
+            const select = document.getElementById('fProdSubcat');
+            try {
+                const res = await fetch(`/api/subcategories?category=${vendorShop.CategoryId}&_=${Date.now()}`);
+                const json = await res.json();
+                const subcats = json.data || [];
+                subcats.forEach(sc => {
+                    const option = document.createElement('option');
+                    option.value = sc.id;
+                    option.textContent = sc.name_ru || sc.name;
+                    select.appendChild(option);
+                });
+            } catch(e) {}
+        }
+
+        async function loadProducts() {
+            const tbody = document.getElementById('productsTableBody');
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;"><div class="loader" style="margin:20px auto;"></div></td></tr>`;
+
+            try {
+                const res = await fetch(`/api/shops/${vendorShop.id}/products?limit=100&includeDrafts=true&_=${Date.now()}`);
+                const json = await res.json();
+                vendorProducts = json.data || [];
+
+                const elTotal = document.getElementById('statTotalProducts');
+                const elActive = document.getElementById('statActiveProducts');
+                if (elTotal) elTotal.textContent = vendorProducts.length;
+                if (elActive) elActive.textContent = vendorProducts.filter(p => p.isPublished).length;
+
+                if (vendorProducts.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text3); padding:40px;">Товары отсутствуют. Нажмите кнопку выше для добавления.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = vendorProducts.map(prod => {
+                    const priceStr = prod.price ? `${parseFloat(prod.price).toLocaleString()} ${vendorShop.currency || 'UZS'}` : '–';
+                    const arStatus = (prod.glbUrl ? '🟢 GLB' : '🔴') + ' / ' + (prod.usdzUrl ? '🟢 USDZ' : '🔴');
+                    const publishedStatus = prod.isPublished ? '🟢 Активен' : '⚪ Черновик';
+                    const stockText = prod.stockStatus === 'In Stock' ? 'В наличии' : 'Под заказ';
+
+                    return `
+                        <tr>
+                            <td><img src="${prod.imageUrl || 'img/placeholder.png'}" class="product-thumb-dashboard"></td>
+                            <td style="font-weight:600;">${escHtml(prod.name)}</td>
+                            <td>${priceStr}</td>
+                            <td>${stockText}</td>
+                            <td>${publishedStatus}</td>
+                            <td style="font-size:12px;">${arStatus}</td>
+                            <td>
+                                <button class="action-icon-btn" onclick="editProduct(${prod.id})" title="Изменить">✏️</button>
+                                <button class="action-icon-btn" onclick="deleteProduct(${prod.id})" title="Удалить">🗑️</button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (err) {
+                console.error('Product catalog load error:', err);
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--red);">Ошибка загрузки каталога товаров.</td></tr>`;
+            }
+        }
+
+        async function saveStoreProfile() {
+            const name = document.getElementById('pName').value.trim();
+            if (!name) { showToast('Название магазина обязательно', 'error'); return; }
+
+            const workingHours = {};
+            const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+            days.forEach(day => {
+                workingHours[day] = {
+                    isActive: document.getElementById(`hours_${day}_active`).checked,
+                    from: document.getElementById(`hours_${day}_from`).value,
+                    to: document.getElementById(`hours_${day}_to`).value
+                };
+            });
+
+            const payload = {
+                name,
+                slug: document.getElementById('pSlug').value.trim(),
+                phone: document.getElementById('pPhone').value.trim(),
+                currency: document.getElementById('pCurrency').value,
+                description: document.getElementById('pTagline').value.trim(),
+                telegram: document.getElementById('pTelegram').value.trim(),
+                instagram: document.getElementById('pInstagram').value.trim(),
+                website: document.getElementById('pWebsite').value.trim(),
+                location: document.getElementById('pAddress').value.trim(),
+                locationLink: document.getElementById('pLocationLink').value.trim(),
+                description_ru: document.getElementById('pDescription').value.trim(),
+                logoUrl: document.getElementById('pLogoUrl').value.trim(),
+                bannerUrl: document.getElementById('pBannerUrl').value.trim(),
+                workingHours: JSON.stringify(workingHours)
+            };
+
+            try {
+                const res = await fetch(`/api/shops/profile`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+                if (!res.ok) throw new Error();
+                showToast('✅ Профиль успешно сохранен', 'success');
+                initDashboard();
+            } catch(e) { showToast('Ошибка сохранения профиля', 'error'); }
+        }
+
+        async function uploadProfileMedia(type) {
+            const fileInput = document.getElementById(`${type}File`);
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('image', file);
+
+            const zone = document.getElementById(`${type}DropZone`);
+            zone.innerHTML = `<span>⏳ Загрузка...</span>`;
+
+            try {
+                const res = await fetch(`/api/upload`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+                if (!res.ok) {
+                    let errMsg = 'Ошибка загрузки медиа';
+                    try {
+                        const json = await res.json();
+                        if (json.message) errMsg = json.message;
+                    } catch (e) {}
+                    throw new Error(errMsg);
+                }
+                const json = await res.json();
+                document.getElementById(`p${type.charAt(0).toUpperCase() + type.slice(1)}Url`).value = json.data.url;
+                zone.innerHTML = `<img src="${json.data.url}"><input type="file" id="${type}File" accept="image/*" onchange="uploadProfileMedia('${type}')">`;
+                showToast('Изображение загружено', 'success');
+            } catch(e) {
+                showToast(e.message, 'error');
+                zone.innerHTML = `<span>❌ Ошибка. Нажмите для повтора</span><input type="file" id="${type}File" accept="image/*" onchange="uploadProfileMedia('${type}')">`;
+            }
+        }
+
+        // Product Form Operations
+        function openProductModal(prod = null) {
+            document.getElementById('productId').value = prod?.id || '';
+            document.getElementById('fProdName').value = prod?.name || '';
+            document.getElementById('fProdSlug').value = prod?.slug || '';
+            document.getElementById('fProdPrice').value = prod?.price || '';
+            document.getElementById('fProdSalePrice').value = prod?.salePrice || '';
+            document.getElementById('fProdSubcat').value = prod?.SubCategoryId || '';
+            document.getElementById('fProdStock').value = prod?.stockStatus || 'In Stock';
+            document.getElementById('fProdShortDesc').value = prod?.shortDescription || '';
+            document.getElementById('fProdDesc').value = prod?.description || '';
+            
+            document.getElementById('fGlbUrl').value = prod?.glbUrl || '';
+            document.getElementById('fUsdzUrl').value = prod?.usdzUrl || '';
+            
+            // Clear file input values so onchange triggers properly
+            document.getElementById('glbFileInput').value = '';
+            document.getElementById('usdzFileInput').value = '';
+
+            document.getElementById('lblGlbText').innerHTML = prod?.glbUrl ? `<span style="color:var(--accent)">🟢 3D модель GLB загружена</span>` : `📁 Нажмите для выбора .glb`;
+            document.getElementById('lblUsdzText').innerHTML = prod?.usdzUrl ? `<span style="color:var(--accent)">🟢 3D модель USDZ загружена</span>` : `📁 Нажмите для выбора .usdz`;
+            
+            document.getElementById('fProdSeoTitle').value = prod?.seoTitle || '';
+            document.getElementById('fProdSeoDesc').value = prod?.seoDescription || '';
+
+            // Reset image gallery list
+            productGalleryImages = [];
+            if (prod?.images) {
+                try { productGalleryImages = JSON.parse(prod.images); } catch(e) {}
+            } else if (prod?.imageUrl) {
+                productGalleryImages = [prod.imageUrl];
+            }
+            renderProductGallerySlots();
+
+            document.getElementById('modalProductTitle').textContent = prod ? 'Редактировать товар' : 'Добавить товар';
+            document.getElementById('productModal').style.display = 'flex';
+            
+            isDraftDirty = false;
+            checkAndRestoreDraft(prod?.id || 'new');
+            setupDraftChangeListeners();
+            startAutoSave();
+        }
+
+        function closeProductModal() {
+            if (isDraftDirty) {
+                if (!confirm('Вы уверены, что хотите закрыть форму? Все несохраненные изменения будут потеряны.')) {
+                    return;
+                }
+            }
+            clearDraftFromLocalStorage(document.getElementById('productId').value || 'new');
+            stopAutoSave();
+            document.getElementById('productModal').style.display = 'none';
+        }
+
+
+        function renderProductGallerySlots() {
+            const list = document.getElementById('prodGallery');
+            list.innerHTML = productGalleryImages.map((url, i) => `
+                <div class="gallery-item-dash">
+                    <img src="${url}">
+                    <button class="gallery-item-del-btn" onclick="removeProductPhoto(${i})">✕</button>
+                </div>
+            `).join('');
+        }
+
+        async function uploadProductPhotos() {
+            const files = document.getElementById('prodGalleryInput').files;
+            if (files.length === 0) return;
+
+            const formData = new FormData();
+            for (let i = 0; i < files.length; i++) {
+                formData.append('images', files[i]);
+            }
+
+            const pId = document.getElementById('productId').value;
+            if (!pId) {
+                showToast('Сначала создайте и сохраните товар, чтобы добавлять к нему фотографии.', 'warning');
+                return;
+            }
+
+            showToast('⏳ Загрузка фото...', 'info');
+
+            try {
+                const res = await fetch(`/api/products/${pId}/images`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+                if (!res.ok) {
+                    let errMsg = 'Ошибка при загрузке фото';
+                    try {
+                        const json = await res.json();
+                        if (json.message) errMsg = json.message;
+                    } catch (e) {}
+                    throw new Error(errMsg);
+                }
+                const json = await res.json();
+                productGalleryImages = json.data;
+                renderProductGallerySlots();
+                showToast('Фото добавлены в галерею', 'success');
+            } catch(e) { showToast(e.message, 'error'); }
+        }
+
+        function removeProductPhoto(idx) {
+            productGalleryImages.splice(idx, 1);
+            renderProductGallerySlots();
+        }
+
+        async function uploadARModel(type) {
+            const input = document.getElementById(`${type}FileInput`);
+            const file = input.files[0];
+            if (!file) return;
+
+            const pId = document.getElementById('productId').value;
+            if (!pId) {
+                showToast('Сначала создайте и сохраните товар, чтобы загрузить к нему 3D модель.', 'warning');
+                return;
+            }
+
+            const progressContainer = document.getElementById(`${type}Progress`);
+            const fill = document.getElementById(`${type}Fill`);
+            progressContainer.style.display = 'block';
+            fill.style.width = '20%';
+
+            const formData = new FormData();
+            formData.append('model', file);
+
+            try {
+                const res = await fetch(`/api/products/${pId}/ar-models`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+                if (!res.ok) {
+                    const errorText = await res.text();
+                    let errMsg = 'Server error';
+                    try {
+                        const errJson = JSON.parse(errorText);
+                        errMsg = errJson.message || errMsg;
+                    } catch(jsonErr) {
+                        errMsg = errorText || errMsg;
+                    }
+                    throw new Error(errMsg);
+                }
+                const json = await res.json();
+                fill.style.width = '100%';
+                
+                const targetInputId = type === 'glb' ? 'fGlbUrl' : 'fUsdzUrl';
+                document.getElementById(targetInputId).value = type === 'glb' ? json.data.glbUrl : json.data.usdzUrl;
+                
+                const labelId = type === 'glb' ? 'lblGlbText' : 'lblUsdzText';
+                document.getElementById(labelId).innerHTML = `<span style="color:var(--accent)">🟢 3D модель ${type.toUpperCase()} успешно загружена!</span>`;
+                showToast('3D модель успешно загружена', 'success');
+            } catch(e) {
+                showToast('Ошибка при загрузке 3D модели: ' + e.message, 'error');
+                fill.style.backgroundColor = 'var(--red)';
+            }
+        }
+
+        async function saveProduct() {
+            const pId = document.getElementById('productId').value;
+            const name = document.getElementById('fProdName').value.trim();
+            const price = document.getElementById('fProdPrice').value.trim();
+            const subcat = document.getElementById('fProdSubcat').value;
+
+            if (!name || !price || !subcat) {
+                showToast('Пожалуйста, заполните все обязательные поля (*)', 'error');
+                return;
+            }
+
+            const payload = {
+                name,
+                slug: document.getElementById('fProdSlug').value.trim(),
+                price: parseFloat(price),
+                salePrice: document.getElementById('fProdSalePrice').value ? parseFloat(document.getElementById('fProdSalePrice').value) : null,
+                SubCategoryId: parseInt(subcat),
+                CategoryId: vendorShop.CategoryId,
+                ShopId: vendorShop.id,
+                stockStatus: document.getElementById('fProdStock').value,
+                shortDescription: document.getElementById('fProdShortDesc').value.trim(),
+                description: document.getElementById('fProdDesc').value.trim(),
+                seoTitle: document.getElementById('fProdSeoTitle').value.trim(),
+                seoDescription: document.getElementById('fProdSeoDesc').value.trim(),
+                images: JSON.stringify(productGalleryImages),
+                imageUrl: productGalleryImages.length > 0 ? productGalleryImages[0] : null,
+                glbUrl: document.getElementById('fGlbUrl').value || null,
+                usdzUrl: document.getElementById('fUsdzUrl').value || null
+            };
+
+            const url = pId ? `/api/products/${pId}` : `/api/products`;
+            const method = pId ? 'PUT' : 'POST';
+
+            try {
+                const res = await fetch(url, {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+                if (!res.ok) throw new Error();
+                showToast(pId ? 'Товар изменен' : 'Товар создан', 'success');
+                clearDraftFromLocalStorage(pId || 'new');
+                stopAutoSave();
+                document.getElementById('productModal').style.display = 'none';
+                loadProducts();
+
+            } catch(e) { showToast('Ошибка сохранения товара', 'error'); }
+        }
+
+        async function editProduct(id) {
+            const prod = vendorProducts.find(p => p.id === id);
+            if (prod) openProductModal(prod);
+        }
+
+        async function deleteProduct(id) {
+            if (!confirm('Вы уверены, что хотите удалить этот товар?')) return;
+            try {
+                const res = await fetch(`/api/products/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) throw new Error();
+                showToast('Товар удален', 'success');
+                loadProducts();
+            } catch(e) { showToast('Ошибка удаления', 'error'); }
+        }
+
+        function switchView(view) {
+            document.getElementById('analyticsView').style.display = view === 'analytics' ? 'block' : 'none';
+            document.getElementById('profileView').style.display = view === 'profile' ? 'block' : 'none';
+            document.getElementById('productsView').style.display = view === 'products' ? 'block' : 'none';
+
+            document.getElementById('menuAnalytics').classList.toggle('active', view === 'analytics');
+            document.getElementById('menuProfile').classList.toggle('active', view === 'profile');
+            document.getElementById('menuProducts').classList.toggle('active', view === 'products');
+        }
+
+        function vendorLogout() {
+            localStorage.removeItem(TOKEN_KEY);
+            window.location.href = 'login.html';
+        }
+
+        // Analytics Loading & Drawing Functions
+        async function loadAnalytics() {
+            const range = document.getElementById('analyticsRange').value;
+            try {
+                const res = await fetch(`/api/analytics/store?range=${range}&_=${Date.now()}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) throw new Error();
+                const json = await res.json();
+                const analytics = json.data;
+
+                // Populate Stats Cards
+                document.getElementById('statTotalViews').textContent = analytics.summary.totalViews;
+                document.getElementById('statProductViews').textContent = analytics.summary.totalProductViews;
+                document.getElementById('statProfileViews').textContent = analytics.summary.totalPageViews;
+                document.getElementById('statArLoads').textContent = analytics.summary.totalArLoads;
+
+                // Draw line chart
+                drawLineChart('analyticsChart', analytics.chartData);
+
+                // Render device & referrer breakdowns
+                renderBreakdownBars('deviceBreakdownList', analytics.deviceBreakdown);
+                renderBreakdownBars('referrerBreakdownList', analytics.referrerBreakdown);
+
+                // Render Popular Products Tables
+                const topProductsTable = document.getElementById('topProductsTable');
+                if (analytics.topProducts.length === 0) {
+                    topProductsTable.innerHTML = `<tr><td colspan="2" style="text-align:center; color:var(--text3); padding:20px;">Нет данных</td></tr>`;
+                } else {
+                    topProductsTable.innerHTML = analytics.topProducts.map(p => `
+                        <tr>
+                            <td style="font-weight:600;">${escHtml(p.name)}</td>
+                            <td style="text-align:right; font-weight:700; color:var(--accent);">${p.views}</td>
+                        </tr>
+                    `).join('');
+                }
+
+                const topArTable = document.getElementById('topArTable');
+                if (analytics.topArProducts.length === 0) {
+                    topArTable.innerHTML = `<tr><td colspan="2" style="text-align:center; color:var(--text3); padding:20px;">Нет данных</td></tr>`;
+                } else {
+                    topArTable.innerHTML = analytics.topArProducts.map(p => `
+                        <tr>
+                            <td style="font-weight:600;">${escHtml(p.name)}</td>
+                            <td style="text-align:right; font-weight:700; color:var(--gold);">${p.loads}</td>
+                        </tr>
+                    `).join('');
+                }
+            } catch(e) {
+                console.error('Error loading analytics:', e);
+                showToast('Ошибка загрузки аналитики', 'error');
+            }
+        }
+
+        function drawLineChart(canvasId, data) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            
+            // Adjust resolution for retina displays
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = 260 * dpr; // fixed height
+            canvas.style.height = '260px';
+            ctx.scale(dpr, dpr);
+            
+            const width = rect.width;
+            const height = 260;
+            
+            ctx.clearRect(0, 0, width, height);
+            
+            if (!data || data.length === 0) {
+                ctx.fillStyle = 'var(--text3)';
+                ctx.font = '14px Outfit, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('Нет данных за выбранный период', width / 2, height / 2);
+                return;
+            }
+            
+            const maxVal = Math.max(...data.map(d => Math.max(d.views, d.arLoads)), 5);
+            
+            const paddingLeft = 40;
+            const paddingRight = 20;
+            const paddingTop = 20;
+            const paddingBottom = 30;
+            
+            const chartWidth = width - paddingLeft - paddingRight;
+            const chartHeight = height - paddingTop - paddingBottom;
+            
+            // Draw grid lines
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.lineWidth = 1;
+            ctx.fillStyle = 'var(--text3)';
+            ctx.font = '10px Outfit, sans-serif';
+            ctx.textAlign = 'right';
+            
+            const gridCount = 4;
+            for (let i = 0; i <= gridCount; i++) {
+                const yVal = Math.round((maxVal / gridCount) * i);
+                const y = paddingTop + chartHeight - (chartHeight * (i / gridCount));
+                
+                ctx.beginPath();
+                ctx.moveTo(paddingLeft, y);
+                ctx.lineTo(width - paddingRight, y);
+                ctx.stroke();
+                
+                ctx.fillText(yVal, paddingLeft - 8, y + 3);
+            }
+            
+            const pointsViews = [];
+            const pointsAr = [];
+            
+            data.forEach((d, idx) => {
+                const x = paddingLeft + (chartWidth * (idx / (data.length - 1 || 1)));
+                const yViews = paddingTop + chartHeight - (chartHeight * (d.views / maxVal));
+                const yAr = paddingTop + chartHeight - (chartHeight * (d.arLoads / maxVal));
+                
+                pointsViews.push({ x, y: yViews });
+                pointsAr.push({ x, y: yAr });
+            });
+            
+            function drawLine(points, strokeColor, fillColor) {
+                if (points.length === 0) return;
+                
+                ctx.beginPath();
+                ctx.moveTo(points[0].x, paddingTop + chartHeight);
+                points.forEach(p => ctx.lineTo(p.x, p.y));
+                ctx.lineTo(points[points.length - 1].x, paddingTop + chartHeight);
+                ctx.closePath();
+                ctx.fillStyle = fillColor;
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.moveTo(points[0].x, points[0].y);
+                for (let i = 1; i < points.length; i++) {
+                    ctx.lineTo(points[i].x, points[i].y);
+                }
+                ctx.strokeStyle = strokeColor;
+                ctx.lineWidth = 2.5;
+                ctx.stroke();
+                
+                points.forEach(p => {
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+                    ctx.fillStyle = strokeColor;
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+                    ctx.fillStyle = '#fff';
+                    ctx.fill();
+                });
+            }
+            
+            drawLine(pointsViews, '#0FA986', 'rgba(15, 169, 134, 0.03)');
+            drawLine(pointsAr, '#FF9500', 'rgba(255, 149, 0, 0.03)');
+            
+            ctx.fillStyle = 'var(--text3)';
+            ctx.textAlign = 'center';
+            if (data.length > 0) {
+                ctx.fillText(data[0].date.substring(5), paddingLeft, height - 10);
+                if (data.length > 2) {
+                    const mid = Math.floor(data.length / 2);
+                    ctx.fillText(data[mid].date.substring(5), paddingLeft + chartWidth / 2, height - 10);
+                }
+                if (data.length > 1) {
+                    ctx.fillText(data[data.length - 1].date.substring(5), width - paddingRight, height - 10);
+                }
+            }
+        }
+
+        function renderBreakdownBars(containerId, breakdownData) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            const total = Object.values(breakdownData || {}).reduce((a, b) => a + b, 0) || 1;
+            
+            container.innerHTML = Object.keys(breakdownData || {}).map(key => {
+                const val = breakdownData[key];
+                const pct = Math.round((val / total) * 100);
+                
+                let label = key.toUpperCase();
+                if (key === 'desktop') label = '💻 Компьютер';
+                if (key === 'mobile') label = '📱 Смартфон';
+                if (key === 'tablet') label = '📁 Планшет';
+                if (key === 'direct') label = '🔗 Прямой переход';
+                if (key === 'search') label = '🔍 Поиск';
+                if (key === 'social') label = '💬 Соц. сети';
+                
+                return `
+                    <div style="display:flex; flex-direction:column; gap:4px; font-size:12px;">
+                        <div style="display:flex; justify-content:space-between; font-weight:600;">
+                            <span>${label}</span>
+                            <span>${pct}% (${val})</span>
+                        </div>
+                        <div style="width:100%; height:6px; background:var(--surface2); border-radius:3px; overflow:hidden;">
+                            <div style="width:${pct}%; height:100%; background:var(--accent); border-radius:3px;"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Product Form Auto-Save (Draft) Management
+        let isDraftDirty = false;
+        let autoSaveTimer = null;
+
+        function markDraftDirty() {
+            isDraftDirty = true;
+        }
+
+        function startAutoSave() {
+            stopAutoSave();
+            autoSaveTimer = setInterval(() => {
+                if (isDraftDirty) {
+                    saveDraftToLocalStorage();
+                }
+            }, 60000); // Save draft every 60 seconds
+        }
+
+        function stopAutoSave() {
+            if (autoSaveTimer) {
+                clearInterval(autoSaveTimer);
+                autoSaveTimer = null;
+            }
+        }
+
+        function saveDraftToLocalStorage() {
+            const pId = document.getElementById('productId').value || 'new';
+            const draft = {
+                name: document.getElementById('fProdName').value,
+                slug: document.getElementById('fProdSlug').value,
+                price: document.getElementById('fProdPrice').value,
+                salePrice: document.getElementById('fProdSalePrice').value,
+                SubCategoryId: document.getElementById('fProdSubcat').value,
+                stockStatus: document.getElementById('fProdStock').value,
+                shortDescription: document.getElementById('fProdShortDesc').value,
+                description: document.getElementById('fProdDesc').value,
+                seoTitle: document.getElementById('fProdSeoTitle').value,
+                seoDescription: document.getElementById('fProdSeoDesc').value,
+                images: productGalleryImages
+            };
+            localStorage.setItem(`houz_draft_prod_${pId}`, JSON.stringify(draft));
+            showToast('✏️ Черновик сохранен локально', 'info');
+        }
+
+        function checkAndRestoreDraft(prodId = 'new') {
+            const draftStr = localStorage.getItem(`houz_draft_prod_${prodId}`);
+            if (draftStr) {
+                if (confirm('Обнаружен несохраненный черновик для этого товара. Восстановить его?')) {
+                    const draft = JSON.parse(draftStr);
+                    document.getElementById('fProdName').value = draft.name || '';
+                    document.getElementById('fProdSlug').value = draft.slug || '';
+                    document.getElementById('fProdPrice').value = draft.price || '';
+                    document.getElementById('fProdSalePrice').value = draft.salePrice || '';
+                    document.getElementById('fProdSubcat').value = draft.SubCategoryId || '';
+                    document.getElementById('fProdStock').value = draft.stockStatus || 'In Stock';
+                    document.getElementById('fProdShortDesc').value = draft.shortDescription || '';
+                    document.getElementById('fProdDesc').value = draft.description || '';
+                    document.getElementById('fProdSeoTitle').value = draft.seoTitle || '';
+                    document.getElementById('fProdSeoDesc').value = draft.seoDescription || '';
+                    productGalleryImages = draft.images || [];
+                    renderProductGallerySlots();
+                    isDraftDirty = true;
+                } else {
+                    clearDraftFromLocalStorage(prodId);
+                }
+            }
+        }
+
+        function clearDraftFromLocalStorage(prodId = 'new') {
+            localStorage.removeItem(`houz_draft_prod_${prodId}`);
+            isDraftDirty = false;
+        }
+
+        // Add dirty listeners to form inputs
+        function setupDraftChangeListeners() {
+            const inputs = ['fProdName', 'fProdSlug', 'fProdPrice', 'fProdSalePrice', 'fProdSubcat', 'fProdStock', 'fProdShortDesc', 'fProdDesc', 'fProdSeoTitle', 'fProdSeoDesc'];
+            inputs.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('input', markDraftDirty);
+            });
+        }
+
+        window.addEventListener('beforeunload', (e) => {
+            if (isDraftDirty) {
+                e.preventDefault();
+                e.returnValue = 'У вас есть несохраненные изменения.';
+                return e.returnValue;
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', initDashboard);
+    </script>
+</body>
+</html>
+

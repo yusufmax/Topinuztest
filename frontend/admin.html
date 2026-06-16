@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Topin</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0FA986">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Topin">
+    <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+    <link rel="stylesheet" href="css/style.css?v=2.5">
+</head>
+
+<body>
+
+    <!-- Admin Header -->
+    <header class="admin-header">
+        <div class="admin-header-inner">
+            <a href="index.html" class="admin-logo">Topin</a>
+            <nav class="admin-nav">
+                <span style="font-size:13px; color:var(--text2)" id="adminUser">Admin</span>
+                <button class="btn-logout" onclick="adminLogout()">Выйти</button>
+            </nav>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <main class="admin-body">
+
+            <!-- VIEW 1: Categories Grid -->
+            <div id="adminCategoryView">
+                <div class="admin-toolbar">
+                    <h1 class="admin-title">Категории магазинов</h1>
+                </div>
+
+                <div id="adminCatGrid" class="admin-cat-grid">
+                    <!-- Populated via JS -->
+                    <div class="empty-state">
+                        <div class="loader" style="margin:0 auto 12px"></div>
+                        Загрузка категорий…
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 2: Shops Table for a specific category -->
+            <div id="adminShopsView" style="display: none;">
+                <div class="admin-toolbar">
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                        <button class="btn-back" onclick="showAdminCategoryView()">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M19 12H5"></path>
+                                <polyline points="12 19 5 12 12 5"></polyline>
+                            </svg>
+                        </button>
+                        <h1 class="admin-title" id="adminShopsTitle">Магазины</h1>
+                    </div>
+                    <button class="btn-add" onclick="openShopForm()">
+                        <span>＋</span> Добавить магазин
+                    </button>
+                </div>
+
+                <!-- Table -->
+                <div class="table-wrap">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Название</th>
+                                <th>Город</th>
+                                <th>Телефон</th>
+                                <th>Категория</th>
+                                <th>Статус</th>
+                                <th>Действия</th>
+                            </tr>
+
+                        </thead>
+                        <tbody id="adminTableBody">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- VIEW 3: Manage Filters (SubCategories) -->
+    <div id="adminFiltersView"
+        style="display: none; position: absolute; top:0; left:0; right:0; bottom:0; padding: 20px; background: var(--bg); box-sizing: border-box; overflow-y:auto; z-index: 10;">
+        <div class="admin-toolbar">
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <button class="btn-back" onclick="showAdminCategoryView()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 12H5"></path>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                </button>
+                <h1 class="admin-title">Фильтры: <span id="adminFiltersCategoryName"></span></h1>
+            </div>
+            <button class="btn-add" onclick="addFilterPrompt()">
+                <span>＋</span> Добавить фильтр
+            </button>
+        </div>
+
+        <div class="table-wrap"
+            style="max-width: 900px; margin: 0 auto; background: var(--surface); border-radius: 12px; padding: 12px;">
+            <div id="adminFiltersList" style="display: flex; flex-direction: column; gap: 8px;">
+                <!-- Filled via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Add / Edit Shop Modal -->
+    <div class="form-modal-overlay" id="shopFormOverlay" style="display:none">
+        <div class="form-modal" role="dialog" aria-modal="true">
+            <h2 class="form-modal-title" id="formTitle">Добавить магазин</h2>
+
+            <style>
+                .drop-zone {
+                    width: 100%;
+                    height: 120px;
+                    border: 2px dashed rgba(255, 255, 255, 0.3);
+                    border-radius: 12px;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    color: rgba(255, 255, 255, 0.6);
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    text-align: center;
+                    position: relative;
+                    overflow: hidden;
+                    background: rgba(0, 0, 0, 0.2);
+                }
+
+                .drop-zone:hover,
+                .drop-zone.dragover {
+                    border-color: var(--accent);
+                    background: rgba(255, 84, 62, 0.1);
+                    color: #fff;
+                }
+
+                .drop-zone img {
+                    max-width: 100%;
+                    max-height: 100%;
+                    object-fit: contain;
+                }
+
+                .drop-zone input[type="file"] {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    opacity: 0;
+                    cursor: pointer;
+                }
+            </style>
+
+            <div class="form-grid">
+                <input type="hidden" id="shopId">
+
+                <div class="form-row">
+                    <label for="fName">Название *</label>
+                    <input type="text" id="fName" placeholder="Kuka Home Mebel" required>
+                </div>
+                <div class="form-row">
+                    <label for="fLocation">Адрес</label>
+                    <input type="text" id="fLocation" placeholder="Ташкент, Юнусабад">
+                </div>
+                <div class="form-row">
+                    <label for="fLocationLink">Ссылка на геолокацию</label>
+                    <input type="url" id="fLocationLink" placeholder="https://maps.google.com/…">
+                </div>
+                <div class="form-row">
+                    <label for="fPhone">Телефон</label>
+                    <input type="tel" id="fPhone" placeholder="+998 90 123 45 67">
+                </div>
+
+                <div class="form-row">
+                    <label for="fCategory">Категория *</label>
+                    <select id="fCategory" onchange="window.adminCategoryChanged(this.value)">
+                        <option value="">Выберите...</option>
+                        <!-- Populated via JS -->
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <label>Подкатегория *</label>
+                    <div id="fSubCategory" class="sub-pills-wrap">
+                        <span class="sub-pill-msg">Выберите категорию...</span>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <label for="fWebsite">Веб-сайт</label>
+                    <input type="url" id="fWebsite" placeholder="https://example.uz">
+                </div>
+                <div class="form-row">
+                    <label for="fInstagram">Instagram</label>
+                    <input type="url" id="fInstagram" placeholder="https://instagram.com/…">
+                </div>
+                <div class="form-row">
+                    <label for="fTelegram">Telegram</label>
+                    <input type="url" id="fTelegram" placeholder="https://t.me/…">
+                </div>
+
+                <hr style="grid-column: 1 / -1; border: none; border-top: 1px solid var(--border2); margin: 8px 0;">
+
+                <!-- Dynamic Custom Links Container -->
+                <div id="customLinksContainer"
+                    style="grid-column: 1 / -1; display: flex; flex-direction: column; gap: 12px;"></div>
+
+                <div class="form-row" style="grid-column: 1 / -1;">
+                    <button type="button" class="btn-cancel" onclick="addCustomLinkRow()"
+                        style="width: max-content; font-size: 13px; padding: 6px 12px; background: transparent; border: 1px dashed var(--border); border-radius: 8px;">
+                        + Добавить дополнительную ссылку
+                    </button>
+                </div>
+                <div class="form-row" style="grid-column: 1 / -1; margin-bottom: 5px;">
+                    <label>Логотип (формат 1:1, макс 2МБ рекомендуется)</label>
+                    <div class="drop-zone" id="logoDropZone">
+                        <span id="logoDropText">📁 Перетащите логотип сюда или нажмите</span>
+                        <input type="file" id="fLogoFile" accept="image/png, image/jpeg, image/svg+xml">
+                    </div>
+                    <!-- Hidden input to store the uploaded URL -->
+                    <input type="hidden" id="fLogoUrl">
+                </div>
+                <div class="form-row" style="grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; margin-top: 10px; margin-bottom: 10px;">
+                    <input type="checkbox" id="fIsActive" style="width: 20px; height: 20px; cursor: pointer;">
+                    <label for="fIsActive" style="margin: 0; cursor: pointer; font-weight: 600;">Магазин активен (виден покупателям)</label>
+                </div>
+                <div class="form-row">
+                    <label for="fDescription">Описание (UZ)</label>
+
+                    <textarea id="fDescription" placeholder="Do'kon haqida qisqacha ma'lumot…"></textarea>
+                </div>
+                <div class="form-row">
+                    <label for="fDescriptionRu">Описание (RU)</label>
+                    <textarea id="fDescriptionRu" placeholder="Краткая информация о магазине…"></textarea>
+                </div>
+
+                <div class="form-row" id="gallerySection" style="grid-column: 1 / -1; display: none;">
+                    <label>Фото галерея (макс. 3 фото, квадратные)</label>
+                    <div id="galleryImagesList"></div>
+                    <label id="galleryAddBtn" style="cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 8px 14px; background: transparent; border: 1px dashed var(--border2); border-radius: 8px; color: var(--text2);">
+                        + Добавить фото
+                        <input type="file" id="galleryFileInput" accept="image/png,image/jpeg,image/webp" multiple style="display: none;">
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-modal-btns">
+                <button class="btn-cancel" onclick="closeShopForm()">Отмена</button>
+                <button class="btn-save" onclick="saveShop()">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/admin.js"></script>
+    <script src="js/adminShops.js"></script>
+    <script src="js/adminFilters.js"></script>
+    <script>
+        // Auth guard + page init (inline to keep admin boot reliable)
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!localStorage.getItem('houz_token')) {
+                window.location.href = 'login.html';
+                return;
+            }
+            adminLoadShops();
+        });
+    </script>
+</body>
+
+</html>

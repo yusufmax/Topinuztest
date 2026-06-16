@@ -1,0 +1,199 @@
+const config = require('./config');
+
+/**
+ * Uploader Agent
+ * Uploads stores and products to the topin.uz site via its API.
+ */
+class UploaderAgent {
+    constructor() {
+        this.token = null;
+    }
+
+    async login() {
+        console.log(`[Uploader Agent] Logging in to API at ${config.apiBaseUrl} as ${config.adminUsername}`);
+        try {
+            const response = await fetch(`${config.apiBaseUrl}/api/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: config.adminUsername,
+                    password: config.adminPassword
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Login failed with status ${response.status}`);
+            }
+
+            const data = await response.json();
+            if (data.success && data.token) {
+                this.token = data.token;
+                console.log(`[Uploader Agent] Authentication successful. Token acquired.`);
+                return true;
+            } else {
+                throw new Error(data.message || 'Unknown authentication error');
+            }
+        } catch (error) {
+            console.error(`[Uploader Agent Error] Login failed:`, error);
+            return false;
+        }
+    }
+
+    async getCategories() {
+        try {
+            const response = await fetch(`${config.apiBaseUrl}/api/categories`);
+            if (!response.ok) throw new Error(`Fetch categories failed with status ${response.status}`);
+            const data = await response.json();
+            return data.success ? data.data : [];
+        } catch (error) {
+            console.error(`[Uploader Agent Error] Failed to get categories:`, error);
+            return [];
+        }
+    }
+
+    async uploadStoreAndProducts(scrapedData) {
+        if (!this.token) {
+            const authenticated = await this.login();
+            if (!authenticated) {
+                throw new Error('Authentication failed. Cannot upload data.');
+            }
+        }
+
+        const { shop, products } = scrapedData;
+        console.log(`[Uploader Agent] Starting upload for store: "${shop.name}" with ${products.length} products`);
+
+        // 1. Resolve Category ID
+        const categories = await this.getCategories();
+        let categoryId = null;
+        
+        // Try to match category by name
+        const matchedCategory = categories.find(c => 
+            c.name.toLowerCase() === shop.categoryName.toLowerCase() ||
+            c.slug.toLowerCase() === shop.categoryName.toLowerCase()
+        );
+
+        if (matchedCategory) {
+            categoryId = matchedCategory.id;
+            console.log(`[Uploader Agent] Category matched: "${matchedCategory.name}" (ID: ${categoryId})`);
+        } else if (categories.length > 0) {
+            // Fallback to first category or "Other"
+            const otherCat = categories.find(c => c.slug === 'other' || c.name.toLowerCase() === 'other');
+            categoryId = otherCat ? otherCat.id : categories[0].id;
+            console.log(`[Uploader Agent] Category "${shop.categoryName}" not found. Falling back to ID: ${categoryId}`);
+        } else {
+            throw new Error('No categories found on platform. Please seed categories first.');
+        }
+
+        // 2. Create the Shop
+        // We will check if shop already exists. First check slug
+        const slug = shop.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+        let shopId = null;
+        let vendorCredentials = null;
+        let createdShop = null;
+
+        try {
+            console.log(`[Uploader Agent] Creating shop: "${shop.name}"`);
+            const shopResponse = await fetch(`${config.apiBaseUrl}/api/shops`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.token}`
+                },
+                body: JSON.stringify({
+                    name: shop.name,
+                    slug: slug,
+                    description: shop.description,
+                    description_ru: shop.description,
+                    location: shop.location,
+                    phone: shop.phone,
+                    instagram: shop.instagram,
+                    telegram: shop.telegram,
+                    website: shop.website,
+                    CategoryId: categoryId,
+                    isActive: true,
+                    logoUrl: shop.logoUrl || '/img/kukaLogo.png' // default logo
+                })
+            });
+
+            const shopData = await shopResponse.json();
+            
+            if (shopData.success) {
+                createdShop = shopData.data;
+                shopId = createdShop.id;
+                vendorCredentials = shopData.credentials; // Auto-generated by backend
+                console.log(`[Uploader Agent] Shop created successfully. ID: ${shopId}`);
+            } else {
+                // If shop exists, try to find it by slug
+                console.warn(`[Uploader Agent Warning] Shop creation returned false: ${shopData.message}. Checking if shop exists...`);
+                const existingShopResponse = await fetch(`${config.apiBaseUrl}/api/shops/by-slug/${slug}`);
+                const existingShopData = await existingShopResponse.json();
+                
+                if (existingShopData.success && existingShopData.data) {
+                    createdShop = existingShopData.data;
+                    shopId = createdShop.id;
+                    vendorCredentials = {
+                        username: `${slug}_admin`,
+                        password: `[Existing account password]`
+                    };
+                    console.log(`[Uploader Agent] Found existing shop. ID: ${shopId}`);
+                } else {
+                    throw new Error(`Failed to create or retrieve shop: ${shopData.message}`);
+                }
+            }
+        } catch (error) {
+            console.error(`[Uploader Agent Error] Shop creation failed:`, error);
+            throw error;
+        }
+
+        // 3. Upload Products
+        let uploadCount = 0;
+        const uploadedProducts = [];
+
+        for (const product of products) {
+            try {
+                console.log(`[Uploader Agent] Uploading product: "${product.name}"`);
+                const productResponse = await fetch(`${config.apiBaseUrl}/api/products`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${this.token}`
+                    },
+                    body: JSON.stringify({
+                        name: product.name,
+                        description: product.description,
+                        price: product.price,
+                        imageUrl: product.imageUrl,
+                        images: JSON.stringify(product.images || [product.imageUrl]),
+                        stockStatus: product.stockStatus || 'In Stock',
+                        tags: product.tags || 'imported',
+                        CategoryId: categoryId,
+                        ShopId: shopId,
+                        isPublished: true,
+                        isAvailable: true
+                    })
+                });
+
+                const productData = await productResponse.json();
+                if (productData.success) {
+                    uploadCount++;
+                    uploadedProducts.push(productData.data);
+                } else {
+                    console.error(`[Uploader Agent Error] Failed to upload product "${product.name}":`, productData.message);
+                }
+            } catch (pError) {
+                console.error(`[Uploader Agent Error] Error uploading product "${product.name}":`, pError);
+            }
+        }
+
+        console.log(`[Uploader Agent] Upload complete. Created shop "${shop.name}" and uploaded ${uploadCount}/${products.length} products.`);
+        
+        return {
+            shop: createdShop,
+            credentials: vendorCredentials,
+            productsUploaded: uploadCount,
+            totalProducts: products.length
+        };
+    }
+}
+
+module.exports = new UploaderAgent();

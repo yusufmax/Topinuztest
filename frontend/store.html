@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storefront | Topin</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0FA986">
+    <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css?v=3.2">
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+        }
+        .store-banner-container {
+            width: 100%;
+            height: 280px;
+            background: linear-gradient(135deg, #1b262c, #0f4c75);
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        .store-banner-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(20,20,20,0.85));
+        }
+        .store-header-content {
+            max-width: 900px;
+            margin: -80px auto 0 auto;
+            position: relative;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 2;
+        }
+        .store-identity {
+            display: flex;
+            align-items: flex-end;
+            gap: 20px;
+        }
+        .store-logo-box {
+            width: 130px;
+            height: 130px;
+            background: var(--surface);
+            border-radius: 20px;
+            border: 4px solid var(--bg);
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .store-logo-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .store-title-block {
+            margin-bottom: 10px;
+        }
+        .store-name {
+            font-size: 32px;
+            font-weight: 800;
+            margin: 0 0 6px 0;
+            color: #fff;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+        .store-tagline {
+            font-size: 15px;
+            color: var(--text2);
+            margin: 0;
+        }
+        .store-details-grid {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+        }
+        .store-info-col {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .store-hours-col {
+            border-left: 1px solid var(--border);
+            padding-left: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .store-info-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            color: var(--text2);
+        }
+        .store-info-row svg, .store-info-row img {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+        .store-info-row a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .store-info-row a:hover {
+            text-decoration: underline;
+        }
+        .tab-nav-container {
+            max-width: 900px;
+            margin: 20px auto 0 auto;
+            padding: 0 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text3);
+            font-size: 16px;
+            font-weight: 600;
+            padding: 12px 20px;
+            cursor: pointer;
+            position: relative;
+            transition: color 0.2s;
+        }
+        .tab-btn.active {
+            color: var(--accent);
+        }
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background-color: var(--accent);
+            border-radius: 3px 3px 0 0;
+        }
+        .tab-content {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        /* Product catalog inside storefront */
+        .filter-sidebar-layout {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 24px;
+        }
+        .filter-panel {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: fit-content;
+        }
+        .filter-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .filter-label {
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text2);
+        }
+        .filter-control {
+            background: var(--surface2);
+            border: 1px solid var(--border2);
+            border-radius: 8px;
+            padding: 10px;
+            color: var(--text);
+            font-size: 14px;
+            outline: none;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .filter-checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--text2);
+            cursor: pointer;
+        }
+        .filter-checkbox-label input {
+            cursor: pointer;
+        }
+        .product-grid-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .catalog-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .catalog-count {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .catalog-sort {
+            width: 180px;
+        }
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        .product-card {
+            background: var(--surface);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+            position: relative;
+            text-decoration: none;
+            color: var(--text);
+        }
+        .product-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent);
+            box-shadow: var(--shadow);
+        }
+        .product-card-img-box {
+            width: 100%;
+            height: 200px;
+            background: var(--surface2);
+            position: relative;
+            overflow: hidden;
+        }
+        .product-card-img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .ar-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(15, 169, 134, 0.9);
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .product-card-info {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .product-card-title {
+            font-size: 15px;
+            font-weight: 700;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .product-card-desc {
+            font-size: 13px;
+            color: var(--text3);
+            margin: 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            height: 36px;
+        }
+        .product-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 4px;
+        }
+        .product-card-price {
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--accent);
+        }
+        .product-card-sale-price {
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--red);
+        }
+        .original-price-strike {
+            font-size: 12px;
+            color: var(--text3);
+            text-decoration: line-through;
+            margin-left: 6px;
+        }
+        .stock-badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .stock-in { background: rgba(15, 169, 134, 0.15); color: var(--accent); }
+        .stock-out { background: rgba(255, 84, 62, 0.15); color: var(--red); }
+        .stock-preorder { background: rgba(255, 193, 7, 0.15); color: #ffc107; }
+
+        @media (max-width: 768px) {
+            .store-banner-container {
+                height: 180px;
+            }
+            .store-identity {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .store-logo-box {
+                width: 100px;
+                height: 100px;
+                border-radius: 16px;
+            }
+            .store-details-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            .store-hours-col {
+                border-left: none;
+                padding-left: 0;
+                border-top: 1px solid var(--border);
+                padding-top: 16px;
+            }
+            .filter-sidebar-layout {
+                grid-template-columns: 1fr;
+            }
+            .product-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 480px) {
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('houz_theme') || 'light');</script>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="site-header">
+        <div class="header-inner">
+            <div style="display:flex;align-items:center;gap:10px;">
+                <a href="../index.html" class="back-btn" aria-label="Go back">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </a>
+                <a href="../index.html" class="home-logo">
+                    <span class="logo-text-top">TOP</span><span class="logo-text-in">IN</span>
+                </a>
+            </div>
+
+            <!-- Language Switcher -->
+            <div id="langWrap" style="position:relative;">
+                <button class="lang-switch-btn" id="langBtn" aria-label="Change Language">
+                    <span class="lang-text">UZ</span>
+                    <svg class="lang-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+                <div class="lang-dropdown" id="langDropdown">
+                    <div class="lang-option" data-lang="uz">O'zbek</div>
+                    <div class="lang-option selected" data-lang="ru">Русский</div>
+                </div>
+            </div>
+
+            <!-- Theme Toggle -->
+            <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" aria-label="Toggle theme">
+                <span class="theme-icon theme-icon-sun">☀️</span>
+                <span class="theme-icon theme-icon-moon">🌙</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Banner -->
+    <div class="store-banner-container" id="storeBanner">
+        <div class="store-banner-overlay"></div>
+    </div>
+
+    <!-- Store Profile Identity Info -->
+    <div class="store-header-content">
+        <div class="store-identity">
+            <div class="store-logo-box" id="storeLogo">🏪</div>
+            <div class="store-title-block">
+                <h1 class="store-name" id="storeName">–</h1>
+                <p class="store-tagline" id="storeTagline">–</p>
+            </div>
+        </div>
+
+        <div class="store-details-grid">
+            <div class="store-info-col" id="storeContacts">
+                <!-- Filled dynamically -->
+            </div>
+            <div class="store-hours-col" id="storeHours">
+                <h3 style="margin: 0 0 10px 0; font-size:15px;" id="hoursTitle">Рабочие часы</h3>
+                <!-- Filled dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation tabs -->
+    <div class="tab-nav-container">
+        <button class="tab-btn active" id="tabProducts" onclick="switchTab('products')">Товары</button>
+        <button class="tab-btn" id="tabAbout" onclick="switchTab('about')">О компании</button>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="tab-content">
+        <!-- Tab 1: Products Listing with Sidebar Filters -->
+        <div id="productsView" class="filter-sidebar-layout">
+            <div class="filter-panel">
+                <div class="filter-section">
+                    <label class="filter-label" id="lblSearch">Поиск по магазину</label>
+                    <input type="text" id="prodSearch" class="filter-control" placeholder="Поиск товара...">
+                </div>
+
+                <div class="filter-section">
+                    <label class="filter-label" id="lblCategory">Категория</label>
+                    <select id="prodCategory" class="filter-control">
+                        <option value="all">Все</option>
+                    </select>
+                </div>
+
+                <div class="filter-section">
+                    <label class="filter-label" id="lblStock">Наличие</label>
+                    <label class="filter-checkbox-label">
+                        <input type="checkbox" id="chkInStock"> <span id="lblInStockOnly">Только в наличии</span>
+                    </label>
+                </div>
+
+                <div class="filter-section">
+                    <label class="filter-label">AR / 3D</label>
+                    <label class="filter-checkbox-label">
+                        <input type="checkbox" id="chkAR"> <span id="lblAROnly">Только с 3D моделью</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="product-grid-container">
+                <div class="catalog-header">
+                    <div class="catalog-count" id="productCount">0 товаров</div>
+                    <select id="catalogSort" class="filter-control catalog-sort">
+                        <option value="newest">Новинки</option>
+                        <option value="price-asc">Цена: дешевые</option>
+                        <option value="price-desc">Цена: дорогие</option>
+                    </select>
+                </div>
+
+                <div class="product-grid" id="productGrid">
+                    <!-- Skeletons loaded initially -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: About View -->
+        <div id="aboutView" style="display: none; background:var(--surface); padding:30px; border-radius:20px; border:1px solid var(--border);">
+            <h2 id="aboutTitle" style="margin-top:0;">О компании</h2>
+            <div id="aboutContent" style="line-height:1.6; color:var(--text2);">
+                <!-- Dynamic rich text description -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast UI element -->
+    <div class="toast" id="toast"></div>
+
+    <script src="../js/config.js?v=3.2"></script>
+    <script src="../js/utils.js?v=3.2"></script>
+    <script>
+        let shop = null;
+        let currentTab = 'products';
+        let shopCategories = [];
+
+        // Parse Slug from URL
+        const storeSlug = window.location.pathname.split('/stores/').pop().replace('/', '');
+
+        async function initStorefront() {
+            // Load Store profile
+            try {
+                const res = await fetch(`/api/shops/by-slug/${encodeURIComponent(storeSlug)}`);
+                if (!res.ok) throw new Error('Shop not found');
+                const json = await res.json();
+                shop = json.data;
+            } catch (err) {
+                document.body.innerHTML = `<div style="text-align:center; padding:100px 20px;">
+                    <h2>Магазин не найден</h2>
+                    <p>Проверьте корректность ссылки или вернитесь на <a href="../index.html" style="color:var(--accent)">главную</a>.</p>
+                </div>`;
+                return;
+            }
+
+            // Sync Header UI elements
+            document.title = `${shop.name} | Topin`;
+            document.getElementById('storeName').textContent = shop.name;
+            document.getElementById('storeTagline').textContent = getLocalizedText(shop, 'description_ru', 'description').substring(0, 250);
+            
+            if (shop.bannerUrl) {
+                document.getElementById('storeBanner').style.backgroundImage = `url('${shop.bannerUrl}')`;
+            }
+            if (shop.logoUrl) {
+                document.getElementById('storeLogo').innerHTML = `<img src="${cloudinaryOptimize(shop.logoUrl)}" alt="${escHtml(shop.name)}">`;
+            }
+
+            // Build Contacts & Social Links
+            const contactsEl = document.getElementById('storeContacts');
+            let contactHtml = '';
+            if (shop.location) {
+                contactHtml += `<div class="store-info-row">
+                    <img src="../img/icons/Location icon.svg" alt="Адрес">
+                    <a href="${shop.locationLink || `https://maps.google.com/?q=${encodeURIComponent(shop.location)}`}" target="_blank" rel="noopener noreferrer">${escHtml(shop.location)}</a>
+                </div>`;
+            }
+            if (shop.phone) {
+                contactHtml += `<div class="store-info-row">
+                    <img src="../img/icons/phone%20icon.svg" alt="Телефон">
+                    <a href="tel:${escHtml(shop.phone)}">${escHtml(shop.phone)}</a>
+                </div>`;
+            }
+            if (shop.telegram) {
+                const handle = shop.telegram.split('/').pop();
+                contactHtml += `<div class="store-info-row">
+                    <img src="../img/icons/Telegram%20.svg" alt="TG">
+                    <a href="${escHtml(shop.telegram)}" target="_blank" rel="noopener noreferrer">@${escHtml(handle)}</a>
+                </div>`;
+            }
+            if (shop.instagram) {
+                const handle = shop.instagram.split('/').pop().replace('?','');
+                contactHtml += `<div class="store-info-row">
+                    <img src="../img/icons/instgram%20.svg" alt="IG">
+                    <a href="${escHtml(shop.instagram)}" target="_blank" rel="noopener noreferrer">@${escHtml(handle)}</a>
+                </div>`;
+            }
+            if (shop.website) {
+                const host = new URL(shop.website).hostname.replace('www.','');
+                contactHtml += `<div class="store-info-row">
+                    <img src="../img/icons/WebsitegoArrow%20Icon.svg" alt="Web">
+                    <a href="${escHtml(shop.website)}" target="_blank" rel="noopener noreferrer">${escHtml(host)}</a>
+                </div>`;
+            }
+            contactsEl.innerHTML = contactHtml;
+
+            // Load Working Hours
+            const hoursEl = document.getElementById('storeHours');
+            if (shop.workingHours) {
+                try {
+                    const hours = JSON.parse(shop.workingHours);
+                    let hHtml = `<h3 style="margin: 0 0 10px 0; font-size:15px;" id="hoursTitle">${currentLang === 'ru' ? 'Рабочие часы' : 'Ish vaqti'}</h3>`;
+                    const days = currentLang === 'ru' 
+                        ? ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
+                        : ['Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sha', 'Ya'];
+                    
+                    const weekKeys = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+                    weekKeys.forEach((dayKey, idx) => {
+                        const status = hours[dayKey]?.isActive ? `${hours[dayKey].from} - ${hours[dayKey].to}` : (currentLang === 'ru' ? 'Выходной' : 'Yopiq');
+                        hHtml += `<div style="display:flex; justify-content:space-between; font-size:13px; color:var(--text3); margin-bottom:4px;">
+                            <span>${days[idx]}</span>
+                            <span>${status}</span>
+                        </div>`;
+                    });
+                    hoursEl.innerHTML = hHtml;
+                } catch(e) { hoursEl.style.display = 'none'; }
+            } else {
+                hoursEl.style.display = 'none';
+            }
+
+            // Load Store-specific Custom Categories & Products
+            await Promise.all([
+                loadStoreSubCategories(),
+                fetchStoreProducts()
+            ]);
+
+            // Bind Event Listeners for Filters
+            document.getElementById('prodSearch').addEventListener('input', debounce(fetchStoreProducts, 300));
+            document.getElementById('prodCategory').addEventListener('change', fetchStoreProducts);
+            document.getElementById('chkInStock').addEventListener('change', fetchStoreProducts);
+            document.getElementById('chkAR').addEventListener('change', fetchStoreProducts);
+            document.getElementById('catalogSort').addEventListener('change', fetchStoreProducts);
+
+            // Send tracking page_view event
+            fetch('/api/analytics/track', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    eventType: 'page_view',
+                    deviceType: window.innerWidth < 768 ? (window.innerWidth < 480 ? 'mobile' : 'tablet') : 'desktop',
+                    referrer: document.referrer || 'direct',
+                    shopId: shop.id
+                })
+            }).catch(e => {});
+        }
+
+
+        async function loadStoreSubCategories() {
+            const select = document.getElementById('prodCategory');
+            try {
+                // Fetch subcategories for the main Category this shop belongs to
+                const res = await fetch(`/api/subcategories?category=${shop.CategoryId}`);
+                const json = await res.json();
+                shopCategories = json.data || [];
+                
+                shopCategories.forEach(sc => {
+                    const option = document.createElement('option');
+                    option.value = sc.id;
+                    option.textContent = currentLang === 'ru' ? sc.name_ru || sc.name : sc.name || sc.name_ru;
+                    select.appendChild(option);
+                });
+            } catch(e) {}
+        }
+
+        async function fetchStoreProducts() {
+            const grid = document.getElementById('productGrid');
+            const search = document.getElementById('prodSearch').value;
+            const subcat = document.getElementById('prodCategory').value;
+            const inStock = document.getElementById('chkInStock').checked;
+            const hasAr = document.getElementById('chkAR').checked;
+            const sort = document.getElementById('catalogSort').value;
+
+            // Display skeletons
+            grid.innerHTML = Array(6).fill().map(() => `
+                <div class="skeleton-card" style="height: 320px;">
+                    <div class="skeleton-logo" style="width:100%; height:180px; border-radius:0;"></div>
+                    <div class="skeleton-info">
+                        <div class="skeleton-line"></div>
+                        <div class="skeleton-line short"></div>
+                    </div>
+                </div>
+            `).join('');
+
+            try {
+                const params = new URLSearchParams();
+                if (subcat && subcat !== 'all') params.append('subcategory', subcat);
+                if (search) params.append('search', search);
+                if (inStock) params.append('inStock', 'true');
+                if (hasAr) params.append('hasAr', 'true');
+                params.append('limit', '100'); // fetch all store products for simplicity
+
+                const res = await fetch(`/api/shops/${shop.id}/products?${params.toString()}`);
+                const json = await res.json();
+                let products = json.data || [];
+
+                // Sort client side based on selection
+                if (sort === 'price-asc') {
+                    products.sort((a,b) => parseFloat(a.price || 0) - parseFloat(b.price || 0));
+                } else if (sort === 'price-desc') {
+                    products.sort((a,b) => parseFloat(b.price || 0) - parseFloat(a.price || 0));
+                }
+
+                document.getElementById('productCount').textContent = `${products.length} ${currentLang === 'ru' ? 'товаров' : 'ta mahsulot'}`;
+
+                if (products.length === 0) {
+                    grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:40px; color:var(--text3);">
+                        <p>${currentLang === 'ru' ? 'Товары не найдены' : 'Mahsulotlar topilmadi'}</p>
+                    </div>`;
+                    return;
+                }
+
+                grid.innerHTML = products.map(prod => {
+                    const hasModel = prod.glbUrl || prod.usdzUrl;
+                    const arBadgeHtml = hasModel ? `<div class="ar-badge">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                        3D / AR
+                    </div>` : '';
+
+                    const stockText = prod.stockStatus === 'In Stock' ? (currentLang === 'ru' ? 'В наличии' : 'Mavjud')
+                                    : prod.stockStatus === 'Out of Stock' ? (currentLang === 'ru' ? 'Нет в наличии' : 'Yopiq')
+                                    : (currentLang === 'ru' ? 'Под заказ' : 'Buyurtma');
+                    const stockClass = prod.stockStatus === 'In Stock' ? 'stock-in'
+                                     : prod.stockStatus === 'Out of Stock' ? 'stock-out'
+                                     : 'stock-preorder';
+
+                    const priceStr = prod.price 
+                        ? `${parseFloat(prod.price).toLocaleString()} ${shop.currency || 'UZS'}`
+                        : (currentLang === 'ru' ? 'Цена по запросу' : 'Narx soʻrov boʻyicha');
+
+                    return `
+                        <a href="/stores/${shop.slug}/products/${prod.slug}" class="product-card">
+                            <div class="product-card-img-box">
+                                <img src="${prod.imageUrl || '../img/placeholder.png'}" alt="${escHtml(prod.name)}" loading="lazy">
+                                ${arBadgeHtml}
+                            </div>
+                            <div class="product-card-info">
+                                <h3 class="product-card-title">${escHtml(prod.name)}</h3>
+                                <p class="product-card-desc">${escHtml(prod.shortDescription || '')}</p>
+                                <div class="product-card-footer">
+                                    <span class="product-card-price">${priceStr}</span>
+                                    <span class="stock-badge ${stockClass}">${stockText}</span>
+                                </div>
+                            </div>
+                        </a>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:40px; color:var(--red);">
+                    <p>Ошибка загрузки товаров</p>
+                </div>`;
+            }
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.getElementById('tabProducts').classList.toggle('active', tab === 'products');
+            document.getElementById('tabAbout').classList.toggle('active', tab === 'about');
+
+            document.getElementById('productsView').style.display = tab === 'products' ? 'grid' : 'none';
+            document.getElementById('aboutView').style.display = tab === 'about' ? 'block' : 'none';
+
+            if (tab === 'about') {
+                const content = getLocalizedText(shop, 'description_ru', 'description');
+                document.getElementById('aboutContent').innerHTML = content.replace(/\n/g, '<br>');
+            }
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+
+        document.addEventListener('DOMContentLoaded', initStorefront);
+    </script>
+</body>
+</html>

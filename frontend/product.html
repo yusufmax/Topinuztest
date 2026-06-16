@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details | Topin</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0FA986">
+    <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css?v=3.2">
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+        }
+        .product-detail-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 40px;
+        }
+        .product-media-column {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .primary-image-box {
+            width: 100%;
+            height: 450px;
+            background: var(--surface);
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: zoom-in;
+        }
+        .primary-image-box img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+        .thumbnail-gallery {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+        .thumb-item {
+            width: 70px;
+            height: 70px;
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            background: var(--surface);
+            cursor: pointer;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: border-color 0.2s;
+        }
+        .thumb-item.active {
+            border-color: var(--accent);
+        }
+        .thumb-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .thumb-item.ar-thumb-btn {
+            background: rgba(15, 169, 134, 0.1);
+            color: var(--accent);
+            font-size: 20px;
+            font-weight: 700;
+        }
+        .product-info-column {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        .breadcrumb {
+            font-size: 13px;
+            color: var(--text3);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .breadcrumb a {
+            color: var(--text3);
+            text-decoration: none;
+        }
+        .breadcrumb a:hover {
+            color: var(--accent);
+        }
+        .product-title {
+            font-size: 30px;
+            font-weight: 800;
+            margin: 0;
+            line-height: 1.2;
+        }
+        .price-row {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+        }
+        .product-price {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--accent);
+        }
+        .product-sale-price {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--red);
+        }
+        .original-price-strikethrough {
+            font-size: 16px;
+            color: var(--text3);
+            text-decoration: line-through;
+        }
+        .stock-badge-large {
+            display: inline-block;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 8px;
+            width: fit-content;
+        }
+        .stock-in { background: rgba(15, 169, 134, 0.15); color: var(--accent); }
+        .stock-out { background: rgba(255, 84, 62, 0.15); color: var(--red); }
+        .stock-preorder { background: rgba(255, 193, 7, 0.15); color: #ffc107; }
+
+        .btn-action-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .btn-primary-ar {
+            background: linear-gradient(135deg, #0FA986, #0b8a6d);
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            padding: 16px 24px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(15,169,134,0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+        }
+        .btn-primary-ar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(15,169,134,0.4);
+        }
+        .btn-secondary-contact {
+            background: var(--surface);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: background 0.2s;
+            text-decoration: none;
+        }
+        .btn-secondary-contact:hover {
+            background: var(--surface2);
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text2);
+            margin: 0 0 10px 0;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+        }
+        .product-desc-block {
+            font-size: 15px;
+            line-height: 1.6;
+            color: var(--text2);
+        }
+        .attribution-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            text-decoration: none;
+            color: var(--text);
+        }
+        .attribution-logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            overflow: hidden;
+            background: var(--surface2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+        .attribution-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        /* model-viewer container */
+        .viewer-container-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .viewer-modal-content {
+            background: var(--surface);
+            border-radius: 24px;
+            width: 90%;
+            max-width: 600px;
+            height: 550px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--border);
+        }
+        .viewer-modal-header {
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+        .viewer-close-btn {
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 22px;
+            cursor: pointer;
+        }
+        model-viewer {
+            width: 100%;
+            height: 100%;
+            background-color: var(--surface2);
+        }
+        
+        @media (max-width: 768px) {
+            .product-detail-container {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            .primary-image-box {
+                height: 320px;
+            }
+        }
+    </style>
+    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('houz_theme') || 'light');</script>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="site-header">
+        <div class="header-inner">
+            <div style="display:flex;align-items:center;gap:10px;">
+                <a href="javascript:history.back()" class="back-btn" id="btnBack" aria-label="Go back">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </a>
+                <a href="/" class="home-logo">
+                    <span class="logo-text-top">TOP</span><span class="logo-text-in">IN</span>
+                </a>
+            </div>
+
+            <!-- Language Switcher -->
+            <div id="langWrap" style="position:relative;">
+                <button class="lang-switch-btn" id="langBtn" aria-label="Change Language">
+                    <span class="lang-text">UZ</span>
+                    <svg class="lang-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+                <div class="lang-dropdown" id="langDropdown">
+                    <div class="lang-option" data-lang="uz">O'zbek</div>
+                    <div class="lang-option selected" data-lang="ru">Русский</div>
+                </div>
+            </div>
+
+            <!-- Theme Toggle -->
+            <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" aria-label="Toggle theme">
+                <span class="theme-icon theme-icon-sun">☀️</span>
+                <span class="theme-icon theme-icon-moon">🌙</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="product-detail-container">
+        <!-- Left: Image Box & Gallery -->
+        <div class="product-media-column">
+            <div class="primary-image-box" id="primaryImageBox" onclick="triggerARFlow()">
+                <img src="" alt="Product" id="primaryImage">
+            </div>
+            <div class="thumbnail-gallery" id="thumbnailGallery">
+                <!-- Clickable thumbs loaded via JS -->
+            </div>
+        </div>
+
+        <!-- Right: Specs & Action Button -->
+        <div class="product-info-column">
+            <div class="breadcrumb" id="productBreadcrumb">
+                <!-- Breadcrumbs -->
+            </div>
+
+            <div>
+                <h1 class="product-title" id="productTitle">–</h1>
+                <p style="color:var(--text3); margin:8px 0 0 0;" id="productCategoryName"></p>
+            </div>
+
+            <div class="price-row" id="priceRow">
+                <span class="product-price" id="productPrice">–</span>
+            </div>
+
+            <span class="stock-badge-large" id="productStockBadge">–</span>
+
+            <div class="btn-action-container">
+                <!-- AR Trigger Button -->
+                <button class="btn-primary-ar" id="btnAR" style="display:none;" onclick="triggerARFlow()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 17 12 22 12"></polyline></svg>
+                    <span id="lblViewAR">Смотреть в 3D / AR</span>
+                </button>
+
+                <!-- Contact Seller Buttons -->
+                <a href="" class="btn-secondary-contact" id="btnContactTelegram" target="_blank" rel="noopener noreferrer">
+                    <img src="/img/icons/Telegram%20.svg" alt="TG" style="width:20px; height:20px;">
+                    <span id="lblContactTG">Связаться в Telegram</span>
+                </a>
+                <a href="" class="btn-secondary-contact" id="btnContactPhone">
+                    <img src="/img/icons/phone%20icon.svg" alt="Phone" style="width:18px; height:18px;">
+                    <span id="lblContactPhone">Позвонить</span>
+                </a>
+            </div>
+
+            <!-- Shop Attribution Box -->
+            <a href="" class="attribution-box" id="shopAttribution">
+                <div class="attribution-logo" id="shopLogo">🏪</div>
+                <div>
+                    <h4 style="margin:0 0 4px 0; font-size:14px; font-weight:700;" id="shopAttributionName">–</h4>
+                    <p style="margin:0; font-size:12px; color:var(--text3);" id="lblVisitStore">Перейти в магазин</p>
+                </div>
+            </a>
+
+            <!-- Collapsible description -->
+            <div>
+                <h3 class="section-title" id="lblDescription">Описание</h3>
+                <div class="product-desc-block" id="productDesc">
+                    <!-- Text description -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Embedded model-viewer Fallback Overlay -->
+    <div class="viewer-container-overlay" id="viewerOverlay">
+        <div class="viewer-modal-content">
+            <div class="viewer-modal-header">
+                <h3 style="margin:0; font-size:16px;" id="lblModalTitle">Просмотр 3D модели</h3>
+                <button class="viewer-close-btn" onclick="close3DViewer()">✕</button>
+            </div>
+            <div id="modelViewerWrapper" style="width:100%; height:100%;">
+                <!-- model-viewer injected dynamically here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast elements -->
+    <div class="toast" id="toast"></div>
+
+    <script src="/js/config.js?v=3.2"></script>
+    <script src="/js/utils.js?v=3.2"></script>
+    <script>
+        let product = null;
+        let shop = null;
+
+        // Parse path slugs
+        const pathSegments = window.location.pathname.split('/');
+        const productSlug = pathSegments.pop() || pathSegments.pop(); // last segment
+        const storeSlug = pathSegments[pathSegments.indexOf('stores') + 1];
+
+        // Device detection flags
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isAndroid = /Android/i.test(navigator.userAgent);
+
+        async function initProductPage() {
+            try {
+                // Fetch storefront info first
+                const shopRes = await fetch(`/api/shops/by-slug/${encodeURIComponent(storeSlug)}`);
+                if (!shopRes.ok) throw new Error('Shop not found');
+                shop = (await shopRes.json()).data;
+
+                // Fetch product details
+                const prodRes = await fetch(`/api/products/by-shop/${shop.id}/by-slug/${encodeURIComponent(productSlug)}`);
+                if (!prodRes.ok) throw new Error('Product not found');
+                product = (await prodRes.json()).data;
+            } catch (err) {
+                document.body.innerHTML = `<div style="text-align:center; padding:100px 20px;">
+                    <h2>Товар не найден</h2>
+                    <p>Проверьте ссылку или вернитесь на <a href="/" style="color:var(--accent)">главную</a>.</p>
+                </div>`;
+                return;
+            }
+
+            // Sync product info
+            document.title = `${product.name} | Topin`;
+            document.getElementById('productTitle').textContent = product.name;
+            document.getElementById('productCategoryName').textContent = currentLang === 'ru' 
+                ? product.Category?.name_ru || product.Category?.name 
+                : product.Category?.name || product.Category?.name_ru;
+            
+            // Description rendering
+            document.getElementById('productDesc').textContent = product.description || product.shortDescription || '';
+
+            // Setup pricing
+            const priceRow = document.getElementById('priceRow');
+            const currency = shop.currency || 'UZS';
+            if (product.salePrice) {
+                priceRow.innerHTML = `
+                    <span class="product-sale-price">${parseFloat(product.salePrice).toLocaleString()} ${currency}</span>
+                    <span class="original-price-strikethrough">${parseFloat(product.price).toLocaleString()} ${currency}</span>
+                `;
+            } else if (product.price) {
+                priceRow.innerHTML = `<span class="product-price">${parseFloat(product.price).toLocaleString()} ${currency}</span>`;
+            } else {
+                priceRow.innerHTML = `<span class="product-price">${currentLang === 'ru' ? 'Цена по запросу' : 'Narx soʻrov boʻyicha'}</span>`;
+            }
+
+            // Setup stock status badge
+            const stockBadge = document.getElementById('productStockBadge');
+            const stockText = product.stockStatus === 'In Stock' ? (currentLang === 'ru' ? 'В наличии' : 'Mavjud')
+                            : product.stockStatus === 'Out of Stock' ? (currentLang === 'ru' ? 'Нет в наличии' : 'Yopiq')
+                            : (currentLang === 'ru' ? 'Под заказ' : 'Buyurtma');
+            const stockClass = product.stockStatus === 'In Stock' ? 'stock-in'
+                             : product.stockStatus === 'Out of Stock' ? 'stock-out'
+                             : 'stock-preorder';
+            stockBadge.textContent = stockText;
+            stockBadge.className = `stock-badge-large ${stockClass}`;
+
+            // Attribution details
+            document.getElementById('shopAttribution').href = `/stores/${shop.slug}`;
+            document.getElementById('shopAttributionName').textContent = shop.name;
+            if (shop.logoUrl) {
+                document.getElementById('shopLogo').innerHTML = `<img src="${cloudinaryOptimize(shop.logoUrl)}" alt="${escHtml(shop.name)}">`;
+            }
+
+            // Contacts links
+            const phoneBtn = document.getElementById('btnContactPhone');
+            const tgBtn = document.getElementById('btnContactTelegram');
+            if (shop.phone) {
+                phoneBtn.href = `tel:${shop.phone}`;
+            } else {
+                phoneBtn.style.display = 'none';
+            }
+            if (shop.telegram) {
+                tgBtn.href = shop.telegram;
+            } else {
+                tgBtn.style.display = 'none';
+            }
+
+            // Sync Gallery & Primary image
+            if (product.imageUrl) {
+                document.getElementById('primaryImage').src = product.imageUrl;
+            }
+
+            const thumbsEl = document.getElementById('thumbnailGallery');
+            let imagesList = [];
+            if (product.images) {
+                try { imagesList = JSON.parse(product.images); } catch(e) {}
+            }
+            if (imagesList.length === 0 && product.imageUrl) {
+                imagesList = [product.imageUrl];
+            }
+
+            let thumbHtml = imagesList.map((url, i) => `
+                <div class="thumb-item ${i === 0 ? 'active' : ''}" onclick="selectImage('${url}', this)">
+                    <img src="${cloudinaryOptimize(url)}" alt="Thumb ${i+1}">
+                </div>
+            `).join('');
+
+            // If product has 3D models, insert a cube 3D trigger button as the final thumb
+            const has3D = product.glbUrl || product.usdzUrl;
+            if (has3D) {
+                thumbHtml += `
+                    <div class="thumb-item ar-thumb-btn" onclick="triggerARFlow()" title="Просмотр в 3D">
+                        📦
+                    </div>
+                `;
+                document.getElementById('btnAR').style.display = 'flex';
+            }
+            thumbsEl.innerHTML = thumbHtml;
+
+            // Breadcrumbs mapping
+            const breadcrumb = document.getElementById('productBreadcrumb');
+            breadcrumb.innerHTML = `
+                <a href="/">${currentLang === 'ru' ? 'Главная' : 'Bosh sahifa'}</a>
+                <span>/</span>
+                <a href="/stores/${shop.slug}">${escHtml(shop.name)}</a>
+                <span>/</span>
+                <span>${escHtml(product.name)}</span>
+            `;
+
+            // Send tracking product_view event
+            fetch('/api/analytics/track', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    eventType: 'product_view',
+                    deviceType: window.innerWidth < 768 ? (window.innerWidth < 480 ? 'mobile' : 'tablet') : 'desktop',
+                    referrer: document.referrer || 'direct',
+                    shopId: shop.id,
+                    productId: product.id
+                })
+            }).catch(e => {});
+        }
+
+        function selectImage(url, el) {
+            document.getElementById('primaryImage').src = url;
+            document.querySelectorAll('.thumb-item').forEach(thumb => thumb.classList.remove('active'));
+            if (el) el.classList.add('active');
+        }
+
+        function triggerARFlow() {
+            if (!product) return;
+
+            const hasGlb = !!product.glbUrl;
+            const hasUsdz = !!product.usdzUrl;
+
+            // Send tracking ar_load event
+            fetch('/api/analytics/track', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    eventType: 'ar_load',
+                    deviceType: window.innerWidth < 768 ? (window.innerWidth < 480 ? 'mobile' : 'tablet') : 'desktop',
+                    referrer: document.referrer || 'direct',
+                    shopId: shop.id,
+                    productId: product.id
+                })
+            }).catch(e => {});
+
+            // iOS / Quick Look handling
+            if (isIOS) {
+                if (hasUsdz) {
+                    const anchor = document.createElement('a');
+                    anchor.setAttribute('rel', 'ar');
+                    anchor.setAttribute('href', product.usdzUrl);
+                    
+                    const img = document.createElement('img');
+                    img.src = product.imageUrl;
+                    anchor.appendChild(img);
+                    
+                    anchor.click();
+                } else if (hasGlb) {
+                    // Fallback to web model-viewer
+                    open3DViewer();
+                } else {
+                    showToast('3D модель недоступна для этого устройства', 'error');
+                }
+            }
+            // Android / Scene Viewer handling
+            else if (isAndroid) {
+                if (hasGlb) {
+                    const fallbackUrl = window.location.href;
+                    const intentUrl = `intent://arvr.google.com/scene-viewer/1.0?file=${encodeURIComponent(product.glbUrl)}&mode=ar_only#Intent;scheme=https;package=com.google.android.googlequicksearchbox;action=android.intent.action.VIEW;S.browser_fallback_url=${encodeURIComponent(fallbackUrl)};end`;
+                    window.location.href = intentUrl;
+                } else {
+                    showToast('3D модель недоступна для этого устройства', 'error');
+                }
+            }
+            // Desktop / Fallback handling
+            else {
+                if (hasGlb) {
+                    open3DViewer();
+                } else {
+                    showToast('3D модель недоступна для этого устройства', 'error');
+                }
+            }
+        }
+
+        function open3DViewer() {
+            if (!product.glbUrl) return;
+
+            // Load model-viewer script dynamically if not loaded
+            if (!window.customElements.get('model-viewer')) {
+                const script = document.createElement('script');
+                script.type = 'module';
+                script.src = 'https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js';
+                document.head.appendChild(script);
+            }
+
+            const wrapper = document.getElementById('modelViewerWrapper');
+            wrapper.innerHTML = `
+                <model-viewer src="${product.glbUrl}" 
+                              alt="${escHtml(product.name)}" 
+                              ar 
+                              camera-controls 
+                              auto-rotate 
+                              style="width: 100%; height: 100%;">
+                </model-viewer>
+            `;
+
+            document.getElementById('viewerOverlay').style.display = 'flex';
+        }
+
+        function close3DViewer() {
+            document.getElementById('viewerOverlay').style.display = 'none';
+            document.getElementById('modelViewerWrapper').innerHTML = '';
+        }
+
+        document.addEventListener('DOMContentLoaded', initProductPage);
+    </script>
+</body>
+</html>
