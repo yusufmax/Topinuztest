@@ -767,6 +767,7 @@ select {
     align-items: flex-end;
     justify-content: center;
     animation: fadeIn 0.2s ease;
+    overscroll-behavior: contain;
 }
 
 @media (min-width: 600px) {
@@ -843,6 +844,7 @@ select {
     max-height: calc(90vh - 46px);
     padding: 0 20px 24px;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
 }
 
 .modal-handle {

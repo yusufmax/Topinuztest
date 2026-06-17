@@ -432,9 +432,34 @@ function initModalScrollRedirect() {
             const currentY = e.touches[0].clientY;
             const dy = currentY - startY;
 
-            // If we are touching the backdrop, or we started the touch at the top and we swipe down
+            const isBody = e.target.closest('.modal-body');
             const isBackdrop = e.target === overlay;
-            if ((isBackdrop || (startedAtTop && modalBody.scrollTop <= 0)) && dy > 0) {
+
+            // If touch starts outside modal-body (e.g. header, handle, backdrop), block background scrolling
+            if (!isBody) {
+                if ((isBackdrop || (startedAtTop && modalBody.scrollTop <= 0)) && dy > 0) {
+                    if (!isDraggingSheet) {
+                        isDraggingSheet = true;
+                        dragStartY = currentY;
+                    }
+                }
+
+                if (isDraggingSheet) {
+                    const dragDistance = currentY - dragStartY;
+                    if (dragDistance > 0) {
+                        sheet.style.transform = `translateY(${dragDistance}px)`;
+                        sheet.style.transition = 'none';
+                    } else {
+                        sheet.style.transform = '';
+                        isDraggingSheet = false;
+                    }
+                }
+                if (e.cancelable) e.preventDefault();
+                return;
+            }
+
+            // Inside modal-body
+            if ((startedAtTop && modalBody.scrollTop <= 0) && dy > 0) {
                 if (!isDraggingSheet) {
                     isDraggingSheet = true;
                     dragStartY = currentY;
@@ -482,11 +507,26 @@ function initModalScrollRedirect() {
 
         // Scroll wheel / trackpad close on desktop when at the top (avoiding inertial scroll artifacts)
         overlay.addEventListener('wheel', (e) => {
-            const timeSinceScroll = Date.now() - lastScrollTopTime;
-            if (modalBody.scrollTop <= 0 && e.deltaY < -5 && timeSinceScroll > 200) {
-                closeShopModal();
+            const isBody = e.target.closest('.modal-body');
+            if (isBody) {
+                const timeSinceScroll = Date.now() - lastScrollTopTime;
+                if (modalBody.scrollTop <= 0 && e.deltaY < -5 && timeSinceScroll > 200) {
+                    closeShopModal();
+                }
+                
+                // Prevent background scroll chain propagation
+                const isScrollingUp = e.deltaY < 0;
+                const isScrollingDown = e.deltaY > 0;
+                const isAtTop = modalBody.scrollTop <= 0;
+                const isAtBottom = modalBody.scrollHeight - modalBody.clientHeight - modalBody.scrollTop <= 1;
+
+                if ((isScrollingUp && isAtTop) || (isScrollingDown && isAtBottom)) {
+                    if (e.cancelable) e.preventDefault();
+                }
+            } else {
+                if (e.cancelable) e.preventDefault();
             }
-        }, { passive: true });
+        }, { passive: false });
     }
 }
 
