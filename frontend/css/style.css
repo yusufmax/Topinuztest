@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+
 /* ─── Reset & Base ──────────────────────────────────────── */
 *,
 *::before,
@@ -69,8 +71,11 @@ html {
     scroll-behavior: smooth;
 }
 
+body, input, button, textarea, select {
+    font-family: var(--font-family-global, "SF Pro Display", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif) !important;
+}
+
 body {
-    font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     background: var(--bg);
     background-image: 
         radial-gradient(at 0% 0%, rgba(20, 184, 166, 0.03) 0px, transparent 50%),
@@ -3736,3 +3741,88 @@ input,
 .market-card:nth-child(7), .home-card:nth-child(7), .product-card:nth-child(7) { animation-delay: 0.28s; }
 .market-card:nth-child(8), .home-card:nth-child(8), .product-card:nth-child(8) { animation-delay: 0.32s; }
 .market-card:nth-child(n+9), .home-card:nth-child(n+9), .product-card:nth-child(n+9) { animation-delay: 0.36s; }
+
+/* ─── Font Selection Overrides ─── */
+[data-font="sf-pro"] {
+    --font-family-global: "SF Pro Display", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+[data-font="playfair"] {
+    --font-family-global: "Playfair Display", Georgia, Cambria, "Times New Roman", Times, serif;
+}
+
+[data-font="outfit"] {
+    --font-family-global: "Outfit", sans-serif;
+}
+
+/* ─── Font Switcher Base & Overrides ─── */
+.font-switcher-wrap {
+    display: flex;
+    align-items: center;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 30px;
+    padding: 3px;
+    gap: 4px;
+}
+
+.font-switch-btn {
+    border: none;
+    background: none;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 20px;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.font-switch-btn:hover {
+    color: var(--text);
+}
+
+.font-switch-btn.active {
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Instagram Theme overrides for switcher */
+[data-ui-style="instagram"] .font-switcher-wrap {
+    border: 1px solid var(--border) !important;
+    border-radius: 4px !important;
+    background: var(--surface) !important;
+    box-shadow: none !important;
+}
+
+[data-ui-style="instagram"] .font-switch-btn {
+    border-radius: 2px !important;
+    color: var(--text2) !important;
+}
+
+[data-ui-style="instagram"] .font-switch-btn.active {
+    background: var(--bg2) !important;
+    color: var(--text) !important;
+    font-weight: 700 !important;
+    box-shadow: none !important;
+}
+
+/* Apple Theme overrides for switcher */
+[data-ui-style="apple"] .font-switcher-wrap {
+    border: 1px solid var(--border) !important;
+    border-radius: 50px !important;
+    background: var(--surface) !important;
+    box-shadow: var(--shadow-sm) !important;
+}
+
+[data-ui-style="apple"] .font-switch-btn {
+    border-radius: 50px !important;
+    color: var(--text2) !important;
+}
+
+[data-ui-style="apple"] .font-switch-btn.active {
+    background: var(--accent) !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+}
