@@ -372,23 +372,90 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-// Auto-expand/collapse bottom sheet on mobile scroll
+// Auto-expand/collapse bottom sheet on mobile scroll & swipe down to close
 function initModalScrollRedirect() {
+    const overlay = document.getElementById('shopModal');
     const modalBody = document.querySelector('#shopModal .modal-body');
-    if (modalBody) {
+    const sheet = document.getElementById('modalSheet');
+    if (modalBody && sheet && overlay) {
         modalBody.addEventListener('scroll', () => {
             // Check if mobile view (e.g. width < 600px)
             if (window.innerWidth < 600) {
-                const sheet = document.getElementById('modalSheet');
-                if (sheet) {
-                    if (modalBody.scrollTop > 15) {
-                        sheet.classList.add('expanded');
-                    } else if (modalBody.scrollTop <= 0) {
-                        sheet.classList.remove('expanded');
-                    }
+                if (modalBody.scrollTop > 15) {
+                    sheet.classList.add('expanded');
+                } else if (modalBody.scrollTop <= 0) {
+                    sheet.classList.remove('expanded');
                 }
             }
         });
+
+        // Touch swipe-down to close on mobile
+        let startY = 0;
+        let dragStartY = 0;
+        let isDraggingSheet = false;
+
+        overlay.addEventListener('touchstart', (e) => {
+            startY = e.touches[0].clientY;
+        }, { passive: true });
+
+        overlay.addEventListener('touchmove', (e) => {
+            const currentY = e.touches[0].clientY;
+            const dy = currentY - startY;
+
+            // If we are touching the backdrop, or modalBody is at the top and we swipe down
+            const isBackdrop = e.target === overlay;
+            if ((isBackdrop || modalBody.scrollTop <= 0) && dy > 0) {
+                if (!isDraggingSheet) {
+                    isDraggingSheet = true;
+                    dragStartY = currentY;
+                }
+            }
+
+            if (isDraggingSheet) {
+                const dragDistance = currentY - dragStartY;
+                if (dragDistance > 0) {
+                    sheet.style.transform = `translateY(${dragDistance}px)`;
+                    sheet.style.transition = 'none';
+                    if (e.cancelable) e.preventDefault();
+                } else {
+                    sheet.style.transform = '';
+                    isDraggingSheet = false;
+                }
+            }
+        }, { passive: false });
+
+        overlay.addEventListener('touchend', (e) => {
+            if (isDraggingSheet) {
+                isDraggingSheet = false;
+                sheet.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+
+                const endY = e.changedTouches[0] ? e.changedTouches[0].clientY : startY;
+                const dragDistance = endY - dragStartY;
+
+                if (dragDistance > 100) {
+                    sheet.style.transform = 'translateY(100%)';
+                    setTimeout(() => {
+                        closeShopModal();
+                        sheet.style.transform = '';
+                        sheet.style.transition = '';
+                    }, 300);
+                } else {
+                    sheet.style.transform = '';
+                    setTimeout(() => {
+                        sheet.style.transition = '';
+                    }, 300);
+                }
+            }
+            startY = 0;
+            dragStartY = 0;
+        }, { passive: true });
+
+        // Scroll wheel / trackpad close on desktop when at the top
+        overlay.addEventListener('wheel', (e) => {
+            if (modalBody.scrollTop <= 0 && e.deltaY < -5) {
+                closeShopModal();
+            }
+        }, { passive: true });
     }
 }
 
