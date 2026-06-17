@@ -1884,6 +1884,10 @@ body {
     /* Reduced padding for mobile */
 }
 
+.home-layout > div {
+    width: 100%;
+}
+
 .home-header-inner {
     display: flex;
     justify-content: space-between;
