@@ -33,9 +33,9 @@
     --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.02);
     
     /* Glassmorphism Variables */
-    --glass-bg: rgba(255, 255, 255, 0.55);
-    --glass-border: rgba(255, 255, 255, 0.6);
-    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.04);
+    --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.3) 40%, rgba(255, 255, 255, 0.15) 100%);
+    --glass-border: rgba(255, 255, 255, 0.75);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.06);
     --glass-blur: blur(20px);
 }
 
@@ -59,9 +59,9 @@
     --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.15);
     
     /* Glassmorphism Variables */
-    --glass-bg: rgba(17, 24, 39, 0.55);
-    --glass-border: rgba(255, 255, 255, 0.06);
-    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.03) 40%, rgba(17, 24, 39, 0.55) 100%);
+    --glass-border: rgba(255, 255, 255, 0.14);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.35);
     --glass-blur: blur(25px);
 }
 
@@ -3582,4 +3582,54 @@ html:not([data-theme="dark"]) .theme-icon-moon { opacity: 1; }
     color: #ffffff !important;
     box-shadow: none !important;
     border-radius: 50px !important;
+}
+
+/* Glass Specular Glare Reflections */
+.market-card,
+.home-card,
+.product-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.market-card::before,
+.home-card::before,
+.product-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: inherit;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 50%);
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.95;
+    transition: opacity 0.3s ease;
+}
+
+/* In dark theme glass mode, slightly softer reflection */
+[data-theme="dark"] .market-card::before,
+[data-theme="dark"] .home-card::before,
+[data-theme="dark"] .product-card::before {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 45%);
+}
+
+/* On hover, make glare more interactive / glowing */
+.market-card:hover::before,
+.home-card:hover::before,
+.product-card:hover::before {
+    opacity: 1;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 60%);
+}
+
+/* Remove this glare highlight completely under flat minimalism styles (Instagram & Apple) */
+[data-ui-style="instagram"] .market-card::before,
+[data-ui-style="instagram"] .home-card::before,
+[data-ui-style="instagram"] .product-card::before,
+[data-ui-style="apple"] .market-card::before,
+[data-ui-style="apple"] .home-card::before,
+[data-ui-style="apple"] .product-card::before {
+    display: none !important;
 }
