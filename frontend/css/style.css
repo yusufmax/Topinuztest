@@ -11,46 +11,58 @@
 
 :root,
 [data-theme="light"] {
-    --bg: #F2F2F7;
-    --bg2: #E5E5EA;
+    --bg: #F5F5F7;
+    --bg2: #E8E8ED;
     --surface: #FFFFFF;
-    --surface2: #F2F2F7;
-    --border: rgba(0, 0, 0, 0.08);
-    --border2: rgba(0, 0, 0, 0.15);
-    --text: #000000;
-    --text2: rgba(60, 60, 67, 0.6);
-    --text3: rgba(60, 60, 67, 0.3);
-    --accent: #0FA986;
-    --accent2: #0B8266;
-    --gold: #FF9500;
-    --green: #34C759;
-    --red: #FF3B30;
-    --blue: #007AFF;
-    --radius-sm: 10px;
-    --radius: 16px;
-    --radius-lg: 24px;
-    --shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+    --surface2: #F5F5F7;
+    --border: rgba(0, 0, 0, 0.05);
+    --border2: rgba(0, 0, 0, 0.1);
+    --text: #1d1d1f;
+    --text2: #6e6e73;
+    --text3: #b0b0b5;
+    --accent: #0f766e; /* Softer, premium deep teal/emerald */
+    --accent2: #115e59;
+    --gold: #f59e0b;
+    --green: #10b981;
+    --red: #ef4444;
+    --blue: #3b82f6;
+    --radius-sm: 12px;
+    --radius: 20px;
+    --radius-lg: 28px;
+    --shadow: 0 8px 30px rgba(0, 0, 0, 0.03);
+    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.02);
+    
+    /* Glassmorphism Variables */
+    --glass-bg: rgba(255, 255, 255, 0.55);
+    --glass-border: rgba(255, 255, 255, 0.6);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.04);
+    --glass-blur: blur(20px);
 }
 
 [data-theme="dark"] {
-    --bg: #0D0D0D;
-    --bg2: #1A1A1A;
-    --surface: #1C1C1E;
-    --surface2: #2C2C2E;
-    --border: rgba(255, 255, 255, 0.08);
-    --border2: rgba(255, 255, 255, 0.15);
-    --text: #F5F5F7;
-    --text2: rgba(235, 235, 245, 0.6);
-    --text3: rgba(235, 235, 245, 0.3);
-    --accent: #10C9A0;
-    --accent2: #0FA986;
-    --gold: #FFB340;
-    --green: #30D158;
-    --red: #FF453A;
-    --blue: #0A84FF;
-    --shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+    --bg: #090d16; /* Deep, luxury midnight blue-slate background instead of pitch black */
+    --bg2: #111827;
+    --surface: rgba(17, 24, 39, 0.75);
+    --surface2: rgba(31, 41, 55, 0.8);
+    --border: rgba(255, 255, 255, 0.05);
+    --border2: rgba(255, 255, 255, 0.1);
+    --text: #f3f4f6;
+    --text2: #9ca3af;
+    --text3: #6b7280;
+    --accent: #14b8a6; /* Beautiful, non-eye-searing high-end teal */
+    --accent2: #0f766e;
+    --gold: #fbbf24;
+    --green: #34d399;
+    --red: #f87171;
+    --blue: #60a5fa;
+    --shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.15);
+    
+    /* Glassmorphism Variables */
+    --glass-bg: rgba(17, 24, 39, 0.55);
+    --glass-border: rgba(255, 255, 255, 0.06);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    --glass-blur: blur(25px);
 }
 
 html {
@@ -60,10 +72,20 @@ html {
 body {
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     background: var(--bg);
+    background-image: 
+        radial-gradient(at 0% 0%, rgba(20, 184, 166, 0.03) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.03) 0px, transparent 50%);
+    background-attachment: fixed;
     color: var(--text);
     min-height: 100vh;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
+}
+
+[data-theme="dark"] body {
+    background-image: 
+        radial-gradient(at 0% 0%, rgba(20, 184, 166, 0.06) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(96, 165, 250, 0.06) 0px, transparent 50%);
 }
 
 a {
@@ -168,10 +190,10 @@ select {
 
 /* ─── Header ─────────────────────────────────────────────── */
 .site-header {
-    background: rgba(242, 242, 247, 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border);
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-bottom: 1px solid var(--glass-border);
     position: sticky;
     top: 0;
     z-index: 100;
@@ -210,13 +232,13 @@ select {
 .search-wrap input {
     width: 100%;
     padding: 10px 16px 10px 40px;
-    background: var(--surface);
-    border: 1px solid var(--border);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
     border-radius: 50px;
     color: var(--text);
     font-size: 16px;
     outline: none;
-    transition: border-color 0.2s, background 0.2s;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
 }
 
 .search-wrap input::placeholder {
@@ -225,7 +247,8 @@ select {
 
 .search-wrap input:focus {
     border-color: var(--accent);
-    background: var(--surface2);
+    background: var(--glass-bg);
+    box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.15);
 }
 
 .search-icon {
@@ -697,9 +720,9 @@ select {
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.75);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     z-index: 999;
     display: flex;
     align-items: flex-end;
@@ -714,8 +737,10 @@ select {
 }
 
 .modal-sheet {
-    background: var(--bg);
-    border: 1px solid var(--border2);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
     width: 100%;
     max-width: 580px;
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
@@ -724,6 +749,7 @@ select {
     overflow: hidden;
     position: relative;
     transition: max-height 0.35s cubic-bezier(.4, 0, .2, 1), border-radius 0.35s;
+    box-shadow: var(--glass-shadow);
 }
 
 .modal-sheet.expanded {
@@ -756,7 +782,7 @@ select {
     justify-content: space-between;
     align-items: center;
     padding: 10px 12px 0;
-    background: var(--bg);
+    background: transparent;
 }
 
 .modal-body {
@@ -775,8 +801,8 @@ select {
 }
 
 .modal-close {
-    background: var(--surface);
-    border: 1px solid var(--border);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
     color: var(--text2);
     width: 32px;
     height: 32px;
@@ -787,12 +813,24 @@ select {
     align-items: center;
     justify-content: center;
     transition: all 0.2s;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    box-shadow: var(--glass-shadow);
     outline: none;
     -webkit-appearance: none;
     appearance: none;
     -webkit-tap-highlight-color: transparent;
     flex-shrink: 0;
+}
+
+.modal-close:hover {
+    background: rgba(255, 255, 255, 0.85);
+    color: var(--text);
+    border-color: var(--accent);
+}
+
+[data-theme="dark"] .modal-close:hover {
+    background: rgba(31, 41, 55, 0.95);
+    color: var(--text);
+    border-color: var(--accent);
 }
 
 .modal-close:hover {
@@ -2138,21 +2176,24 @@ html:not([data-theme="dark"]) .theme-icon-moon { opacity: 1; }
 
 /* Category Pills */
 .cat-pill {
-    background: var(--surface2);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
     color: var(--text2);
-    border: none;
     border-radius: 40px;
     padding: 8px 16px;
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
-    transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
     outline: none;
     -webkit-appearance: none;
     appearance: none;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
     -webkit-user-select: none;
+    box-shadow: var(--glass-shadow);
 }
 
 .cat-pill:focus,
@@ -2163,7 +2204,14 @@ html:not([data-theme="dark"]) .theme-icon-moon { opacity: 1; }
 
 @media (hover: hover) and (pointer: fine) {
     .cat-pill:hover {
-        background: var(--border);
+        background: rgba(255, 255, 255, 0.75);
+        border-color: var(--accent);
+        color: var(--text);
+    }
+    
+    [data-theme="dark"] .cat-pill:hover {
+        background: rgba(31, 41, 55, 0.85);
+        border-color: var(--accent);
         color: var(--text);
     }
 }
@@ -2173,9 +2221,11 @@ html:not([data-theme="dark"]) .theme-icon-moon { opacity: 1; }
 }
 
 .cat-pill.active {
-    background: var(--accent);
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
     color: #ffffff;
     font-weight: 600;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(20, 184, 166, 0.25);
 }
 
 /* Toolbar */
@@ -2211,7 +2261,7 @@ html:not([data-theme="dark"]) .theme-icon-moon { opacity: 1; }
 
 /* Market Cards (Horizontal Layout) */
 .market-card {
-    background: var(--surface);
+    background: var(--glass-bg);
     border-radius: 20px;
     padding: 12px 16px;
     display: flex;
@@ -2220,8 +2270,10 @@ html:not([data-theme="dark"]) .theme-icon-moon { opacity: 1; }
     cursor: pointer;
     text-decoration: none;
     transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, opacity 1s ease, filter 1s ease;
-    border: 1px solid var(--border);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
     opacity: 1;
     filter: blur(0px);
     -webkit-user-select: none;
@@ -2230,8 +2282,8 @@ html:not([data-theme="dark"]) .theme-icon-moon { opacity: 1; }
 
 .market-card:focus,
 .market-card:focus-visible {
-    border-color: var(--border);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    border-color: var(--glass-border);
+    box-shadow: var(--glass-shadow);
 }
 
 .market-card-hidden {
@@ -2241,10 +2293,15 @@ html:not([data-theme="dark"]) .theme-icon-moon { opacity: 1; }
 
 @media (hover: hover) and (pointer: fine) {
     .market-card:hover {
-        background: var(--surface);
-        border-color: var(--text3);
+        background: rgba(255, 255, 255, 0.65);
+        border-color: var(--accent);
         transform: translateY(-2px);
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    }
+    
+    [data-theme="dark"] .market-card:hover {
+        background: rgba(31, 41, 55, 0.7);
+        border-color: var(--accent);
     }
 }
 
