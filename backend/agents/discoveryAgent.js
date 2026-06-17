@@ -186,12 +186,12 @@ async function discoverShops(query = '') {
 
 function getCategoryFromQuery(text = '') {
     const txt = text.toLowerCase();
-    if (txt.includes('svet') || txt.includes('light') || txt.includes('lyustra') || txt.includes('lamp')) return 'Lighting';
-    if (txt.includes('oboi') || txt.includes('wall') || txt.includes('panel') || txt.includes('sten')) return 'Walls';
-    if (txt.includes('stone') || txt.includes('kamen') || txt.includes('mramor')) return 'Stone';
-    if (txt.includes('floor') || txt.includes('parket') || txt.includes('laminat')) return 'Floor';
-    if (txt.includes('art') || txt.includes('decor') || txt.includes('kartin') || txt.includes('kartina')) return 'Art & Decor';
-    if (txt.includes('plant') || txt.includes('flower') || txt.includes('rasten')) return 'Plants';
+    if (txt.includes('svet') || txt.includes('light') || txt.includes('lyustra') || txt.includes('lamp') || txt.includes('свет') || txt.includes('люстр') || txt.includes('ламп') || txt.includes('светильник')) return 'Lighting';
+    if (txt.includes('oboi') || txt.includes('wall') || txt.includes('panel') || txt.includes('sten') || txt.includes('обои') || txt.includes('панел') || txt.includes('стен')) return 'Walls';
+    if (txt.includes('stone') || txt.includes('kamen') || txt.includes('mramor') || txt.includes('камен') || txt.includes('мрамор') || txt.includes('гранит')) return 'Stone';
+    if (txt.includes('floor') || txt.includes('parket') || txt.includes('laminat') || txt.includes('пол') || txt.includes('паркет') || txt.includes('ламинат')) return 'Floor';
+    if (txt.includes('art') || txt.includes('decor') || txt.includes('kartin') || txt.includes('kartina') || txt.includes('декор') || txt.includes('картин') || txt.includes('ваза')) return 'Art & Decor';
+    if (txt.includes('plant') || txt.includes('flower') || txt.includes('rasten') || txt.includes('цвет') || txt.includes('растен')) return 'Plants';
     return 'Furniture'; // Default
 }
 
