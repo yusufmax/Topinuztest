@@ -3738,3 +3738,9 @@ html:not([data-theme="dark"]) .theme-icon-moon { opacity: 1; }
     border-radius: var(--radius-sm) !important;
     border-color: var(--border) !important;
 }
+
+/* Dark Mode Map color inversion */
+[data-theme="dark"] .modal-map-container iframe {
+    filter: invert(90%) hue-rotate(180deg) contrast(1.2) brightness(0.9);
+    background: #111827;
+}
