@@ -168,11 +168,15 @@
 
                 <!-- 3. Details Section: Location on the Left, Social Links on the Right -->
                 <div class="modal-details-grid">
-                    <!-- Left: Location address -->
+                    <!-- Left: Location address & Map -->
                     <div class="modal-details-left">
                         <div class="modal-shop-loc" id="modalLoc" style="margin: 0; width: 100%;">
                             <img src="img/icons/Location icon.svg" alt="Location" class="modal-loc-icon">
                             <span id="modalLocText">–</span>
+                        </div>
+                        <!-- Little Map container -->
+                        <div class="modal-map-container" id="modalMapContainer" style="width: 100%; height: 160px; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); display: none;">
+                            <iframe id="modalMapIframe" src="" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                         </div>
                     </div>
 

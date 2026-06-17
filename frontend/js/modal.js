@@ -137,6 +137,19 @@ function openShopModal(shopId) {
       }
     }
 
+    // Load dynamic map
+    const mapContainer = document.getElementById('modalMapContainer');
+    const mapIframe = document.getElementById('modalMapIframe');
+    if (mapContainer && mapIframe) {
+      if (shop.location) {
+        mapIframe.src = `https://maps.google.com/maps?q=${encodeURIComponent(shop.location)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+        mapContainer.style.display = 'block';
+      } else {
+        mapIframe.src = '';
+        mapContainer.style.display = 'none';
+      }
+    }
+
     // Store button
     const storeBtn = document.getElementById('modalStoreBtn');
     const storeBtnText = document.getElementById('modalStoreBtnText');

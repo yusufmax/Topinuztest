@@ -3732,3 +3732,9 @@ html:not([data-theme="dark"]) .theme-icon-moon { opacity: 1; }
     border: 1px solid var(--border) !important;
     box-shadow: var(--shadow) !important;
 }
+
+/* Modal Map Container Theme Styles */
+.modal-map-container {
+    border-radius: var(--radius-sm) !important;
+    border-color: var(--border) !important;
+}
