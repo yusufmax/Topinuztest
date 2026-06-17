@@ -87,32 +87,43 @@ async function discoverShops(query = '') {
     const results = [];
     const lowerQuery = query.toLowerCase();
 
-    // 1. If Mock Mode is active, filter from our curated database or generate a matched list
-    if (config.mockMode || !query) {
-        // Filter curated list
-        const filteredCurated = CURATED_MOCK_STORES.filter(store => 
+    // Helper to get filtered curated shops matching query
+    const getFilteredShops = () => {
+        return CURATED_MOCK_STORES.filter(store => 
             store.name.toLowerCase().includes(lowerQuery) ||
             store.description.toLowerCase().includes(lowerQuery) ||
-            store.categoryName.toLowerCase().includes(lowerQuery)
+            store.categoryName.toLowerCase().includes(lowerQuery) ||
+            store.instagram.toLowerCase().includes(lowerQuery) ||
+            store.telegram.toLowerCase().includes(lowerQuery)
         );
+    };
 
+    // Helper to generate a realistic fallback shop matching query
+    const generateFallbackShop = () => {
+        const formattedQuery = query.charAt(0).toUpperCase() + query.slice(1);
+        const categoryName = getCategoryFromQuery(query);
+        const guessedTelegram = lowerQuery.replace(/[^a-z0-9]/g, '');
+        return {
+            name: `${formattedQuery} Tashkent`,
+            description: `Specialized boutique for high-quality ${query} products in Uzbekistan.`,
+            location: "Ташкент, ул. Бабура, 25",
+            phone: "+998 90 123 45 67",
+            instagram: `${guessedTelegram}_tashkent`,
+            telegram: `${guessedTelegram}_uz`,
+            website: `https://${guessedTelegram}-tashkent.uz`,
+            categoryName: categoryName,
+            sourceType: "telegram",
+            scrapeTarget: `${guessedTelegram}_uz`
+        };
+    };
+
+    // 1. If Mock Mode is active, filter from our curated database or generate a matched list
+    if (config.mockMode || !query) {
+        const filteredCurated = getFilteredShops();
         if (filteredCurated.length > 0) {
             results.push(...filteredCurated);
         } else {
-            // Generate a realistic custom shop matching the query
-            const formattedQuery = query.charAt(0).toUpperCase() + query.slice(1);
-            results.push({
-                name: `${formattedQuery} Tashkent`,
-                description: `Specialized boutique for high-quality ${query} products in Uzbekistan.`,
-                location: "Ташкент, ул. Бабура, 25",
-                phone: "+998 90 123 45 67",
-                instagram: `${lowerQuery}_tashkent`,
-                telegram: `${lowerQuery}_uz`,
-                website: `https://${lowerQuery}-tashkent.uz`,
-                categoryName: getCategoryFromQuery(query),
-                sourceType: "telegram",
-                scrapeTarget: `${lowerQuery}_channel_preview`
-            });
+            results.push(generateFallbackShop());
         }
         
         // Add artificial delay for realism
@@ -122,7 +133,7 @@ async function discoverShops(query = '') {
 
     // 2. Real Web Search Crawling mode (DuckDuckGo search parsing)
     try {
-        const searchUrl = `https://html.duckduckgo.com/html/?q=site:instagram.com+mebel+tashkent+${encodeURIComponent(query)}`;
+        const searchUrl = `https://html.duckduckgo.com/html/?q=site:instagram.com+tashkent+${encodeURIComponent(query)}`;
         const response = await fetch(searchUrl, {
             headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' }
         });
@@ -154,31 +165,46 @@ async function discoverShops(query = '') {
 
             // Parse shop name from Title
             let shopName = item.title.replace(/(@[a-zA-Z0-9_\.]+)|(Instagram photos and videos)|(•.*)/g, '').trim();
-            if (!shopName || shopName.length < 3) shopName = instagramHandle || 'Tashkent Mebel Shop';
+            if (!shopName || shopName.length < 3) shopName = instagramHandle || 'Tashkent Shop';
             
             // Clean title
             shopName = shopName.replace(/^[\|\-\s]+|[\|\-\s]+$/g, '');
 
             // Guess category
             const categoryName = getCategoryFromQuery(shopName + ' ' + item.snippet);
+            const guessedTelegram = instagramHandle || shopName.toLowerCase().replace(/[^a-z0-9]/g, '');
 
             results.push({
                 name: shopName,
                 description: item.snippet.substring(0, 250),
                 location: extractLocation(item.snippet) || "Ташкент, Узбекистан",
                 phone: extractPhone(item.snippet) || "+998 90 000 00 00",
-                instagram: instagramHandle || `${shopName.toLowerCase().replace(/[^a-z0-9]/g, '')}`,
-                telegram: `${instagramHandle || shopName.toLowerCase().replace(/[^a-z0-9]/g, '')}_uz`,
+                instagram: instagramHandle || guessedTelegram,
+                telegram: `${guessedTelegram}_uz`,
                 website: '',
                 categoryName: categoryName,
-                sourceType: 'instagram',
-                scrapeTarget: instagramHandle || 'instagram_handle'
+                sourceType: 'telegram', // Set to telegram for actual channel scraping support
+                scrapeTarget: `${guessedTelegram}_uz`
             });
         }
     } catch (error) {
         console.error("[Discovery Agent Error] Web search crawl failed, falling back to curated list.", error);
-        // Fallback to Curated list if network crawl fails
-        return CURATED_MOCK_STORES.slice(0, 3);
+        // Fallback to filtered Curated list or generate fallback shop if network crawl fails
+        const filteredCurated = getFilteredShops();
+        if (filteredCurated.length > 0) {
+            return filteredCurated;
+        } else {
+            return [generateFallbackShop()];
+        }
+    }
+
+    if (results.length === 0) {
+        const filteredCurated = getFilteredShops();
+        if (filteredCurated.length > 0) {
+            return filteredCurated;
+        } else {
+            return [generateFallbackShop()];
+        }
     }
 
     return results;
