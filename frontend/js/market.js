@@ -19,17 +19,7 @@ async function initShopsPage() {
     fetchAndRenderShops(_activeMainCategory),
   ]);
 
-  const searchInput = document.getElementById('shopSearch');
-  if (searchInput) {
-    searchInput.placeholder = t('searchPlaceholder');
-    let timeout = null;
-    searchInput.addEventListener('input', () => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        fetchAndRenderShops(_activeMainCategory, _activeSubCategory, searchInput.value);
-      }, 300);
-    });
-  }
+
 
   document.getElementById('shopModal')?.addEventListener('click', (e) => {
     if (e.target === document.getElementById('shopModal')) closeShopModal();

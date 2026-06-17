@@ -44,28 +44,50 @@
             <!-- Header Search Bar -->
             <div class="search-wrap">
                 <span class="search-icon">🔍</span>
-                <input type="text" id="shopSearch" placeholder="Поиск магазинов..." aria-label="Search">
+                <input type="text" id="headerSearchInput" placeholder="Поиск магазинов..." aria-label="Search">
             </div>
         </div>
     </header>
 
     <main class="page-wrapper" style="max-width: 900px; margin: 0 auto;">
-        <!-- Category tags -->
-        <div class="markets-categories-wrap">
-            <div class="markets-categories" id="catTabs">
-                <!-- Injected via JS -->
+        <!-- Main Category View -->
+        <div id="homeView">
+            <!-- Category tags -->
+            <div class="markets-categories-wrap">
+                <div class="markets-categories" id="catTabs">
+                    <!-- Injected via JS -->
+                </div>
+            </div>
+
+            <!-- Toolbar -->
+            <div class="markets-toolbar">
+                <div class="markets-count" id="shopCount" style="font-weight: 500;">0</div>
+            </div>
+
+            <!-- Shops Grid -->
+            <div class="shops-wrap">
+                <div class="shops-grid" id="shopsGrid">
+                    <div class="loader" id="shopLoader"></div>
+                </div>
             </div>
         </div>
 
-        <!-- Toolbar -->
-        <div class="markets-toolbar">
-            <div class="markets-count" id="shopCount" style="font-weight: 500;">0</div>
-        </div>
-
-        <!-- Shops Grid -->
-        <div class="shops-wrap">
-            <div class="shops-grid" id="shopsGrid">
-                <div class="loader" id="shopLoader"></div>
+        <!-- Search Results View -->
+        <div id="searchView" style="display: none; padding: 0 16px;">
+            <div class="search-results-header">
+                <h2 class="search-results-title">Результаты поиска для "<span id="searchQueryVal"></span>"</h2>
+                <button class="close-search-btn" id="closeSearchBtn">✕ Закрыть поиск</button>
+            </div>
+            
+            <div class="search-tabs" style="margin-top: 20px;">
+                <button class="search-tab-btn active" id="searchTabProducts">Товары (<span id="searchCountProducts">0</span>)</button>
+                <button class="search-tab-btn" id="searchTabShops">Магазины (<span id="searchCountShops">0</span>)</button>
+            </div>
+            
+            <div class="search-results-content" style="margin-top: 20px;">
+                <div class="products-grid" id="searchProductsGrid"></div>
+                <div class="shops-grid" id="searchShopsGrid" style="display: none; grid-template-columns: repeat(2, 1fr); gap: 16px;"></div>
+                <div class="no-results-msg" id="noResultsMsg" style="display: none;">Ничего не найдено</div>
             </div>
         </div>
 
@@ -183,6 +205,7 @@
     <script src="js/config.js?v=3.1"></script>
     <script src="js/utils.js?v=3.1"></script>
     <script src="js/market.js?v=3.1"></script>
+    <script src="js/home.js?v=3.1"></script>
     <script src="js/modal.js?v=3.1"></script>
 </body>
 

@@ -396,8 +396,10 @@ function setupSearch() {
 
 document.addEventListener('DOMContentLoaded', () => {
     const path = window.location.pathname;
-    const page = path.split('/').pop() || 'index.html';
-    if (page === 'index.html' || page === '' || page === '/') {
+    const page = path.split('/').pop();
+    if (page === 'shops.html' || page === 'shops') {
+        setupSearch();
+    } else if (page === 'index.html' || page === '' || page === '/' || page === 'index') {
         initIndexPage();
     }
 });
