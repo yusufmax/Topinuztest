@@ -1771,12 +1771,19 @@ select {
 }
 
 @media (max-width: 480px) {
-    .home-card-img {
-        height: 60px !important;
-    }
     .home-card {
-        padding: 12px !important;
+        aspect-ratio: 182 / 133 !important;
+        padding: 10px 8px !important;
         border-radius: 16px !important;
+        gap: 4px !important;
+    }
+    .home-card-img {
+        height: 48px !important;
+        max-height: 50% !important;
+    }
+    .home-card-label {
+        font-size: 11px !important;
+        margin-top: auto !important;
     }
     .home-grid {
         gap: 10px !important;
