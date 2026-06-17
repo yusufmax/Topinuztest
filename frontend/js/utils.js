@@ -12,7 +12,7 @@
     document.documentElement.setAttribute('data-ui-style', savedStyle);
 
     let savedFont = localStorage.getItem('houz_font') || 'sf-pro';
-    if (savedFont !== 'sf-pro' && savedFont !== 'playfair' && savedFont !== 'outfit') {
+    if (savedFont !== 'sf-pro' && savedFont !== 'playfair' && savedFont !== 'inter') {
         savedFont = 'sf-pro';
         localStorage.setItem('houz_font', 'sf-pro');
     }
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         let activeFont = localStorage.getItem('houz_font') || 'sf-pro';
-        if (activeFont !== 'sf-pro' && activeFont !== 'playfair' && activeFont !== 'outfit') {
+        if (activeFont !== 'sf-pro' && activeFont !== 'playfair' && activeFont !== 'inter') {
             activeFont = 'sf-pro';
         }
 
@@ -108,17 +108,48 @@ document.addEventListener('DOMContentLoaded', () => {
             <button class="style-switch-btn ${activeStyle === 'glassmorphism' ? 'active' : ''}" data-style="glassmorphism">✨ Glass</button>
         `;
         
-        // Font Switcher
-        const fontSwitcher = document.createElement('div');
-        fontSwitcher.className = 'font-switcher-wrap';
-        fontSwitcher.innerHTML = `
-            <button class="font-switch-btn ${activeFont === 'sf-pro' ? 'active' : ''}" data-font="sf-pro">Aa SF Pro</button>
-            <button class="font-switch-btn ${activeFont === 'playfair' ? 'active' : ''}" data-font="playfair">Aa Playfair</button>
-            <button class="font-switch-btn ${activeFont === 'outfit' ? 'active' : ''}" data-font="outfit">Aa Outfit</button>
+        // Font Dropdown Switcher
+        const fontWrapper = document.createElement('div');
+        fontWrapper.className = 'font-wrap';
+        fontWrapper.id = 'fontWrap';
+        fontWrapper.style.cssText = 'margin: 0; position: relative;';
+        
+        let activeFontName = 'SF Pro';
+        if (activeFont === 'playfair') activeFontName = 'Playfair';
+        if (activeFont === 'inter') activeFontName = 'Inter';
+
+        fontWrapper.innerHTML = `
+            <button class="font-dropdown-btn" id="fontDropdownBtn" aria-label="Change Font">
+                <svg class="font-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="4 7 4 4 20 4 20 7"></polyline>
+                    <line x1="9" y1="20" x2="15" y2="20"></line>
+                    <line x1="12" y1="4" x2="12" y2="20"></line>
+                </svg>
+                <span class="font-btn-text" id="fontBtnText">${activeFontName}</span>
+                <svg class="font-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s;">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+            </button>
+            <div class="font-dropdown" id="fontDropdown">
+                <div class="font-option-item ${activeFont === 'sf-pro' ? 'selected' : ''}" data-font="sf-pro">
+                    <span>SF Pro</span>
+                    <svg class="font-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <div class="font-option-item ${activeFont === 'playfair' ? 'selected' : ''}" data-font="playfair">
+                    <span>Playfair</span>
+                    <svg class="font-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <div class="font-option-item ${activeFont === 'inter' ? 'selected' : ''}" data-font="inter">
+                    <span>Inter</span>
+                    <svg class="font-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+            </div>
         `;
         
         // Append inside footer-controls
-        controls.insertBefore(fontSwitcher, controls.firstChild);
+        controls.insertBefore(fontWrapper, controls.firstChild);
         controls.insertBefore(switcher, controls.firstChild);
         
         // Bind Style Toggles
@@ -132,14 +163,55 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Bind Font Toggles
-        fontSwitcher.querySelectorAll('.font-switch-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                fontSwitcher.querySelectorAll('.font-switch-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                const nextFont = btn.dataset.font;
+        // Bind Font Dropdown Actions
+        const dropdownBtn = fontWrapper.querySelector('#fontDropdownBtn');
+        const dropdownMenu = fontWrapper.querySelector('#fontDropdown');
+        const arrow = fontWrapper.querySelector('.font-arrow');
+        
+        dropdownBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = dropdownMenu.classList.contains('active');
+            
+            // Close other dropdowns
+            document.querySelectorAll('.lang-dropdown, .font-dropdown').forEach(d => {
+                if (d !== dropdownMenu) d.classList.remove('active');
+            });
+            document.querySelectorAll('.lang-arrow, .font-arrow').forEach(a => {
+                if (a !== arrow) a.style.transform = '';
+            });
+            
+            if (!isOpen) {
+                dropdownMenu.classList.add('active');
+                arrow.style.transform = 'rotate(180deg)';
+            } else {
+                dropdownMenu.classList.remove('active');
+                arrow.style.transform = '';
+            }
+        });
+        
+        // Hide dropdown on click outside
+        document.addEventListener('click', () => {
+            dropdownMenu.classList.remove('active');
+            arrow.style.transform = '';
+        });
+        
+        fontWrapper.querySelectorAll('.font-option-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.stopPropagation();
+                fontWrapper.querySelectorAll('.font-option-item').forEach(el => el.classList.remove('selected'));
+                item.classList.add('selected');
+                
+                const nextFont = item.dataset.font;
+                let nextName = 'SF Pro';
+                if (nextFont === 'playfair') nextName = 'Playfair';
+                if (nextFont === 'inter') nextName = 'Inter';
+                
+                fontWrapper.querySelector('#fontBtnText').textContent = nextName;
                 localStorage.setItem('houz_font', nextFont);
                 document.documentElement.setAttribute('data-font', nextFont);
+                
+                dropdownMenu.classList.remove('active');
+                arrow.style.transform = '';
             });
         });
     }

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
 
 /* ─── Reset & Base ──────────────────────────────────────── */
 *,
@@ -35,9 +35,9 @@
     --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.02);
     
     /* Glassmorphism Variables */
-    --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.3) 40%, rgba(255, 255, 255, 0.15) 100%);
-    --glass-border: rgba(255, 255, 255, 0.75);
-    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.06);
+    --glass-bg: rgba(255, 255, 255, 0.55);
+    --glass-border: rgba(255, 255, 255, 0.6);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.04);
     --glass-blur: blur(20px);
 }
 
@@ -61,9 +61,9 @@
     --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.15);
     
     /* Glassmorphism Variables */
-    --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.03) 40%, rgba(17, 24, 39, 0.55) 100%);
-    --glass-border: rgba(255, 255, 255, 0.14);
-    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.35);
+    --glass-bg: rgba(17, 24, 39, 0.55);
+    --glass-border: rgba(255, 255, 255, 0.06);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
     --glass-blur: blur(25px);
 }
 
@@ -3589,159 +3589,6 @@ html:not([data-theme="dark"]) .theme-icon-moon { opacity: 1; }
     border-radius: 50px !important;
 }
 
-/* Glass Specular Glare Reflections */
-.market-card,
-.home-card,
-.product-card {
-    position: relative;
-    overflow: hidden;
-}
-
-.market-card::before,
-.home-card::before,
-.product-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border-radius: inherit;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 50%);
-    pointer-events: none;
-    z-index: 1;
-    opacity: 0.95;
-    transition: opacity 0.3s ease;
-}
-
-/* In dark theme glass mode, slightly softer reflection */
-[data-theme="dark"] .market-card::before,
-[data-theme="dark"] .home-card::before,
-[data-theme="dark"] .product-card::before {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 45%);
-}
-
-/* On hover, make glare more interactive / glowing */
-.market-card:hover::before,
-.home-card:hover::before,
-.product-card:hover::before {
-    opacity: 1;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 60%);
-}
-
-/* Remove this glare highlight completely under flat minimalism styles (Instagram & Apple) */
-[data-ui-style="instagram"] .market-card::before,
-[data-ui-style="instagram"] .home-card::before,
-[data-ui-style="instagram"] .product-card::before,
-[data-ui-style="apple"] .market-card::before,
-[data-ui-style="apple"] .home-card::before,
-[data-ui-style="apple"] .product-card::before {
-    display: none !important;
-}
-
-/* Smooth Morphing UI Style / Theme Transitions */
-body,
-.site-header,
-.market-card,
-.home-card,
-.product-card,
-.modal-sheet,
-.cat-pill,
-.search-wrap input,
-.hero-search-box,
-button,
-a,
-input,
-.style-switcher-wrap,
-.style-switch-btn {
-    transition: background 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                border-radius 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                backdrop-filter 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                -webkit-backdrop-filter 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-
-/* Tactile scale-down animation on active click/tap */
-.market-card:active,
-.home-card:active,
-.product-card:active,
-.style-switch-btn:active,
-.cat-pill:active,
-.btn-modal-primary:active,
-.btn-primary-ar:active,
-.theme-toggle-btn:active,
-.lang-switch-btn:active {
-    transform: scale(0.96) !important;
-    transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-
-/* Specular shimmer shine for primary buttons */
-@keyframes buttonShimmer {
-    0% { left: -150%; }
-    100% { left: 150%; }
-}
-
-.btn-modal-primary,
-.btn-primary-ar,
-.hero-search-box button {
-    position: relative;
-    overflow: hidden;
-}
-
-.btn-modal-primary::after,
-.btn-primary-ar::after,
-.hero-search-box button::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -150%;
-    width: 60%;
-    height: 100%;
-    background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.3) 50%, rgba(255, 255, 255, 0) 100%);
-    transform: skewX(-20deg);
-    pointer-events: none;
-    z-index: 1;
-}
-
-.btn-modal-primary:hover::after,
-.btn-primary-ar:hover::after,
-.hero-search-box button:hover::after {
-    animation: buttonShimmer 1.4s infinite cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Staggered load animation for listing cards */
-.market-card,
-.home-card,
-.product-card {
-    animation: cardEntrance 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-@keyframes cardEntrance {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Entrance delays for staggered layout */
-.market-card:nth-child(1), .home-card:nth-child(1), .product-card:nth-child(1) { animation-delay: 0.04s; }
-.market-card:nth-child(2), .home-card:nth-child(2), .product-card:nth-child(2) { animation-delay: 0.08s; }
-.market-card:nth-child(3), .home-card:nth-child(3), .product-card:nth-child(3) { animation-delay: 0.12s; }
-.market-card:nth-child(4), .home-card:nth-child(4), .product-card:nth-child(4) { animation-delay: 0.16s; }
-.market-card:nth-child(5), .home-card:nth-child(5), .product-card:nth-child(5) { animation-delay: 0.2s; }
-.market-card:nth-child(6), .home-card:nth-child(6), .product-card:nth-child(6) { animation-delay: 0.24s; }
-.market-card:nth-child(7), .home-card:nth-child(7), .product-card:nth-child(7) { animation-delay: 0.28s; }
-.market-card:nth-child(8), .home-card:nth-child(8), .product-card:nth-child(8) { animation-delay: 0.32s; }
-.market-card:nth-child(n+9), .home-card:nth-child(n+9), .product-card:nth-child(n+9) { animation-delay: 0.36s; }
-
 /* ─── Font Selection Overrides ─── */
 [data-font="sf-pro"] {
     --font-family-global: "SF Pro Display", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -3751,78 +3598,123 @@ input,
     --font-family-global: "Playfair Display", Georgia, Cambria, "Times New Roman", Times, serif;
 }
 
-[data-font="outfit"] {
-    --font-family-global: "Outfit", sans-serif;
+[data-font="inter"] {
+    --font-family-global: "Inter", sans-serif;
 }
 
-/* ─── Font Switcher Base & Overrides ─── */
-.font-switcher-wrap {
+/* ─── Font Dropdown Base Styling ─── */
+.font-wrap {
+    position: relative;
+    display: inline-block;
+}
+
+.font-dropdown-btn {
     display: flex;
     align-items: center;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 30px;
-    padding: 3px;
-    gap: 4px;
-}
-
-.font-switch-btn {
-    border: none;
-    background: none;
-    font-size: 11px;
-    font-weight: 600;
-    padding: 6px 12px;
+    gap: 8px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    padding: 6px 14px;
     border-radius: 20px;
-    color: var(--text2);
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
+    box-shadow: var(--glass-shadow);
 }
 
-.font-switch-btn:hover {
-    color: var(--text);
-}
-
-.font-switch-btn.active {
+.font-dropdown-btn:hover {
     background: var(--surface);
+    border-color: var(--border2);
+}
+
+.font-dropdown {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    margin-bottom: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 6px;
+    min-width: 130px;
+    box-shadow: var(--shadow);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.font-dropdown.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+.font-option-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-radius: 8px;
     color: var(--text);
-    box-shadow: var(--shadow-sm);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.1s;
 }
 
-/* Instagram Theme overrides for switcher */
-[data-ui-style="instagram"] .font-switcher-wrap {
-    border: 1px solid var(--border) !important;
-    border-radius: 4px !important;
+.font-option-item:hover {
+    background: var(--bg2);
+}
+
+.font-option-item.selected {
+    color: var(--accent) !important;
+}
+
+.font-option-item.selected .font-check {
+    stroke: var(--accent) !important;
+}
+
+/* Instagram UI overrides for font switcher */
+[data-ui-style="instagram"] .font-dropdown-btn {
     background: var(--surface) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius-sm) !important;
     box-shadow: none !important;
 }
 
-[data-ui-style="instagram"] .font-switch-btn {
-    border-radius: 2px !important;
-    color: var(--text2) !important;
-}
-
-[data-ui-style="instagram"] .font-switch-btn.active {
+[data-ui-style="instagram"] .font-dropdown-btn:hover {
     background: var(--bg2) !important;
-    color: var(--text) !important;
-    font-weight: 700 !important;
-    box-shadow: none !important;
 }
 
-/* Apple Theme overrides for switcher */
-[data-ui-style="apple"] .font-switcher-wrap {
+[data-ui-style="instagram"] .font-dropdown {
+    border-radius: var(--radius-sm) !important;
+    box-shadow: none !important;
     border: 1px solid var(--border) !important;
-    border-radius: 50px !important;
-    background: var(--surface) !important;
-    box-shadow: var(--shadow-sm) !important;
 }
 
-[data-ui-style="apple"] .font-switch-btn {
+/* Apple UI overrides for font switcher */
+[data-ui-style="apple"] .font-dropdown-btn {
+    background: var(--bg2) !important;
+    border: none !important;
     border-radius: 50px !important;
-    color: var(--text2) !important;
-}
-
-[data-ui-style="apple"] .font-switch-btn.active {
-    background: var(--accent) !important;
-    color: #ffffff !important;
     box-shadow: none !important;
+}
+
+[data-ui-style="apple"] .font-dropdown-btn:hover {
+    background: var(--border2) !important;
+}
+
+[data-ui-style="apple"] .font-dropdown {
+    border-radius: 16px !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: var(--shadow) !important;
 }
