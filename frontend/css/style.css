@@ -3147,3 +3147,439 @@ html:not([data-theme="dark"]) .theme-icon-moon { opacity: 1; }
         flex: 1 !important;
     }
 }
+
+/* ─── UI Style Segmented Switcher ─── */
+.style-switcher-wrap {
+    display: flex;
+    align-items: center;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 30px;
+    padding: 3px;
+    gap: 4px;
+}
+
+.style-switch-btn {
+    border: none;
+    background: none;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 20px;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.style-switch-btn:hover {
+    color: var(--text);
+}
+
+.style-switch-btn.active {
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: var(--shadow-sm);
+}
+
+/* ─── UI Style Override: Instagram-like Minimalism ─── */
+[data-ui-style="instagram"] {
+    --bg: #ffffff !important;
+    --bg2: #fafafa !important;
+    --surface: #ffffff !important;
+    --surface2: #fafafa !important;
+    --border: #dbdbdb !important;
+    --border2: #dbdbdb !important;
+    --text: #262626 !important;
+    --text2: #737373 !important;
+    --text3: #a8a8a8 !important;
+    --accent: #0095f6 !important; /* Instagram Link Blue */
+    --accent2: #1877f2 !important;
+    --radius-sm: 4px !important;
+    --radius: 8px !important;
+    --radius-lg: 8px !important;
+    --shadow: none !important;
+    --shadow-sm: none !important;
+    
+    --glass-bg: #ffffff !important;
+    --glass-border: #dbdbdb !important;
+    --glass-shadow: none !important;
+    --glass-blur: none !important;
+}
+
+[data-theme="dark"][data-ui-style="instagram"] {
+    --bg: #000000 !important;
+    --bg2: #121212 !important;
+    --surface: #000000 !important;
+    --surface2: #121212 !important;
+    --border: #262626 !important;
+    --border2: #262626 !important;
+    --text: #f5f5f5 !important;
+    --text2: #a8a8a8 !important;
+    --text3: #737373 !important;
+    --accent: #0095f6 !important;
+    --accent2: #1877f2 !important;
+    
+    --glass-bg: #000000 !important;
+    --glass-border: #262626 !important;
+}
+
+/* Instagram Overrides */
+[data-ui-style="instagram"] body {
+    background-image: none !important;
+    background: var(--bg) !important;
+}
+
+[data-ui-style="instagram"] .site-header {
+    background: var(--surface) !important;
+    border-bottom: 1px solid var(--border) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+[data-ui-style="instagram"] .logo {
+    background: none !important;
+    -webkit-background-clip: initial !important;
+    -webkit-text-fill-color: initial !important;
+    background-clip: initial !important;
+    color: var(--text) !important;
+}
+
+[data-ui-style="instagram"] .market-card,
+[data-ui-style="instagram"] .home-card,
+[data-ui-style="instagram"] .product-card,
+[data-ui-style="instagram"] .modal-sheet {
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius) !important;
+    box-shadow: none !important;
+    background: var(--surface) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+[data-ui-style="instagram"] .market-card:hover,
+[data-ui-style="instagram"] .home-card:hover,
+[data-ui-style="instagram"] .product-card:hover {
+    transform: none !important;
+    box-shadow: none !important;
+    background: var(--bg2) !important;
+}
+
+[data-ui-style="instagram"] .cat-pill {
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius-sm) !important;
+    background: var(--surface) !important;
+    color: var(--text) !important;
+    box-shadow: none !important;
+}
+
+[data-ui-style="instagram"] .cat-pill:hover {
+    background: var(--bg2) !important;
+    border-color: var(--border2) !important;
+}
+
+[data-ui-style="instagram"] .cat-pill.active {
+    background: var(--text) !important;
+    color: var(--surface) !important;
+    border-color: var(--text) !important;
+}
+
+[data-ui-style="instagram"] .search-wrap input,
+[data-ui-style="instagram"] .hero-search-box {
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius-sm) !important;
+    background: var(--bg2) !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+[data-ui-style="instagram"] .search-wrap input:focus {
+    border-color: var(--text2) !important;
+    background: var(--surface) !important;
+}
+
+[data-ui-style="instagram"] .btn-modal-primary,
+[data-ui-style="instagram"] .hero-search-box button,
+[data-ui-style="instagram"] .btn-primary-ar {
+    background: var(--accent) !important;
+    color: #ffffff !important;
+    border-radius: var(--radius-sm) !important;
+    border: none !important;
+    box-shadow: none !important;
+    font-weight: 600 !important;
+}
+
+[data-ui-style="instagram"] .btn-modal-primary:hover,
+[data-ui-style="instagram"] .hero-search-box button:hover,
+[data-ui-style="instagram"] .btn-primary-ar:hover {
+    background: var(--accent2) !important;
+    transform: none !important;
+}
+
+[data-ui-style="instagram"] .modal-close,
+[data-ui-style="instagram"] .btn-modal-share,
+[data-ui-style="instagram"] .theme-toggle-btn,
+[data-ui-style="instagram"] .lang-switch-btn {
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius-sm) !important;
+    background: var(--surface) !important;
+    box-shadow: none !important;
+    color: var(--text) !important;
+}
+
+[data-ui-style="instagram"] .modal-close:hover,
+[data-ui-style="instagram"] .btn-modal-share:hover,
+[data-ui-style="instagram"] .theme-toggle-btn:hover,
+[data-ui-style="instagram"] .lang-switch-btn:hover {
+    background: var(--bg2) !important;
+}
+
+[data-ui-style="instagram"] .modal-shop-loc {
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius-sm) !important;
+    background: var(--bg2) !important;
+    color: var(--text) !important;
+    box-shadow: none !important;
+}
+
+[data-ui-style="instagram"] .style-switcher-wrap {
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius) !important;
+    background: var(--surface) !important;
+    box-shadow: none !important;
+}
+
+[data-ui-style="instagram"] .style-switch-btn {
+    border-radius: var(--radius-sm) !important;
+    color: var(--text2) !important;
+}
+
+[data-ui-style="instagram"] .style-switch-btn.active {
+    background: var(--bg2) !important;
+    color: var(--text) !important;
+    font-weight: 700 !important;
+    box-shadow: none !important;
+}
+
+[data-ui-style="instagram"] .ar-banner {
+    background: var(--bg2) !important;
+    border: 1px solid var(--border) !important;
+    color: var(--text) !important;
+    border-radius: var(--radius) !important;
+}
+
+[data-ui-style="instagram"] .ar-banner p {
+    color: var(--text2) !important;
+}
+
+[data-ui-style="instagram"] .ar-badge-big {
+    background: var(--accent) !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+    border-radius: var(--radius-sm) !important;
+}
+
+/* ─── UI Style Override: Apple-like Minimalism ─── */
+[data-ui-style="apple"] {
+    --bg: #f5f5f7 !important; /* Apple Light Grey */
+    --bg2: #e8e8ed !important;
+    --surface: #ffffff !important;
+    --surface2: #f5f5f7 !important;
+    --border: rgba(0, 0, 0, 0.04) !important;
+    --border2: rgba(0, 0, 0, 0.08) !important;
+    --text: #1d1d1f !important; /* Apple Charcoal Black */
+    --text2: #86868b !important; /* Apple Grey */
+    --text3: #aeaeb2 !important;
+    --accent: #0071e3 !important; /* Apple Blue */
+    --accent2: #0077ed !important;
+    --radius-sm: 12px !important;
+    --radius: 20px !important;
+    --radius-lg: 24px !important;
+    --shadow: 0 8px 30px rgba(0, 0, 0, 0.04) !important;
+    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.02) !important;
+    
+    --glass-bg: rgba(255, 255, 255, 0.8) !important;
+    --glass-border: rgba(0, 0, 0, 0.04) !important;
+    --glass-shadow: 0 8px 30px rgba(0, 0, 0, 0.04) !important;
+    --glass-blur: blur(20px) !important;
+}
+
+[data-theme="dark"][data-ui-style="apple"] {
+    --bg: #000000 !important; /* Apple Pure Black */
+    --bg2: #161617 !important;
+    --surface: #1d1d1f !important;
+    --surface2: #333336 !important;
+    --border: rgba(255, 255, 255, 0.06) !important;
+    --border2: rgba(255, 255, 255, 0.12) !important;
+    --text: #f5f5f7 !important;
+    --text2: #86868b !important;
+    --text3: #48484a !important;
+    --accent: #2997ff !important; /* Apple Light Blue */
+    --accent2: #0071e3 !important;
+    --shadow: 0 8px 30px rgba(0, 0, 0, 0.3) !important;
+    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    
+    --glass-bg: rgba(29, 29, 31, 0.8) !important;
+    --glass-border: rgba(255, 255, 255, 0.06) !important;
+    --glass-shadow: 0 8px 30px rgba(0, 0, 0, 0.3) !important;
+    --glass-blur: blur(20px) !important;
+}
+
+/* Apple Overrides */
+[data-ui-style="apple"] body {
+    background-image: none !important;
+    background: var(--bg) !important;
+}
+
+[data-ui-style="apple"] .site-header {
+    background: var(--glass-bg) !important;
+    border-bottom: 1px solid var(--border) !important;
+    backdrop-filter: var(--glass-blur) !important;
+    -webkit-backdrop-filter: var(--glass-blur) !important;
+}
+
+[data-ui-style="apple"] .logo {
+    background: none !important;
+    -webkit-background-clip: initial !important;
+    -webkit-text-fill-color: initial !important;
+    background-clip: initial !important;
+    color: var(--text) !important;
+}
+
+[data-ui-style="apple"] .market-card,
+[data-ui-style="apple"] .home-card,
+[data-ui-style="apple"] .product-card,
+[data-ui-style="apple"] .modal-sheet {
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius) !important;
+    box-shadow: var(--shadow) !important;
+    background: var(--surface) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+[data-ui-style="apple"] .market-card:hover,
+[data-ui-style="apple"] .home-card:hover,
+[data-ui-style="apple"] .product-card:hover {
+    transform: scale(1.015) !important;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06) !important;
+    background: var(--surface) !important;
+}
+[data-theme="dark"][data-ui-style="apple"] .market-card:hover,
+[data-theme="dark"][data-ui-style="apple"] .home-card:hover,
+[data-theme="dark"][data-ui-style="apple"] .product-card:hover {
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3) !important;
+}
+
+[data-ui-style="apple"] .cat-pill {
+    border: none !important;
+    border-radius: 50px !important;
+    background: var(--bg2) !important;
+    color: var(--text) !important;
+    box-shadow: none !important;
+    padding: 8px 16px !important;
+}
+
+[data-ui-style="apple"] .cat-pill:hover {
+    background: var(--border2) !important;
+}
+
+[data-ui-style="apple"] .cat-pill.active {
+    background: var(--accent) !important;
+    color: #ffffff !important;
+}
+
+[data-ui-style="apple"] .search-wrap input,
+[data-ui-style="apple"] .hero-search-box {
+    border: none !important;
+    border-radius: 50px !important;
+    background: var(--bg2) !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+[data-ui-style="apple"] .search-wrap input:focus {
+    background: var(--surface) !important;
+    box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15) !important;
+}
+
+[data-ui-style="apple"] .btn-modal-primary,
+[data-ui-style="apple"] .hero-search-box button,
+[data-ui-style="apple"] .btn-primary-ar {
+    background: var(--accent) !important;
+    color: #ffffff !important;
+    border-radius: 50px !important;
+    border: none !important;
+    box-shadow: none !important;
+    font-weight: 500 !important;
+}
+
+[data-ui-style="apple"] .btn-modal-primary:hover,
+[data-ui-style="apple"] .hero-search-box button:hover,
+[data-ui-style="apple"] .btn-primary-ar:hover {
+    opacity: 0.9 !important;
+}
+
+[data-ui-style="apple"] .modal-close,
+[data-ui-style="apple"] .btn-modal-share,
+[data-ui-style="apple"] .theme-toggle-btn,
+[data-ui-style="apple"] .lang-switch-btn {
+    border: none !important;
+    border-radius: 50px !important;
+    background: var(--bg2) !important;
+    box-shadow: none !important;
+    color: var(--text) !important;
+}
+
+[data-ui-style="apple"] .modal-close:hover,
+[data-ui-style="apple"] .btn-modal-share:hover,
+[data-ui-style="apple"] .theme-toggle-btn:hover,
+[data-ui-style="apple"] .lang-switch-btn:hover {
+    background: var(--border2) !important;
+}
+
+[data-ui-style="apple"] .modal-shop-loc {
+    border: none !important;
+    border-radius: 50px !important;
+    background: var(--bg2) !important;
+    color: var(--text) !important;
+    box-shadow: none !important;
+}
+
+[data-ui-style="apple"] .style-switcher-wrap {
+    border: 1px solid var(--border) !important;
+    border-radius: 50px !important;
+    background: var(--surface) !important;
+    box-shadow: var(--shadow-sm) !important;
+}
+
+[data-ui-style="apple"] .style-switch-btn {
+    border-radius: 50px !important;
+    color: var(--text2) !important;
+}
+
+[data-ui-style="apple"] .style-switch-btn.active {
+    background: var(--accent) !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+}
+
+[data-ui-style="apple"] .ar-banner {
+    background: var(--surface) !important;
+    border: 1px solid var(--border) !important;
+    color: var(--text) !important;
+    border-radius: var(--radius) !important;
+    box-shadow: var(--shadow) !important;
+}
+
+[data-ui-style="apple"] .ar-banner p {
+    color: var(--text2) !important;
+}
+
+[data-ui-style="apple"] .ar-badge-big {
+    background: var(--accent) !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+    border-radius: 50px !important;
+}

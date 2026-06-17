@@ -1,8 +1,15 @@
-// ─── Theme Management ──────────────────────────────────
+// ─── Theme & UI Style Management ────────────────────────
 (function initTheme() {
     const saved = localStorage.getItem('houz_theme');
     const theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     document.documentElement.setAttribute('data-theme', theme);
+
+    let savedStyle = localStorage.getItem('houz_ui_style') || 'glassmorphism';
+    if (savedStyle !== 'glassmorphism' && savedStyle !== 'instagram' && savedStyle !== 'apple') {
+        savedStyle = 'glassmorphism';
+        localStorage.setItem('houz_ui_style', 'glassmorphism');
+    }
+    document.documentElement.setAttribute('data-ui-style', savedStyle);
 })();
 
 function toggleTheme() {
@@ -70,3 +77,34 @@ document.addEventListener('touchend', () => {
 document.addEventListener('touchcancel', () => {
     document.querySelectorAll('.tapped').forEach(el => el.classList.remove('tapped'));
 }, { passive: true });
+
+// ─── Dynamic UI Style Switcher ──────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    const controls = document.querySelector('.footer-controls');
+    if (controls) {
+        let activeStyle = localStorage.getItem('houz_ui_style') || 'glassmorphism';
+        if (activeStyle !== 'glassmorphism' && activeStyle !== 'instagram' && activeStyle !== 'apple') {
+            activeStyle = 'glassmorphism';
+        }
+        const switcher = document.createElement('div');
+        switcher.className = 'style-switcher-wrap';
+        switcher.innerHTML = `
+            <button class="style-switch-btn ${activeStyle === 'instagram' ? 'active' : ''}" data-style="instagram">📸 Instagram</button>
+            <button class="style-switch-btn ${activeStyle === 'apple' ? 'active' : ''}" data-style="apple">🍏 Apple</button>
+            <button class="style-switch-btn ${activeStyle === 'glassmorphism' ? 'active' : ''}" data-style="glassmorphism">✨ Glass</button>
+        `;
+        
+        // Append as the first item inside footer-controls
+        controls.insertBefore(switcher, controls.firstChild);
+        
+        switcher.querySelectorAll('.style-switch-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                switcher.querySelectorAll('.style-switch-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const nextStyle = btn.dataset.style;
+                localStorage.setItem('houz_ui_style', nextStyle);
+                document.documentElement.setAttribute('data-ui-style', nextStyle);
+            });
+        });
+    }
+});
