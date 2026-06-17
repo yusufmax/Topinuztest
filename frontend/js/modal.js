@@ -353,15 +353,38 @@ async function _loadModalProducts(shopId, shopSlug, shopName, shopCurrency) {
     }
 }
 
-function closeShopModal() {
+function closeShopModal(immediate = false) {
     _stopCarousel();
     const overlay = document.getElementById('shopModal');
-    if (overlay) overlay.style.display = 'none';
-    
     const sheet = document.getElementById('modalSheet');
-    if (sheet) sheet.classList.remove('expanded');
     
-    document.body.style.overflow = '';
+    if (overlay) {
+        if (immediate) {
+            overlay.style.display = 'none';
+            overlay.classList.remove('closing');
+            if (sheet) {
+                sheet.classList.remove('expanded');
+                sheet.style.transform = '';
+                sheet.style.transition = '';
+            }
+            document.body.style.overflow = '';
+            return;
+        }
+
+        if (overlay.classList.contains('closing')) return;
+
+        overlay.classList.add('closing');
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            overlay.classList.remove('closing');
+            if (sheet) {
+                sheet.classList.remove('expanded');
+                sheet.style.transform = '';
+                sheet.style.transition = '';
+            }
+            document.body.style.overflow = '';
+        }, 280);
+    }
 }
 
 // Close with Escape key
@@ -434,10 +457,9 @@ function initModalScrollRedirect() {
 
                 if (dragDistance > 100) {
                     sheet.style.transform = 'translateY(100%)';
+                    overlay.classList.add('closing');
                     setTimeout(() => {
-                        closeShopModal();
-                        sheet.style.transform = '';
-                        sheet.style.transition = '';
+                        closeShopModal(true);
                     }, 300);
                 } else {
                     sheet.style.transform = '';
