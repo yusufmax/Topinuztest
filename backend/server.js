@@ -28,53 +28,65 @@ app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 // Cache the shops.html file in memory — cleared on each deploy (process restart)
 let _shopsHtml = null;
 
-// SSR Open Graph Interceptor for Telegram/WhatsApp previews
-app.get('/shops.html', async (req, res, next) => {
+// SSR Open Graph Interceptor for Telegram/WhatsApp previews & Clean URL serving
+app.get('/shops', async (req, res, next) => {
     const shopId = req.query.shop;
-    if (!shopId) return next(); // Pass down to static server if not a specific shop share
 
     try {
-        const { Shop, Category } = require('./models');
-        const shop = await Shop.findByPk(shopId, { include: [{ model: Category }] });
-
-        if (!shop) return next();
-
         if (!_shopsHtml) _shopsHtml = fs.readFileSync(path.join(__dirname, '../frontend/shops.html'), 'utf-8');
         let html = _shopsHtml;
+
+        if (shopId) {
+            const { Shop, Category } = require('./models');
+            const shop = await Shop.findByPk(shopId, { include: [{ model: Category }] });
+
+            if (shop) {
+                const catName = shop.Category ? (shop.Category.name_ru || shop.Category.name) : '';
+                const titleStr = catName ? `${catName} - ${shop.name}` : shop.name;
+                const safeTitle = (titleStr || 'Topin').replace(/"/g, '&quot;');
+                
+                const rawDesc = shop.description_ru || shop.description || "";
+                const safeDesc = rawDesc.substring(0, 160).replace(/"/g, '&quot;');
+                const safeImage = 'https://topin.uz/img/Topin_logo.jpeg';
+                const url = `https://topin.uz/shops?category=${req.query.category || 'all'}&shop=${shopId}`;
+
+                const ogTags = `
+            <!-- Dynamic Open Graph Data -->
+            <meta property="og:title" content="${safeTitle}">
+            <meta property="og:description" content="${safeDesc}">
+            <meta property="og:image" content="${safeImage}">
+            <meta property="og:url" content="${url}">
+            <meta property="og:type" content="website">
+            
+            <!-- Dynamic Twitter Card Data -->
+            <meta name="twitter:card" content="summary_large_image">
+            <meta name="twitter:title" content="${safeTitle}">
+            <meta name="twitter:description" content="${safeDesc}">
+            <meta name="twitter:image" content="${safeImage}">
+                `;
+
+                // Inject into <head>
+                html = html.replace('</head>', `${ogTags}\n</head>`);
+                html = html.replace(/<title>.*<\/title>/, `<title>${safeTitle} | Topin</title>`);
+            }
+        }
         
-        const catName = shop.Category ? (shop.Category.name_ru || shop.Category.name) : '';
-        const titleStr = catName ? `${catName} - ${shop.name}` : shop.name;
-        const safeTitle = (titleStr || 'Ho.uz').replace(/"/g, '&quot;');
-        
-        const rawDesc = shop.description_ru || shop.description || "";
-        const safeDesc = rawDesc.substring(0, 160).replace(/"/g, '&quot;');
-        const safeImage = 'https://topin.uz/img/Topin_logo.jpeg';
-        const url = `https://topin.uz/shops.html?category=${req.query.category || 'all'}&shop=${shopId}`;
-
-        const ogTags = `
-    <!-- Dynamic Open Graph Data -->
-    <meta property="og:title" content="${safeTitle}">
-    <meta property="og:description" content="${safeDesc}">
-    <meta property="og:image" content="${safeImage}">
-    <meta property="og:url" content="${url}">
-    <meta property="og:type" content="website">
-    
-    <!-- Dynamic Twitter Card Data -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="${safeTitle}">
-    <meta name="twitter:description" content="${safeDesc}">
-    <meta name="twitter:image" content="${safeImage}">
-        `;
-
-        // Inject into <head>
-        html = html.replace('</head>', `${ogTags}\n</head>`);
-        html = html.replace(/<title>.*<\/title>/, `<title>${safeTitle} | Ho.uz</title>`);
-
         return res.send(html);
     } catch (err) {
         console.error('OG Tag Injection Error:', err);
-        return next();
+        return res.sendFile(path.join(__dirname, '../frontend/shops.html'));
     }
+});
+
+// Redirects for legacy .html URLs to clean dynamic routes
+app.get('/shops.html', (req, res) => {
+    const query = req.url.split('?')[1] || '';
+    res.redirect(301, `/shops${query ? '?' + query : ''}`);
+});
+
+app.get('/index.html', (req, res) => {
+    const query = req.url.split('?')[1] || '';
+    res.redirect(301, `/${query ? '?' + query : ''}`);
 });
 
 let _storeHtml = null;

@@ -273,8 +273,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch(e) {}
 
     const path = window.location.pathname;
-    const page = path.split('/').pop() || 'index.html';
-    if (page === 'shops.html') {
+    const page = path.split('/').pop();
+    if (page === 'shops.html' || page === 'shops') {
         initShopsPage();
         const wrap = document.querySelector('.markets-categories-wrap');
         if (wrap) enableDragScroll(wrap);
