@@ -401,7 +401,12 @@ function initModalScrollRedirect() {
     const modalBody = document.querySelector('#shopModal .modal-body');
     const sheet = document.getElementById('modalSheet');
     if (modalBody && sheet && overlay) {
+        let lastScrollTopTime = 0;
+
         modalBody.addEventListener('scroll', () => {
+            if (modalBody.scrollTop > 0) {
+                lastScrollTopTime = Date.now();
+            }
             // Check if mobile view (e.g. width < 600px)
             if (window.innerWidth < 600) {
                 if (modalBody.scrollTop > 15) {
@@ -416,18 +421,20 @@ function initModalScrollRedirect() {
         let startY = 0;
         let dragStartY = 0;
         let isDraggingSheet = false;
+        let startedAtTop = false;
 
         overlay.addEventListener('touchstart', (e) => {
             startY = e.touches[0].clientY;
+            startedAtTop = (modalBody.scrollTop <= 0);
         }, { passive: true });
 
         overlay.addEventListener('touchmove', (e) => {
             const currentY = e.touches[0].clientY;
             const dy = currentY - startY;
 
-            // If we are touching the backdrop, or modalBody is at the top and we swipe down
+            // If we are touching the backdrop, or we started the touch at the top and we swipe down
             const isBackdrop = e.target === overlay;
-            if ((isBackdrop || modalBody.scrollTop <= 0) && dy > 0) {
+            if ((isBackdrop || (startedAtTop && modalBody.scrollTop <= 0)) && dy > 0) {
                 if (!isDraggingSheet) {
                     isDraggingSheet = true;
                     dragStartY = currentY;
@@ -470,11 +477,13 @@ function initModalScrollRedirect() {
             }
             startY = 0;
             dragStartY = 0;
+            startedAtTop = false;
         }, { passive: true });
 
-        // Scroll wheel / trackpad close on desktop when at the top
+        // Scroll wheel / trackpad close on desktop when at the top (avoiding inertial scroll artifacts)
         overlay.addEventListener('wheel', (e) => {
-            if (modalBody.scrollTop <= 0 && e.deltaY < -5) {
+            const timeSinceScroll = Date.now() - lastScrollTopTime;
+            if (modalBody.scrollTop <= 0 && e.deltaY < -5 && timeSinceScroll > 200) {
                 closeShopModal();
             }
         }, { passive: true });
