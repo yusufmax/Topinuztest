@@ -15,6 +15,16 @@
     <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
     <link rel="stylesheet" href="css/style.css?v=3.1">
     <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('houz_theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));</script>
+    <style>
+        @media (max-width: 600px) {
+            .site-header .home-logo {
+                display: none !important;
+            }
+            .header-inner {
+                gap: 8px !important;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -29,6 +39,12 @@
                 <a href="index.html" class="home-logo">
                     <span class="logo-text-top">TOP</span><span class="logo-text-in">IN</span>
                 </a>
+            </div>
+
+            <!-- Header Search Bar -->
+            <div class="search-wrap">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="shopSearch" placeholder="Поиск магазинов..." aria-label="Search">
             </div>
         </div>
     </header>

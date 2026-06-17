@@ -21,6 +21,7 @@ async function initShopsPage() {
 
   const searchInput = document.getElementById('shopSearch');
   if (searchInput) {
+    searchInput.placeholder = t('searchPlaceholder');
     let timeout = null;
     searchInput.addEventListener('input', () => {
       clearTimeout(timeout);
