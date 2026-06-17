@@ -156,27 +156,31 @@
             </div>
 
             <div class="modal-body">
-                <div class="modal-content-grid">
-                    <!-- Left/Top Section: Logo & Info -->
-                    <div class="modal-info-col">
-                        <div class="modal-logo" id="modalLogo">🏪</div>
-                        <h2 class="modal-shop-name" id="modalName">–</h2>
-                        <p class="modal-shop-desc" id="modalDescFull">Bu do'kon haqida ma'lumot...</p>
+                <!-- 1. Header Section: Logo & Name & Description -->
+                <div class="modal-info-col" style="margin-bottom: 20px;">
+                    <div class="modal-logo" id="modalLogo">🏪</div>
+                    <h2 class="modal-shop-name" id="modalName">–</h2>
+                    <p class="modal-shop-desc" id="modalDescFull">Bu do'kon haqida ma'lumot...</p>
+                </div>
 
-                        <div class="modal-shop-loc" id="modalLoc" style="margin-bottom: 24px;">
+                <!-- 2. Image Carousel -->
+                <div class="shop-carousel" id="shopCarousel" style="margin-bottom: 24px;"></div>
+
+                <!-- 3. Details Section: Location on the Left, Social Links on the Right -->
+                <div class="modal-details-grid">
+                    <!-- Left: Location address -->
+                    <div class="modal-details-left">
+                        <div class="modal-shop-loc" id="modalLoc" style="margin: 0; width: 100%;">
                             <img src="img/icons/Location icon.svg" alt="Location" class="modal-loc-icon">
                             <span id="modalLocText">–</span>
                         </div>
                     </div>
 
-                    <!-- Right/Bottom Section: Links & Contacts -->
-                    <div class="modal-links-col">
+                    <!-- Right: Social Links -->
+                    <div class="modal-details-right">
                         <div class="modal-rows" id="modalRows"></div>
                     </div>
                 </div>
-
-                <!-- Image Carousel -->
-                <div class="shop-carousel" id="shopCarousel"></div>
 
                 <!-- Store Products Grid Section -->
                 <div class="modal-products-section" id="modalProductsSection" style="margin-top: 24px; border-top: 1px solid var(--border); padding-top: 20px; display: none;">
