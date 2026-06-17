@@ -10,6 +10,13 @@
         localStorage.setItem('houz_ui_style', 'glassmorphism');
     }
     document.documentElement.setAttribute('data-ui-style', savedStyle);
+
+    let savedFont = localStorage.getItem('houz_font') || 'sf-pro';
+    if (savedFont !== 'sf-pro' && savedFont !== 'playfair' && savedFont !== 'outfit') {
+        savedFont = 'sf-pro';
+        localStorage.setItem('houz_font', 'sf-pro');
+    }
+    document.documentElement.setAttribute('data-font', savedFont);
 })();
 
 function toggleTheme() {
@@ -78,7 +85,7 @@ document.addEventListener('touchcancel', () => {
     document.querySelectorAll('.tapped').forEach(el => el.classList.remove('tapped'));
 }, { passive: true });
 
-// ─── Dynamic UI Style Switcher ──────────────────────────
+// ─── Dynamic UI Style & Font Switcher ──────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
     const controls = document.querySelector('.footer-controls');
     if (controls) {
@@ -86,6 +93,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (activeStyle !== 'glassmorphism' && activeStyle !== 'instagram' && activeStyle !== 'apple') {
             activeStyle = 'glassmorphism';
         }
+        
+        let activeFont = localStorage.getItem('houz_font') || 'sf-pro';
+        if (activeFont !== 'sf-pro' && activeFont !== 'playfair' && activeFont !== 'outfit') {
+            activeFont = 'sf-pro';
+        }
+
+        // Style Switcher
         const switcher = document.createElement('div');
         switcher.className = 'style-switcher-wrap';
         switcher.innerHTML = `
@@ -94,9 +108,20 @@ document.addEventListener('DOMContentLoaded', () => {
             <button class="style-switch-btn ${activeStyle === 'glassmorphism' ? 'active' : ''}" data-style="glassmorphism">✨ Glass</button>
         `;
         
-        // Append as the first item inside footer-controls
+        // Font Switcher
+        const fontSwitcher = document.createElement('div');
+        fontSwitcher.className = 'font-switcher-wrap';
+        fontSwitcher.innerHTML = `
+            <button class="font-switch-btn ${activeFont === 'sf-pro' ? 'active' : ''}" data-font="sf-pro">Aa SF Pro</button>
+            <button class="font-switch-btn ${activeFont === 'playfair' ? 'active' : ''}" data-font="playfair">Aa Playfair</button>
+            <button class="font-switch-btn ${activeFont === 'outfit' ? 'active' : ''}" data-font="outfit">Aa Outfit</button>
+        `;
+        
+        // Append inside footer-controls
+        controls.insertBefore(fontSwitcher, controls.firstChild);
         controls.insertBefore(switcher, controls.firstChild);
         
+        // Bind Style Toggles
         switcher.querySelectorAll('.style-switch-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 switcher.querySelectorAll('.style-switch-btn').forEach(b => b.classList.remove('active'));
@@ -104,6 +129,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 const nextStyle = btn.dataset.style;
                 localStorage.setItem('houz_ui_style', nextStyle);
                 document.documentElement.setAttribute('data-ui-style', nextStyle);
+            });
+        });
+
+        // Bind Font Toggles
+        fontSwitcher.querySelectorAll('.font-switch-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                fontSwitcher.querySelectorAll('.font-switch-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const nextFont = btn.dataset.font;
+                localStorage.setItem('houz_font', nextFont);
+                document.documentElement.setAttribute('data-font', nextFont);
             });
         });
     }
