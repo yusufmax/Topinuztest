@@ -395,6 +395,12 @@
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
         const isAndroid = /Android/i.test(navigator.userAgent);
 
+        function removeImageCrop(url) {
+            if (!url) return '';
+            // Replace fit=crop with fit=max for CDN/Unsplash URLs to prevent CDN-side cropping
+            return url.replace(/([?&])fit=crop/g, '$1fit=max');
+        }
+
         async function initProductPage() {
             try {
                 // Fetch storefront info first
@@ -472,7 +478,7 @@
 
             // Sync Gallery & Primary image
             if (product.imageUrl) {
-                document.getElementById('primaryImage').src = product.imageUrl;
+                document.getElementById('primaryImage').src = removeImageCrop(product.imageUrl);
             }
 
             const thumbsEl = document.getElementById('thumbnailGallery');
@@ -486,7 +492,7 @@
 
             let thumbHtml = imagesList.map((url, i) => `
                 <div class="thumb-item ${i === 0 ? 'active' : ''}" onclick="selectImage('${url}', this)">
-                    <img src="${cloudinaryOptimize(url)}" alt="Thumb ${i+1}">
+                    <img src="${removeImageCrop(cloudinaryOptimize(url))}" alt="Thumb ${i+1}">
                 </div>
             `).join('');
 
@@ -522,7 +528,7 @@
         }
 
         function selectImage(url, el) {
-            document.getElementById('primaryImage').src = url;
+            document.getElementById('primaryImage').src = removeImageCrop(url);
             document.querySelectorAll('.thumb-item').forEach(thumb => thumb.classList.remove('active'));
             if (el) el.classList.add('active');
         }
