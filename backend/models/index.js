@@ -126,15 +126,24 @@ const initDb = async () => {
             const hasUser = await User.findOne({ where: { ShopId: shop.id } });
             if (!hasUser) {
                 const vendorUsername = `${shop.slug}_admin`;
-                const vendorPassword = `${shop.slug}_pass2026`;
-                const hashedPassword = await bcrypt.hash(vendorPassword, 12);
-                await User.create({
-                    username: vendorUsername,
-                    password: hashedPassword,
-                    role: 'vendor',
-                    ShopId: shop.id
-                });
-                console.log(`Seeded vendor account for ${shop.name}: Username: ${vendorUsername}, Password: ${vendorPassword}`);
+                const existingUserByUsername = await User.findOne({ where: { username: vendorUsername } });
+                if (!existingUserByUsername) {
+                    const vendorPassword = `${shop.slug}_pass2026`;
+                    const hashedPassword = await bcrypt.hash(vendorPassword, 12);
+                    await User.create({
+                        username: vendorUsername,
+                        password: hashedPassword,
+                        role: 'vendor',
+                        ShopId: shop.id
+                    });
+                    console.log(`Seeded vendor account for ${shop.name}: Username: ${vendorUsername}, Password: ${vendorPassword}`);
+                } else {
+                    if (existingUserByUsername.ShopId === null) {
+                        existingUserByUsername.ShopId = shop.id;
+                        await existingUserByUsername.save();
+                        console.log(`Linked existing user "${vendorUsername}" to shop "${shop.name}"`);
+                    }
+                }
             }
         }
         
