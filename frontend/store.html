@@ -518,6 +518,8 @@
     <script>
         let shop = null;
         let currentTab = 'products';
+        const pathSegments = window.location.pathname.split('/').filter(Boolean);
+        const storeSlug = pathSegments[pathSegments.indexOf('stores') + 1];
                 function renderStorefrontDetails() {
             if (!shop) return;
             // Sync Header UI elements
