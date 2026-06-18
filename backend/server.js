@@ -55,8 +55,25 @@ app.get('/shops', async (req, res, next) => {
                 const safeTitle = (titleStr || 'Topin').replace(/"/g, '&quot;');
                 
                 const rawDesc = shop.description_ru || shop.description || "";
-                const safeDesc = rawDesc.substring(0, 160).replace(/"/g, '&quot;');
-                const safeImage = 'https://topin.uz/img/Topin_logo.jpeg';
+                let descLines = [];
+                if (rawDesc) descLines.push(rawDesc);
+                if (shop.workingHours) descLines.push(`🕒 Время работы: ${shop.workingHours}`);
+                const contacts = [];
+                if (shop.phone) contacts.push(shop.phone);
+                if (shop.telegram) contacts.push(`@${shop.telegram.replace('@', '')}`);
+                if (contacts.length > 0) descLines.push(`📞 Контакты: ${contacts.join(', ')}`);
+                if (shop.location) descLines.push(`📍 Адрес: ${shop.location}`);
+                
+                const safeDesc = descLines.join('\n').substring(0, 350).replace(/"/g, '&quot;');
+
+                let safeImage = 'https://topin.uz/img/Topin_logo.jpeg';
+                if (shop.logoUrl) {
+                    if (shop.logoUrl.startsWith('http')) {
+                        safeImage = shop.logoUrl;
+                    } else {
+                        safeImage = `https://topin.uz${shop.logoUrl.startsWith('/') ? '' : '/'}${shop.logoUrl}`;
+                    }
+                }
                 const url = `https://topin.uz/shops?category=${req.query.category || 'all'}&shop=${shopId}`;
 
                 const ogTags = `
@@ -125,8 +142,25 @@ app.get('/stores/:storeSlug', async (req, res, next) => {
         const safeTitle = (titleStr || 'Topin').replace(/"/g, '&quot;');
 
         const rawDesc = shop.description_ru || shop.description || "";
-        const safeDesc = rawDesc.substring(0, 160).replace(/"/g, '&quot;');
-        const safeImage = shop.logoUrl || 'https://topin.uz/img/Topin_logo.jpeg';
+        let descLines = [];
+        if (rawDesc) descLines.push(rawDesc);
+        if (shop.workingHours) descLines.push(`🕒 Время работы: ${shop.workingHours}`);
+        const contacts = [];
+        if (shop.phone) contacts.push(shop.phone);
+        if (shop.telegram) contacts.push(`@${shop.telegram.replace('@', '')}`);
+        if (contacts.length > 0) descLines.push(`📞 Контакты: ${contacts.join(', ')}`);
+        if (shop.location) descLines.push(`📍 Адрес: ${shop.location}`);
+        
+        const safeDesc = descLines.join('\n').substring(0, 350).replace(/"/g, '&quot;');
+
+        let safeImage = 'https://topin.uz/img/Topin_logo.jpeg';
+        if (shop.logoUrl) {
+            if (shop.logoUrl.startsWith('http')) {
+                safeImage = shop.logoUrl;
+            } else {
+                safeImage = `https://topin.uz${shop.logoUrl.startsWith('/') ? '' : '/'}${shop.logoUrl}`;
+            }
+        }
         const url = `https://topin.uz/stores/${storeSlug}`;
 
         const ogTags = `
