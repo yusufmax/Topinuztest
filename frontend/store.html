@@ -396,8 +396,14 @@
         </div>
 
         <div class="store-details-grid">
-            <div class="store-info-col" id="storeContacts">
-                <!-- Filled dynamically -->
+            <div class="store-info-col">
+                <div id="storeContacts" style="display: flex; flex-direction: column; gap: 16px;">
+                    <!-- Filled dynamically -->
+                </div>
+                <!-- Little Map container -->
+                <div id="storeMapContainer" style="width: 100%; height: 160px; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); display: none; margin-top: 16px;">
+                    <iframe id="storeMapIframe" src="" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
             </div>
             <div class="store-hours-col" id="storeHours">
                 <h3 style="margin: 0 0 10px 0; font-size:15px;" id="hoursTitle">Рабочие часы</h3>
@@ -572,6 +578,19 @@
                 </div>`;
             }
             contactsEl.innerHTML = contactHtml;
+
+            // Load Dynamic Map
+            const mapContainer = document.getElementById('storeMapContainer');
+            const mapIframe = document.getElementById('storeMapIframe');
+            if (mapContainer && mapIframe) {
+                if (shop.location) {
+                    mapIframe.src = `https://maps.google.com/maps?q=${encodeURIComponent(shop.location)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+                    mapContainer.style.display = 'block';
+                } else {
+                    mapIframe.src = '';
+                    mapContainer.style.display = 'none';
+                }
+            }
 
             // Load Working Hours
             const hoursEl = document.getElementById('storeHours');
