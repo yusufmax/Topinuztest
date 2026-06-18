@@ -160,6 +160,7 @@
                 <div class="modal-info-col" style="margin-bottom: 20px;">
                     <div class="modal-logo" id="modalLogo">🏪</div>
                     <h2 class="modal-shop-name" id="modalName">–</h2>
+                    <div id="modalRatingContainer" style="margin-bottom: 8px;"></div>
                     <p class="modal-shop-desc" id="modalDescFull">Bu do'kon haqida ma'lumot...</p>
                 </div>
 
@@ -190,6 +191,40 @@
                 <div class="modal-products-section" id="modalProductsSection" style="margin-top: 24px; border-top: 1px solid var(--border); padding-top: 20px; display: none;">
                     <h3 class="modal-products-title" id="modalProductsTitle" style="font-size: 16px; font-weight: 600; margin-bottom: 16px; color: var(--text);">Товары магазина</h3>
                     <div class="modal-products-grid" id="modalProductsGrid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 24px;"></div>
+                </div>
+
+                <!-- Reviews section in modal -->
+                <div class="reviews-section" style="margin-top: 24px; border-top: 1px solid var(--border); padding-top: 20px;">
+                    <h3 class="reviews-title" id="lblReviewsTitle">Отзывы и оценки</h3>
+                    <div class="reviews-list" id="modalReviewsList">
+                        <!-- Loaded dynamically -->
+                    </div>
+
+                    <!-- Write a review form -->
+                    <div class="review-form-container">
+                        <h4 class="review-form-title" id="lblWriteReview">Оставить отзыв</h4>
+                        <form class="review-form" id="modalReviewForm" onsubmit="submitModalReview(event)">
+                            <div class="form-group">
+                                <label for="modalReviewAuthor" id="lblYourName">Ваше имя</label>
+                                <input type="text" id="modalReviewAuthor" class="form-input" placeholder="Введите имя..." required>
+                            </div>
+                            <div class="form-group">
+                                <label id="lblYourRating">Ваша оценка</label>
+                                <div class="star-rating-selector" id="modalStarSelector">
+                                    <span data-val="1">☆</span>
+                                    <span data-val="2">☆</span>
+                                    <span data-val="3">☆</span>
+                                    <span data-val="4">☆</span>
+                                    <span data-val="5">☆</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="modalReviewComment" id="lblYourComment">Комментарий</label>
+                                <textarea id="modalReviewComment" class="form-textarea" placeholder="Напишите ваш отзыв..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn-submit-review" id="btnSubmitReview">Отправить отзыв</button>
+                        </form>
+                    </div>
                 </div>
 
                 <!-- Go to Store Button at the very bottom -->

@@ -185,7 +185,8 @@ function renderShops(shops) {
 
       <div class="market-info">
         <div class="market-name">${escHtml(shop.name)}</div>
-        <div class="market-desc">${escHtml((currentLang === 'ru' ? shop.description_ru : shop.description) || '')}</div>
+        ${renderRatingStarsHtml(shop.rating, shop.reviewsCount)}
+        <div class="market-desc" style="margin-top: 4px;">${escHtml((currentLang === 'ru' ? shop.description_ru : shop.description) || '')}</div>
       </div>
 
       <div class="market-chevron">

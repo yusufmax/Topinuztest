@@ -1,8 +1,9 @@
-const { Shop, ShopImage, SubCategory, Category, User, sequelize } = require('../models');
+const { Shop, ShopImage, SubCategory, Category, User, Review, sequelize } = require('../models');
 const { Op } = require('sequelize');
 const sharp = require('sharp');
 const slugify = require('../utils/slugify');
 const { uploadBuffer } = require('../utils/uploader');
+const { recalculateShopRating } = require('../utils/ratingHelper');
 
 const shopIncludes = [
     { model: SubCategory, through: { attributes: [] } },
@@ -98,6 +99,7 @@ exports.createShop = async (req, res) => {
         }
 
         const shop = await Shop.create(req.body);
+        await recalculateShopRating(shop.id);
 
         const subCats = req.body.SubCategories || req.body.subCategoryIds;
         if (subCats && subCats.length) {
@@ -142,6 +144,7 @@ exports.updateShop = async (req, res) => {
         }
 
         await shop.update(req.body);
+        await recalculateShopRating(shop.id);
 
         const subCats = req.body.SubCategories || req.body.subCategoryIds;
         if (subCats) {
@@ -261,9 +264,48 @@ exports.updateMyShopProfile = async (req, res) => {
         }
 
         await shop.update(req.body);
+        await recalculateShopRating(shop.id);
         cacheClear();
         const updatedShop = await Shop.findByPk(shop.id, { include: shopIncludes });
         res.json({ success: true, data: updatedShop });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+exports.getShopReviews = async (req, res) => {
+    try {
+        const reviews = await Review.findAll({
+            where: { ShopId: req.params.id },
+            order: [['createdAt', 'DESC']]
+        });
+        res.json({ success: true, data: reviews });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+exports.createShopReview = async (req, res) => {
+    try {
+        const { authorName, comment, rating } = req.body;
+        if (!comment || rating === undefined) {
+            return res.status(400).json({ success: false, message: 'Comment and rating are required' });
+        }
+        const numericRating = parseInt(rating);
+        if (numericRating < 1 || numericRating > 5) {
+            return res.status(400).json({ success: false, message: 'Rating must be between 1 and 5' });
+        }
+        const review = await Review.create({
+            authorName: authorName || 'Гость',
+            comment,
+            rating: numericRating,
+            ShopId: req.params.id
+        });
+
+        // Recalculate combined rating
+        await recalculateShopRating(req.params.id);
+
+        res.status(201).json({ success: true, data: review });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }

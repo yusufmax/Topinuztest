@@ -53,6 +53,22 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: true
         },
+        baseRating: {
+            type: DataTypes.FLOAT,
+            defaultValue: 5.0
+        },
+        baseRatingCount: {
+            type: DataTypes.INTEGER,
+            defaultValue: 1
+        },
+        rating: {
+            type: DataTypes.FLOAT,
+            defaultValue: 5.0
+        },
+        reviewsCount: {
+            type: DataTypes.INTEGER,
+            defaultValue: 0
+        },
         isPublished: {
             type: DataTypes.BOOLEAN,
             defaultValue: true

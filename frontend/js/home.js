@@ -55,6 +55,7 @@ async function loadFeaturedStores() {
                 <div class="featured-store-card" onclick="location.href='/stores/${shop.slug}'">
                     ${logoHtml}
                     <div class="featured-store-name">${escHtml(shop.name)}</div>
+                    ${renderRatingStarsHtml(shop.rating, shop.reviewsCount)}
                     ${catName ? `<span class="featured-store-cat">${escHtml(catName)}</span>` : ''}
                 </div>
             `;
@@ -141,6 +142,7 @@ function renderProductsGridHtml(products) {
                 <div class="product-card-content">
                     <span class="product-card-shop">${escHtml(shop.name || '')}</span>
                     <h3 class="product-card-name">${escHtml(prod.name)}</h3>
+                    ${renderRatingStarsHtml(prod.rating, prod.reviewsCount)}
                     <div class="product-card-price-row">
                         <span class="product-card-price" style="${prod.salePrice ? 'color: var(--red);' : ''}">${displayPriceStr}</span>
                         ${oldPriceHtml}
@@ -319,6 +321,7 @@ function setupSearch() {
                             ${logoHtml}
                             <div style="display:flex; flex-direction:column; gap:4px; flex:1; overflow:hidden;">
                                 <div class="featured-store-name" style="text-align:left; font-size:16px;">${escHtml(shop.name)}</div>
+                                ${renderRatingStarsHtml(shop.rating, shop.reviewsCount)}
                                 ${catName ? `<span class="featured-store-cat" style="align-self:flex-start; margin-top:2px;">${escHtml(catName)}</span>` : ''}
                             </div>
                         </div>

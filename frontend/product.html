@@ -325,6 +325,7 @@
             <div>
                 <h1 class="product-title" id="productTitle">–</h1>
                 <p style="color:var(--text3); margin:8px 0 0 0;" id="productCategoryName"></p>
+                <div id="productRatingContainer" style="margin-top: 8px;"></div>
             </div>
 
             <div class="price-row" id="priceRow">
@@ -361,6 +362,40 @@
                     <!-- Text description -->
                 </div>
             </div>
+
+            <!-- Reviews Section -->
+            <section class="reviews-section">
+                <h3 class="section-title" id="lblReviewsTitle">Отзывы и оценки</h3>
+                <div class="reviews-list" id="reviewsList">
+                    <!-- Loaded dynamically -->
+                </div>
+
+                <!-- Write a review form -->
+                <div class="review-form-container">
+                    <h4 class="review-form-title" id="lblWriteReview">Оставить отзыв</h4>
+                    <form class="review-form" id="reviewForm" onsubmit="submitReview(event)">
+                        <div class="form-group">
+                            <label for="reviewAuthor" id="lblYourName">Ваше имя</label>
+                            <input type="text" id="reviewAuthor" class="form-input" placeholder="Введите имя..." required>
+                        </div>
+                        <div class="form-group">
+                            <label id="lblYourRating">Ваша оценка</label>
+                            <div class="star-rating-selector" id="starSelector">
+                                <span data-val="1">☆</span>
+                                <span data-val="2">☆</span>
+                                <span data-val="3">☆</span>
+                                <span data-val="4">☆</span>
+                                <span data-val="5">☆</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="reviewComment" id="lblYourComment">Комментарий</label>
+                            <textarea id="reviewComment" class="form-textarea" placeholder="Напишите ваш отзыв..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn-submit-review" id="btnSubmitReview">Отправить отзыв</button>
+                    </form>
+                </div>
+            </section>
         </div>
     </main>
 
@@ -385,6 +420,7 @@
     <script>
         let product = null;
         let shop = null;
+        let selectedRating = 5;
 
         // Parse path slugs
         const pathSegments = window.location.pathname.split('/');
@@ -410,6 +446,9 @@
                 ? product.Category?.name_ru || product.Category?.name 
                 : product.Category?.name || product.Category?.name_ru;
             
+            // Render Rating stars
+            document.getElementById('productRatingContainer').innerHTML = renderRatingStarsHtml(product.rating, product.reviewsCount);
+
             // Description rendering
             document.getElementById('productDesc').textContent = product.description || product.shortDescription || '';
 
@@ -521,6 +560,8 @@
             }
 
             renderProductDetails();
+            setupStarSelector();
+            await loadReviews();
 
             // Send tracking product_view event
             fetch('/api/analytics/track', {
@@ -534,6 +575,148 @@
                     productId: product.id
                 })
             }).catch(e => {});
+        }
+
+        function setupStarSelector() {
+            const stars = document.querySelectorAll('#starSelector span');
+            if (stars.length === 0) return;
+
+            function updateStarsVisuals(rating) {
+                stars.forEach(s => {
+                    const val = parseInt(s.dataset.val);
+                    if (val <= rating) {
+                        s.textContent = '★';
+                        s.classList.add('selected');
+                    } else {
+                        s.textContent = '☆';
+                        s.classList.remove('selected');
+                    }
+                });
+            }
+
+            // Default
+            updateStarsVisuals(selectedRating);
+
+            stars.forEach(star => {
+                star.addEventListener('mouseover', () => {
+                    const hoverVal = parseInt(star.dataset.val);
+                    stars.forEach(s => {
+                        const val = parseInt(s.dataset.val);
+                        s.classList.toggle('hovered', val <= hoverVal);
+                    });
+                });
+
+                star.addEventListener('mouseout', () => {
+                    stars.forEach(s => s.classList.remove('hovered'));
+                });
+
+                star.addEventListener('click', () => {
+                    selectedRating = parseInt(star.dataset.val);
+                    updateStarsVisuals(selectedRating);
+                });
+            });
+        }
+
+        async function loadReviews() {
+            const listEl = document.getElementById('reviewsList');
+            if (!listEl || !product) return;
+
+            listEl.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text3);">${currentLang === 'ru' ? '⏳ Загрузка отзывов...' : '⏳ Fikrlar yuklanmoqda...'}</div>`;
+
+            try {
+                const res = await fetch(`/api/products/${product.id}/reviews`);
+                if (!res.ok) throw new Error();
+                const json = await res.json();
+                const reviews = json.data || [];
+
+                if (reviews.length === 0) {
+                    listEl.innerHTML = `<div class="empty-reviews">${t('noReviewsYet')}</div>`;
+                    return;
+                }
+
+                listEl.innerHTML = reviews.map(r => {
+                    const dateStr = new Date(r.createdAt).toLocaleDateString(currentLang === 'ru' ? 'ru-RU' : 'uz-UZ', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                    
+                    let starsHtml = '';
+                    for (let i = 1; i <= 5; i++) {
+                        starsHtml += i <= r.rating ? '★' : '☆';
+                    }
+
+                    return `
+                        <div class="review-item">
+                            <div class="review-header">
+                                <span class="review-author">${escHtml(r.authorName)}</span>
+                                <span class="review-date">${dateStr}</span>
+                            </div>
+                            <div class="review-stars">${starsHtml}</div>
+                            <p class="review-comment">${escHtml(r.comment)}</p>
+                        </div>
+                    `;
+                }).join('');
+            } catch (err) {
+                listEl.innerHTML = `<div style="color:var(--red); text-align:center;">${currentLang === 'ru' ? 'Ошибка загрузки отзывов.' : 'Fikrlar yuklashda xatolik.'}</div>`;
+            }
+        }
+
+        async function submitReview(event) {
+            event.preventDefault();
+            if (!product) return;
+
+            const authorInput = document.getElementById('reviewAuthor');
+            const commentInput = document.getElementById('reviewComment');
+            const btnSubmit = document.getElementById('btnSubmitReview');
+
+            if (!commentInput.value.trim()) return;
+
+            btnSubmit.disabled = true;
+            btnSubmit.textContent = '...';
+
+            try {
+                const res = await fetch(`/api/products/${product.id}/reviews`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        authorName: authorInput.value.trim() || 'Гость',
+                        comment: commentInput.value.trim(),
+                        rating: selectedRating
+                    })
+                });
+
+                if (!res.ok) throw new Error();
+                
+                // Clear form
+                authorInput.value = '';
+                commentInput.value = '';
+                selectedRating = 5;
+                const starSelector = document.getElementById('starSelector');
+                if (starSelector) {
+                    const stars = starSelector.querySelectorAll('span');
+                    stars.forEach(s => {
+                        s.textContent = parseInt(s.dataset.val) <= 5 ? '★' : '☆';
+                        s.classList.add('selected');
+                    });
+                }
+
+                showToast(t('reviewSuccess'), 'success');
+
+                // Reload product info (to update average rating) & reviews list
+                const prodRes = await fetch(`/api/products/by-shop/${shop.id}/by-slug/${encodeURIComponent(productSlug)}`);
+                if (prodRes.ok) {
+                    product = (await prodRes.json()).data;
+                    renderProductDetails();
+                }
+                
+                await loadReviews();
+            } catch (err) {
+                showToast('Ошибка при отправке отзыва', 'error');
+            } finally {
+                btnSubmit.disabled = false;
+                btnSubmit.textContent = t('submitReviewBtn');
+            }
         }
 
         function selectImage(url, el) {
@@ -634,6 +817,7 @@
 
         window.addEventListener('langchange', () => {
             renderProductDetails();
+            loadReviews();
         });
     </script>
     

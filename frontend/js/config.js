@@ -105,7 +105,18 @@ const i18n = {
     outOfStockStatus: "Mavjud emas",
     preorderStatus: "Buyurtma bo'yicha",
     daysAbbrev: ['Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sha', 'Ya'],
-    pageNotFound: "Sahifa topilmadi"
+    pageNotFound: "Sahifa topilmadi",
+    // Reviews
+    reviewsTitle: "Fikrlar va baholar",
+    writeReview: "Fikr qoldirish",
+    yourName: "Sizning ismingiz",
+    yourRating: "Sizning bahoingiz",
+    yourComment: "Fikr-mulohaza",
+    submitReviewBtn: "Yuborish",
+    reviewSuccess: "Fikr muvaffaqiyatli qo'shildi!",
+    inputNamePlaceholder: "Ismingizni kiriting...",
+    inputCommentPlaceholder: "Fikringizni yozing...",
+    noReviewsYet: "Fikrlar hali yo'q. Birinchi bo'lib fikr qoldiring!"
   },
   ru: {
     home: "Главная",
@@ -209,7 +220,18 @@ const i18n = {
     outOfStockStatus: "Нет в наличии",
     preorderStatus: "Под заказ",
     daysAbbrev: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
-    pageNotFound: "Магазин не найден"
+    pageNotFound: "Магазин не найден",
+    // Reviews
+    reviewsTitle: "Отзывы и оценки",
+    writeReview: "Оставить отзыв",
+    yourName: "Ваше имя",
+    yourRating: "Ваша оценка",
+    yourComment: "Комментарий",
+    submitReviewBtn: "Отправить отзыв",
+    reviewSuccess: "Отзыв успешно добавлен!",
+    inputNamePlaceholder: "Введите имя...",
+    inputCommentPlaceholder: "Напишите ваш отзыв...",
+    noReviewsYet: "Отзывов пока нет. Оставьте первый отзыв!"
   }
 };
 
@@ -340,6 +362,31 @@ function translateStaticElements() {
 
   const aboutTitle = document.getElementById('aboutTitle');
   if (aboutTitle) aboutTitle.textContent = t('aboutCompany');
+
+  // Reviews forms & sections
+  const lblReviewsTitle = document.getElementById('lblReviewsTitle');
+  if (lblReviewsTitle) lblReviewsTitle.textContent = t('reviewsTitle');
+
+  const lblWriteReview = document.getElementById('lblWriteReview');
+  if (lblWriteReview) lblWriteReview.textContent = t('writeReview');
+
+  const lblYourName = document.getElementById('lblYourName');
+  if (lblYourName) lblYourName.textContent = t('yourName');
+
+  const lblYourRating = document.getElementById('lblYourRating');
+  if (lblYourRating) lblYourRating.textContent = t('yourRating');
+
+  const lblYourComment = document.getElementById('lblYourComment');
+  if (lblYourComment) lblYourComment.textContent = t('yourComment');
+
+  const btnSubmitReview = document.getElementById('btnSubmitReview');
+  if (btnSubmitReview) btnSubmitReview.textContent = t('submitReviewBtn');
+
+  const reviewAuthor = document.getElementById('reviewAuthor');
+  if (reviewAuthor) reviewAuthor.placeholder = t('inputNamePlaceholder');
+
+  const reviewComment = document.getElementById('reviewComment');
+  if (reviewComment) reviewComment.placeholder = t('inputCommentPlaceholder');
 
   // Re-translate search results title if visible
   const searchQueryVal = document.getElementById('searchQueryVal');

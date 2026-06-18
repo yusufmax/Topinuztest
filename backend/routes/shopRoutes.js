@@ -14,6 +14,10 @@ router.post('/', authMiddleware, shopController.createShop);
 router.put('/:id', authMiddleware, shopController.updateShop);
 router.delete('/:id', authMiddleware, shopController.deleteShop);
 
+// Shop reviews
+router.get('/:id/reviews', shopController.getShopReviews);
+router.post('/:id/reviews', shopController.createShopReview);
+
 // Products under this shop
 router.get('/:shopId/products', productController.getAllProducts);
 

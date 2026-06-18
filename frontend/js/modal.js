@@ -116,6 +116,12 @@ function openShopModal(shopId) {
     // Info Column
     document.getElementById('modalName').textContent = shop.name;
 
+    // Rating
+    const ratingContainer = document.getElementById('modalRatingContainer');
+    if (ratingContainer) {
+      ratingContainer.innerHTML = renderRatingStarsHtml(shop.rating, shop.reviewsCount);
+    }
+
     const desc = currentLang === 'ru' ? shop.description_ru : shop.description;
     document.getElementById('modalDescFull').textContent = desc || t('descPlaceholder');
 
@@ -282,6 +288,24 @@ function openShopModal(shopId) {
             modalBody.scrollTop = 0;
         }
         _navigatingToStore = false;
+
+        // Reset reviews form
+        selectedModalRating = 5;
+        const authorInput = document.getElementById('modalReviewAuthor');
+        const commentInput = document.getElementById('modalReviewComment');
+        if (authorInput) authorInput.value = '';
+        if (commentInput) commentInput.value = '';
+        const starSelector = document.getElementById('modalStarSelector');
+        if (starSelector) {
+            const stars = starSelector.querySelectorAll('span');
+            stars.forEach(s => {
+                s.textContent = parseInt(s.dataset.val) <= 5 ? '★' : '☆';
+                s.classList.add('selected');
+            });
+        }
+
+        // Load reviews list
+        loadModalReviews(shop.id);
 
         // Fetch and render the store's products inside the bottom sheet
         _loadModalProducts(shop.id, shop.slug, shop.name, shop.currency || 'UZS');
@@ -552,10 +576,167 @@ function initModalScrollRedirect() {
     }
 }
 
+let selectedModalRating = 5;
+
+function setupModalStarSelector() {
+    const stars = document.querySelectorAll('#modalStarSelector span');
+    if (stars.length === 0) return;
+
+    function updateStarsVisuals(rating) {
+        stars.forEach(s => {
+            const val = parseInt(s.dataset.val);
+            if (val <= rating) {
+                s.textContent = '★';
+                s.classList.add('selected');
+            } else {
+                s.textContent = '☆';
+                s.classList.remove('selected');
+            }
+        });
+    }
+
+    // Default
+    updateStarsVisuals(5);
+
+    stars.forEach(star => {
+        star.addEventListener('mouseover', () => {
+            const hoverVal = parseInt(star.dataset.val);
+            stars.forEach(s => {
+                const val = parseInt(s.dataset.val);
+                s.classList.toggle('hovered', val <= hoverVal);
+            });
+        });
+
+        star.addEventListener('mouseout', () => {
+            stars.forEach(s => s.classList.remove('hovered'));
+        });
+
+        star.addEventListener('click', () => {
+            selectedModalRating = parseInt(star.dataset.val);
+            updateStarsVisuals(selectedModalRating);
+        });
+    });
+}
+
+async function loadModalReviews(shopId) {
+    const listEl = document.getElementById('modalReviewsList');
+    if (!listEl) return;
+
+    listEl.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text3);">${currentLang === 'ru' ? '⏳ Загрузка отзывов...' : '⏳ Fikrlar yuklanmoqda...'}</div>`;
+
+    try {
+        const res = await fetch(`/api/shops/${shopId}/reviews`);
+        if (!res.ok) throw new Error();
+        const json = await res.json();
+        const reviews = json.data || [];
+
+        if (reviews.length === 0) {
+            listEl.innerHTML = `<div class="empty-reviews">${t('noReviewsYet')}</div>`;
+            return;
+        }
+
+        listEl.innerHTML = reviews.map(r => {
+            const dateStr = new Date(r.createdAt).toLocaleDateString(currentLang === 'ru' ? 'ru-RU' : 'uz-UZ', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            let starsHtml = '';
+            for (let i = 1; i <= 5; i++) {
+                starsHtml += i <= r.rating ? '★' : '☆';
+            }
+
+            return `
+                <div class="review-item">
+                    <div class="review-header">
+                        <span class="review-author">${escHtml(r.authorName)}</span>
+                        <span class="review-date">${dateStr}</span>
+                    </div>
+                    <div class="review-stars">${starsHtml}</div>
+                    <p class="review-comment">${escHtml(r.comment)}</p>
+                </div>
+            `;
+        }).join('');
+    } catch (err) {
+        listEl.innerHTML = `<div style="color:var(--red); text-align:center;">${currentLang === 'ru' ? 'Ошибка загрузки отзывов.' : 'Fikrlar yuklashda xatolik.'}</div>`;
+    }
+}
+
+async function submitModalReview(event) {
+    event.preventDefault();
+    const shopId = window._currentOpenShopId;
+    if (!shopId) return;
+
+    const authorInput = document.getElementById('modalReviewAuthor');
+    const commentInput = document.getElementById('modalReviewComment');
+    const btnSubmit = document.querySelector('#modalReviewForm button[type="submit"]');
+
+    if (!commentInput.value.trim()) return;
+
+    btnSubmit.disabled = true;
+    btnSubmit.textContent = '...';
+
+    try {
+        const res = await fetch(`/api/shops/${shopId}/reviews`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                authorName: authorInput.value.trim() || 'Гость',
+                comment: commentInput.value.trim(),
+                rating: selectedModalRating
+            })
+        });
+
+        if (!res.ok) throw new Error();
+        
+        // Clear form
+        authorInput.value = '';
+        commentInput.value = '';
+        selectedModalRating = 5;
+        const starSelector = document.getElementById('modalStarSelector');
+        if (starSelector) {
+            const stars = starSelector.querySelectorAll('span');
+            stars.forEach(s => {
+                s.textContent = parseInt(s.dataset.val) <= 5 ? '★' : '☆';
+                s.classList.add('selected');
+            });
+        }
+
+        showToast(t('reviewSuccess'), 'success');
+
+        // Reload shop in local list to update average rating on shops page
+        const shopRes = await fetch(`/api/shops/by-slug/${_allShops.find(s => s.id === shopId).slug}`);
+        if (shopRes.ok) {
+            const updatedShop = (await shopRes.json()).data;
+            const idx = _allShops.findIndex(s => s.id === shopId);
+            if (idx !== -1) {
+                _allShops[idx] = updatedShop;
+            }
+            // Update modal header rating
+            const ratingContainer = document.getElementById('modalRatingContainer');
+            if (ratingContainer) {
+                ratingContainer.innerHTML = renderRatingStarsHtml(updatedShop.rating, updatedShop.reviewsCount);
+            }
+        }
+        
+        await loadModalReviews(shopId);
+    } catch (err) {
+        showToast('Ошибка при отправке отзыва', 'error');
+    } finally {
+        btnSubmit.disabled = false;
+        btnSubmit.textContent = t('submitReviewBtn');
+    }
+}
+
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initModalScrollRedirect);
+    document.addEventListener('DOMContentLoaded', () => {
+        initModalScrollRedirect();
+        setupModalStarSelector();
+    });
 } else {
     initModalScrollRedirect();
+    setupModalStarSelector();
 }
 
 window.addEventListener('langchange', () => {

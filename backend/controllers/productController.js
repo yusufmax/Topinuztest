@@ -1,9 +1,10 @@
-const { Product, Shop, Category, SubCategory, sequelize } = require('../models');
+const { Product, Shop, Category, SubCategory, Review, sequelize } = require('../models');
 const { Op } = require('sequelize');
 const sharp = require('sharp');
 const crypto = require('crypto');
 const slugify = require('../utils/slugify');
 const { uploadBuffer } = require('../utils/uploader');
+const { recalculateProductRating } = require('../utils/ratingHelper');
 
 const productIncludes = [
     { model: Shop, attributes: ['id', 'name', 'slug', 'logoUrl', 'phone', 'telegram', 'instagram'] },
@@ -118,6 +119,7 @@ exports.createProduct = async (req, res) => {
         }
 
         const product = await Product.create(req.body);
+        await recalculateProductRating(product.id);
         const updatedProduct = await Product.findByPk(product.id, { include: productIncludes });
         res.status(201).json({ success: true, data: updatedProduct });
     } catch (err) {
@@ -138,6 +140,7 @@ exports.updateProduct = async (req, res) => {
         }
 
         await product.update(req.body);
+        await recalculateProductRating(product.id);
         const updatedProduct = await Product.findByPk(product.id, { include: productIncludes });
         res.json({ success: true, data: updatedProduct });
     } catch (err) {
@@ -240,6 +243,44 @@ exports.uploadProductARModel = async (req, res) => {
         
         await product.save();
         res.json({ success: true, data: { glbUrl: product.glbUrl, usdzUrl: product.usdzUrl } });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+exports.getProductReviews = async (req, res) => {
+    try {
+        const reviews = await Review.findAll({
+            where: { ProductId: req.params.id },
+            order: [['createdAt', 'DESC']]
+        });
+        res.json({ success: true, data: reviews });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+exports.createProductReview = async (req, res) => {
+    try {
+        const { authorName, comment, rating } = req.body;
+        if (!comment || rating === undefined) {
+            return res.status(400).json({ success: false, message: 'Comment and rating are required' });
+        }
+        const numericRating = parseInt(rating);
+        if (numericRating < 1 || numericRating > 5) {
+            return res.status(400).json({ success: false, message: 'Rating must be between 1 and 5' });
+        }
+        const review = await Review.create({
+            authorName: authorName || 'Гость',
+            comment,
+            rating: numericRating,
+            ProductId: req.params.id
+        });
+
+        // Recalculate combined rating
+        await recalculateProductRating(req.params.id);
+
+        res.status(201).json({ success: true, data: review });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }

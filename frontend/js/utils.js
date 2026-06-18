@@ -216,3 +216,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+function renderRatingStarsHtml(rating, count = 0) {
+    const r = parseFloat(rating || 5.0);
+    const fullStars = Math.round(r);
+    let starsHtml = '';
+    for (let i = 1; i <= 5; i++) {
+        starsHtml += i <= fullStars ? '★' : '☆';
+    }
+    return `
+        <div class="rating-stars-container" title="Rating: ${r.toFixed(1)} / 5">
+            <span class="stars">${starsHtml}</span>
+            <span class="rating-value" style="font-weight:700; font-size:13px; margin-left:2px;">${r.toFixed(1)}</span>
+            <span class="rating-count">(${count})</span>
+        </div>
+    `;
+}

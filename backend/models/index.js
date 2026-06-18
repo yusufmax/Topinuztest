@@ -10,6 +10,7 @@ const SubCategory = require('./SubCategory')(sequelize, DataTypes);
 const Product = require('./Product')(sequelize, DataTypes);
 const ShopImage = require('./ShopImage')(sequelize, DataTypes);
 const AnalyticsEvent = require('./AnalyticsEvent')(sequelize, DataTypes);
+const Review = require('./Review')(sequelize, DataTypes);
 
 // Associations
 Shop.hasMany(Product);
@@ -41,6 +42,12 @@ AnalyticsEvent.belongsTo(Shop);
 
 Product.hasMany(AnalyticsEvent, { onDelete: 'CASCADE' });
 AnalyticsEvent.belongsTo(Product);
+
+Shop.hasMany(Review, { onDelete: 'CASCADE' });
+Review.belongsTo(Shop);
+
+Product.hasMany(Review, { onDelete: 'CASCADE' });
+Review.belongsTo(Product);
 
 // Database Initialization function
 const initDb = async () => {
@@ -82,6 +89,17 @@ const initDb = async () => {
             // User role and ShopId columns
             try { await sequelize.query("ALTER TABLE Users ADD COLUMN role VARCHAR(255) DEFAULT 'vendor';"); } catch (e) {}
             try { await sequelize.query("ALTER TABLE Users ADD COLUMN ShopId INTEGER REFERENCES Shops (id) ON DELETE SET NULL ON UPDATE CASCADE;"); } catch (e) {}
+
+            // Ratings & reviews columns
+            try { await sequelize.query("ALTER TABLE Shops ADD COLUMN baseRating REAL DEFAULT 5.0;"); } catch (e) {}
+            try { await sequelize.query("ALTER TABLE Shops ADD COLUMN baseRatingCount INTEGER DEFAULT 1;"); } catch (e) {}
+            try { await sequelize.query("ALTER TABLE Shops ADD COLUMN rating REAL DEFAULT 5.0;"); } catch (e) {}
+            try { await sequelize.query("ALTER TABLE Shops ADD COLUMN reviewsCount INTEGER DEFAULT 0;"); } catch (e) {}
+
+            try { await sequelize.query("ALTER TABLE Products ADD COLUMN baseRating REAL DEFAULT 5.0;"); } catch (e) {}
+            try { await sequelize.query("ALTER TABLE Products ADD COLUMN baseRatingCount INTEGER DEFAULT 1;"); } catch (e) {}
+            try { await sequelize.query("ALTER TABLE Products ADD COLUMN rating REAL DEFAULT 5.0;"); } catch (e) {}
+            try { await sequelize.query("ALTER TABLE Products ADD COLUMN reviewsCount INTEGER DEFAULT 0;"); } catch (e) {}
 
             await sequelize.query('PRAGMA foreign_keys = true;');
         } else {
@@ -152,5 +170,6 @@ module.exports = {
     SubCategory,
     Product,
     AnalyticsEvent,
+    Review,
     initDb
 };

@@ -9,6 +9,10 @@ router.get('/', productController.getAllProducts);
 router.get('/by-shop/:shopId/by-slug/:productSlug', productController.getProductBySlug);
 router.get('/:id', productController.getProductById);
 
+// Product reviews
+router.get('/:id/reviews', productController.getProductReviews);
+router.post('/:id/reviews', productController.createProductReview);
+
 // Protected routes (admin/vendor)
 router.post('/', authMiddleware, productController.createProduct);
 router.put('/:id', authMiddleware, productController.updateProduct);
