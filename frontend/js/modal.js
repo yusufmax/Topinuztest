@@ -2,6 +2,7 @@ let _carouselTimer = null;
 let _carouselIdx = 0;
 let _carouselCount = 0;
 let _navigatingToStore = false;
+let _modalScrollY = 0;
 
 function _buildCarousel(images) {
     _stopCarousel();
@@ -261,6 +262,12 @@ function openShopModal(shopId) {
     const overlay = document.getElementById('shopModal');
     if (overlay) {
         overlay.style.display = 'flex';
+        
+        // Lock background scroll
+        _modalScrollY = window.scrollY;
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${_modalScrollY}px`;
+        document.body.style.width = '100%';
         document.body.style.overflow = 'hidden';
         
         // Reset sheet layout and scroll position
@@ -358,6 +365,15 @@ function closeShopModal(immediate = false) {
     const overlay = document.getElementById('shopModal');
     const sheet = document.getElementById('modalSheet');
     
+    // Unlock background scroll helper
+    const unlockBody = () => {
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        document.body.style.overflow = '';
+        window.scrollTo(0, _modalScrollY);
+    };
+
     if (overlay) {
         if (immediate) {
             overlay.style.display = 'none';
@@ -367,7 +383,7 @@ function closeShopModal(immediate = false) {
                 sheet.style.transform = '';
                 sheet.style.transition = '';
             }
-            document.body.style.overflow = '';
+            unlockBody();
             return;
         }
 
@@ -382,7 +398,7 @@ function closeShopModal(immediate = false) {
                 sheet.style.transform = '';
                 sheet.style.transition = '';
             }
-            document.body.style.overflow = '';
+            unlockBody();
         }, 280);
     }
 }
@@ -434,6 +450,7 @@ function initModalScrollRedirect() {
 
             const isBody = e.target.closest('.modal-body');
             const isBackdrop = e.target === overlay;
+            const isScrollable = modalBody.scrollHeight > modalBody.clientHeight;
 
             // If touch starts outside modal-body (e.g. header, handle, backdrop), block background scrolling
             if (!isBody) {
@@ -476,6 +493,8 @@ function initModalScrollRedirect() {
                     sheet.style.transform = '';
                     isDraggingSheet = false;
                 }
+            } else if (!isScrollable) {
+                if (e.cancelable) e.preventDefault();
             }
         }, { passive: false });
 
@@ -512,6 +531,7 @@ function initModalScrollRedirect() {
                 const timeSinceScroll = Date.now() - lastScrollTopTime;
                 if (modalBody.scrollTop <= 0 && e.deltaY < -5 && timeSinceScroll > 200) {
                     closeShopModal();
+                    return;
                 }
                 
                 // Prevent background scroll chain propagation
