@@ -317,7 +317,7 @@ function setupSearch() {
                     const catName = shop.Category ? (currentLang === 'ru' ? shop.Category.name_ru || shop.Category.name : shop.Category.name || shop.Category.name_ru) : '';
                     
                     return `
-                        <div class="featured-store-card" onclick="location.href='/stores/${shop.slug}'" style="flex:unset; flex-direction:row; text-align:left; justify-content:flex-start; width:100%;">
+                        <div class="featured-store-card" onclick="typeof openShopModal === 'function' ? openShopModal(${shop.id}) : location.href='/stores/${shop.slug}'" style="flex:unset; flex-direction:row; text-align:left; justify-content:flex-start; width:100%;">
                             ${logoHtml}
                             <div style="display:flex; flex-direction:column; gap:4px; flex:1; overflow:hidden;">
                                 <div class="featured-store-name" style="text-align:left; font-size:16px;">${escHtml(shop.name)}</div>
