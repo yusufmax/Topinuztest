@@ -235,10 +235,7 @@ function openShopModal(shopId) {
       `;
       shareBtn.onclick = async () => {
         const shareCat = shop.Category && shop.Category.slug ? shop.Category.slug : _activeMainCategory;
-        const origin = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-            ? window.location.origin 
-            : 'https://topin.uz';
-        const shareUrl = `${origin}/shops?category=${shareCat}&shop=${shop.id}`;
+        const shareUrl = `${window.location.origin}${window.location.pathname}?category=${shareCat}&shop=${shop.id}`;
         
         let descParts = [];
         if (shop.description_ru || shop.description) {
@@ -823,6 +820,17 @@ function showCustomShareMenu(url, title, text) {
     
     const isRu = currentLang === 'ru';
     
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const tgUrl = isMobile 
+        ? `tg://msg_url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title + '\n' + text)}`
+        : `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title + '\n' + text)}`;
+    
+    const waUrl = isMobile
+        ? `whatsapp://send?text=${encodeURIComponent(title + '\n' + text + '\n\n' + url)}`
+        : `https://api.whatsapp.com/send?text=${encodeURIComponent(title + '\n' + text + '\n\n' + url)}`;
+        
+    const targetAttr = isMobile ? '' : 'target="_blank"';
+    
     menu.innerHTML = `
         <div class="custom-share-card">
             <div class="share-card-header">
@@ -834,11 +842,11 @@ function showCustomShareMenu(url, title, text) {
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                     <span>${isRu ? 'Копировать ссылку' : 'Havolani nusxalash'}</span>
                 </button>
-                <a class="share-opt-btn telegram" href="https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title + '\n' + text)}" target="_blank" onclick="closeCustomShareMenu()">
+                <a class="share-opt-btn telegram" href="${tgUrl}" ${targetAttr} onclick="closeCustomShareMenu()">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                     <span>Telegram</span>
                 </a>
-                <a class="share-opt-btn whatsapp" href="https://api.whatsapp.com/send?text=${encodeURIComponent(title + '\n' + text + '\n\n' + url)}" target="_blank" onclick="closeCustomShareMenu()">
+                <a class="share-opt-btn whatsapp" href="${waUrl}" ${targetAttr} onclick="closeCustomShareMenu()">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
                     <span>WhatsApp</span>
                 </a>
