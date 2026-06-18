@@ -244,6 +244,8 @@ function setupSearch() {
         productsGrid.style.display = 'none';
     });
 
+    window._performSearchGlobal = performSearch;
+
     async function performSearch(query) {
         if (!query) return;
         queryValSpan.textContent = query;
@@ -401,5 +403,23 @@ document.addEventListener('DOMContentLoaded', () => {
         setupSearch();
     } else if (page === 'index.html' || page === '' || page === '/' || page === 'index') {
         initIndexPage();
+    }
+});
+
+window.addEventListener('langchange', () => {
+    const path = window.location.pathname;
+    const page = path.split('/').pop();
+    if (page === 'index.html' || page === '' || page === '/' || page === 'index') {
+        loadCategoriesHome();
+        loadFeaturedStores();
+        loadRecentProducts();
+        loadArProducts();
+    }
+    const searchView = document.getElementById('searchView');
+    if (searchView && searchView.style.display !== 'none' && window._performSearchGlobal) {
+        const queryValSpan = document.getElementById('searchQueryVal');
+        if (queryValSpan && queryValSpan.textContent) {
+            window._performSearchGlobal(queryValSpan.textContent);
+        }
     }
 });

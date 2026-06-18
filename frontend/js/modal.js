@@ -106,6 +106,7 @@ function _stopCarousel() {
 }
 
 function openShopModal(shopId) {
+    window._currentOpenShopId = shopId;
     const shop = _allShops.find(s => s.id === shopId);
     if (!shop) return;
 
@@ -361,6 +362,7 @@ async function _loadModalProducts(shopId, shopSlug, shopName, shopCurrency) {
 }
 
 function closeShopModal(immediate = false) {
+    window._currentOpenShopId = null;
     _stopCarousel();
     const overlay = document.getElementById('shopModal');
     const sheet = document.getElementById('modalSheet');
@@ -555,3 +557,10 @@ if (document.readyState === 'loading') {
 } else {
     initModalScrollRedirect();
 }
+
+window.addEventListener('langchange', () => {
+    const modal = document.getElementById('shopModal');
+    if (modal && (modal.style.display === 'block' || modal.style.display === 'flex') && window._currentOpenShopId) {
+        openShopModal(window._currentOpenShopId);
+    }
+});

@@ -71,7 +71,41 @@ const i18n = {
       "plants": "O‘simliklar",
       "bathroom": "Vannaxona",
       "other": "Boshqa"
-    }
+    },
+    // New dynamic translation keys
+    searchHeaderPlaceholder: "Do'konlar va tovarlarni qidirish...",
+    searchShopsPlaceholder: "Do'konlarni qidirish...",
+    catalogCategories: "Katalog kategoriyalari",
+    searchResultsFor: "\"{query}\" uchun qidiruv natijalari",
+    closeSearch: "✕ Qidiruvni yopish",
+    tabProducts: "Mahsulotlar",
+    tabShops: "Do'konlar",
+    nothingFound: "Hech narsa topilmadi",
+    shopProducts: "Do'kon mahsulotlari",
+    viewInRoom: "Xonangizda ko'rish",
+    contactTelegram: "Telegram orqali bog'lanish",
+    callPhone: "Qo'ng'iroq qilish",
+    descriptionTitle: "Tavsif",
+    view3dModel: "3D modelni ko'rish",
+    searchInStore: "Do'kon bo'ylab qidiruv",
+    searchProductPlaceholder: "Mahsulot qidirish...",
+    categoryLabel: "Kategoriya",
+    stockLabel: "Mavjudligi",
+    onlyInStock: "Faqat mavjud",
+    onlyWith3d: "Faqat 3D model bilan",
+    productsCountText: "{count} ta mahsulot",
+    sortNewest: "Yangiliklar",
+    sortPriceAsc: "Narx: arzon",
+    sortPriceDesc: "Narx: qimmat",
+    aboutCompany: "Kompaniya haqida",
+    workingHoursTitle: "Ish vaqti",
+    closedDay: "Yopiq",
+    priceOnRequest: "Narx soʻrov boʻyicha",
+    inStockStatus: "Mavjud",
+    outOfStockStatus: "Mavjud emas",
+    preorderStatus: "Buyurtma bo'yicha",
+    daysAbbrev: ['Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sha', 'Ya'],
+    pageNotFound: "Sahifa topilmadi"
   },
   ru: {
     home: "Главная",
@@ -141,7 +175,41 @@ const i18n = {
       "plants": "Растения",
       "bathroom": "Ванная комната",
       "other": "Другое"
-    }
+    },
+    // New dynamic translation keys
+    searchHeaderPlaceholder: "Поиск магазинов и товаров...",
+    searchShopsPlaceholder: "Поиск магазинов...",
+    catalogCategories: "Категории каталога",
+    searchResultsFor: "Результаты поиска для \"{query}\"",
+    closeSearch: "✕ Закрыть поиск",
+    tabProducts: "Товары",
+    tabShops: "Магазины",
+    nothingFound: "Ничего не найдено",
+    shopProducts: "Товары магазина",
+    viewInRoom: "Посмотреть у себя в комнате",
+    contactTelegram: "Связаться в Telegram",
+    callPhone: "Позвонить",
+    descriptionTitle: "Описание",
+    view3dModel: "Просмотр 3D модели",
+    searchInStore: "Поиск по магазину",
+    searchProductPlaceholder: "Поиск товара...",
+    categoryLabel: "Категория",
+    stockLabel: "Наличие",
+    onlyInStock: "Только в наличии",
+    onlyWith3d: "Только с 3D моделью",
+    productsCountText: "{count} товаров",
+    sortNewest: "Новинки",
+    sortPriceAsc: "Цена: дешевые",
+    sortPriceDesc: "Цена: дорогие",
+    aboutCompany: "О компании",
+    workingHoursTitle: "Рабочие часы",
+    closedDay: "Выходной",
+    priceOnRequest: "Цена по запросу",
+    inStockStatus: "В наличии",
+    outOfStockStatus: "Нет в наличии",
+    preorderStatus: "Под заказ",
+    daysAbbrev: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
+    pageNotFound: "Магазин не найден"
   }
 };
 
@@ -156,10 +224,163 @@ function getCatName(slug) {
 function switchLang(lang) {
   currentLang = lang;
   localStorage.setItem('houz_lang_v2', lang);
-  location.reload(); 
+  document.documentElement.setAttribute('lang', lang);
+  
+  // ── Sync UI language switcher state across layout ──
+  updateLanguageSwitcherUI(lang);
+  
+  // ── Translate static elements on the active page ──
+  translateStaticElements();
+  
+  // ── Notify page scripts to rebuild/re-render localized contents ──
+  window.dispatchEvent(new CustomEvent('langchange', { detail: lang }));
+}
+
+function updateLanguageSwitcherUI(lang) {
+  const langBtn = document.getElementById('langBtn');
+  const langDropdown = document.getElementById('langDropdown');
+  if (langBtn && langDropdown) {
+    const textSpan = langBtn.querySelector('.lang-text');
+    if (textSpan) textSpan.textContent = lang.toUpperCase();
+
+    const options = langDropdown.querySelectorAll('.lang-option');
+    options.forEach(opt => {
+      opt.classList.toggle('selected', opt.getAttribute('data-lang') === lang);
+    });
+  }
+}
+
+function translateStaticElements() {
+  document.documentElement.setAttribute('lang', currentLang);
+
+  // Translate header search input placeholder
+  const headerSearchInput = document.getElementById('headerSearchInput');
+  if (headerSearchInput) {
+    const isShops = window.location.pathname.includes('shops');
+    headerSearchInput.placeholder = t(isShops ? 'searchShopsPlaceholder' : 'searchHeaderPlaceholder');
+  }
+
+  // index.html specific elements
+  const catalogTitle = document.querySelector('.categories-section .section-title');
+  if (catalogTitle) catalogTitle.textContent = t('catalogCategories');
+
+  // closeSearchBtn
+  const closeSearchBtn = document.getElementById('closeSearchBtn');
+  if (closeSearchBtn) closeSearchBtn.textContent = t('closeSearch');
+
+  // search tabs text
+  const searchTabProducts = document.getElementById('searchTabProducts');
+  if (searchTabProducts) {
+    const countSpan = document.getElementById('searchCountProducts');
+    const countVal = countSpan ? countSpan.textContent : '0';
+    searchTabProducts.innerHTML = `${t('tabProducts')} (<span id="searchCountProducts">${countVal}</span>)`;
+  }
+  const searchTabShops = document.getElementById('searchTabShops');
+  if (searchTabShops) {
+    const countSpan = document.getElementById('searchCountShops');
+    const countVal = countSpan ? countSpan.textContent : '0';
+    searchTabShops.innerHTML = `${t('tabShops')} (<span id="searchCountShops">${countVal}</span>)`;
+  }
+
+  // noResultsMsg
+  const noResultsMsg = document.getElementById('noResultsMsg');
+  if (noResultsMsg) noResultsMsg.textContent = t('nothingFound');
+
+  // modalProductsTitle (shops.html modal)
+  const modalProductsTitle = document.getElementById('modalProductsTitle');
+  if (modalProductsTitle) modalProductsTitle.textContent = t('shopProducts');
+
+  // modalStoreBtnText (shops.html modal)
+  const modalStoreBtnText = document.getElementById('modalStoreBtnText');
+  if (modalStoreBtnText) modalStoreBtnText.textContent = t('goToStore');
+
+  // product.html elements
+  const lblViewAR = document.getElementById('lblViewAR');
+  if (lblViewAR) lblViewAR.textContent = t('viewInRoom');
+
+  const lblContactTG = document.getElementById('lblContactTG');
+  if (lblContactTG) lblContactTG.textContent = t('contactTelegram');
+
+  const lblContactPhone = document.getElementById('lblContactPhone');
+  if (lblContactPhone) lblContactPhone.textContent = t('callPhone');
+
+  const lblVisitStore = document.getElementById('lblVisitStore');
+  if (lblVisitStore) lblVisitStore.textContent = t('goToStore');
+
+  const lblDescription = document.getElementById('lblDescription');
+  if (lblDescription) lblDescription.textContent = t('descriptionTitle');
+
+  const lblModalTitle = document.getElementById('lblModalTitle');
+  if (lblModalTitle) lblModalTitle.textContent = t('view3dModel');
+
+  // store.html elements
+  const tabProducts = document.getElementById('tabProducts');
+  if (tabProducts) tabProducts.textContent = t('tabProducts');
+
+  const tabAbout = document.getElementById('tabAbout');
+  if (tabAbout) tabAbout.textContent = t('aboutCompany');
+
+  const lblSearch = document.getElementById('lblSearch');
+  if (lblSearch) lblSearch.textContent = t('searchInStore');
+
+  const prodSearch = document.getElementById('prodSearch');
+  if (prodSearch) prodSearch.placeholder = t('searchProductPlaceholder');
+
+  const lblCategory = document.getElementById('lblCategory');
+  if (lblCategory) lblCategory.textContent = t('categoryLabel');
+
+  const lblStock = document.getElementById('lblStock');
+  if (lblStock) lblStock.textContent = t('stockLabel');
+
+  const lblInStockOnly = document.getElementById('lblInStockOnly');
+  if (lblInStockOnly) lblInStockOnly.textContent = t('onlyInStock');
+
+  const lblAROnly = document.getElementById('lblAROnly');
+  if (lblAROnly) lblAROnly.textContent = t('onlyWith3d');
+
+  const aboutTitle = document.getElementById('aboutTitle');
+  if (aboutTitle) aboutTitle.textContent = t('aboutCompany');
+
+  // Re-translate search results title if visible
+  const searchQueryVal = document.getElementById('searchQueryVal');
+  if (searchQueryVal && searchQueryVal.textContent) {
+    const titleContainer = document.querySelector('.search-results-title');
+    if (titleContainer) {
+      titleContainer.innerHTML = t('searchResultsFor').replace('{query}', `<span id="searchQueryVal">${searchQueryVal.textContent}</span>`);
+    }
+  }
+
+  // Update option values in catalogSort dropdown
+  const catalogSort = document.getElementById('catalogSort');
+  if (catalogSort) {
+    const optNewest = catalogSort.querySelector('option[value="newest"]');
+    if (optNewest) optNewest.textContent = t('sortNewest');
+    const optPriceAsc = catalogSort.querySelector('option[value="price-asc"]');
+    if (optPriceAsc) optPriceAsc.textContent = t('sortPriceAsc');
+    const optPriceDesc = catalogSort.querySelector('option[value="price-desc"]');
+    if (optPriceDesc) optPriceDesc.textContent = t('sortPriceDesc');
+  }
+
+  // Update category select 'all' option in store.html
+  const prodCategory = document.getElementById('prodCategory');
+  if (prodCategory) {
+    const optAll = prodCategory.querySelector('option[value="all"]');
+    if (optAll) optAll.textContent = t('hammasi');
+  }
+
+  // Footer text
+  const footerText = document.querySelector('.site-footer div[style*="font-size"]');
+  if (footerText) {
+    footerText.textContent = currentLang === 'ru' 
+      ? '© 2026 Topin · Ташкент, Узбекистан' 
+      : '© 2026 Topin · Toshkent, O\'zbekiston';
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Translate static strings immediately on DOM load
+    translateStaticElements();
+
     const langWrap = document.getElementById('langWrap');
     const langBtn = document.getElementById('langBtn');
     const langDropdown = document.getElementById('langDropdown');
@@ -167,13 +388,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (langWrap && langBtn && langDropdown) {
 
         // ── Sync UI to saved language on every page load ──
-        const textSpan = langBtn.querySelector('.lang-text');
-        if (textSpan) textSpan.textContent = currentLang.toUpperCase();
-
-        const options = langDropdown.querySelectorAll('.lang-option');
-        options.forEach(opt => {
-            opt.classList.toggle('selected', opt.getAttribute('data-lang') === currentLang);
-        });
+        updateLanguageSwitcherUI(currentLang);
         // ─────────────────────────────────────────────────
 
         langBtn.addEventListener('click', (e) => {
@@ -187,15 +402,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
   
+        const options = langDropdown.querySelectorAll('.lang-option');
         options.forEach(opt => {
             opt.addEventListener('click', () => {
-                options.forEach(o => o.classList.remove('selected'));
-                opt.classList.add('selected');
                 langDropdown.classList.remove('active');
                 
                 const lang = opt.getAttribute('data-lang');
-                if (textSpan) textSpan.textContent = lang.toUpperCase();
-                
                 switchLang(lang);
             });
         });

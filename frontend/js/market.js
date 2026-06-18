@@ -270,3 +270,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (wrap) enableDragScroll(wrap);
     }
 });
+
+async function handleLangChangeMarket() {
+  const catName = _activeMainCategory === 'all' ? t('allShops') : getCatName(_activeMainCategory);
+  const titleEl = document.getElementById('pageTitle');
+  if (titleEl) titleEl.textContent = catName;
+
+  await buildCategoryTabs(_activeMainCategory);
+  renderShops(_allShops);
+}
+
+window.addEventListener('langchange', () => {
+    const path = window.location.pathname;
+    const page = path.split('/').pop();
+    if (page === 'shops.html' || page === 'shops') {
+        handleLangChangeMarket();
+    }
+});

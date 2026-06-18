@@ -476,26 +476,8 @@
     <script>
         let shop = null;
         let currentTab = 'products';
-        let shopCategories = [];
-
-        // Parse Slug from URL
-        const storeSlug = window.location.pathname.split('/stores/').pop().replace('/', '');
-
-        async function initStorefront() {
-            // Load Store profile
-            try {
-                const res = await fetch(`/api/shops/by-slug/${encodeURIComponent(storeSlug)}`);
-                if (!res.ok) throw new Error('Shop not found');
-                const json = await res.json();
-                shop = json.data;
-            } catch (err) {
-                document.body.innerHTML = `<div style="text-align:center; padding:100px 20px;">
-                    <h2>Магазин не найден</h2>
-                    <p>Проверьте корректность ссылки или вернитесь на <a href="/" style="color:var(--accent)">главную</a>.</p>
-                </div>`;
-                return;
-            }
-
+                function renderStorefrontDetails() {
+            if (!shop) return;
             // Sync Header UI elements
             document.title = `${shop.name} | Topin`;
             document.getElementById('storeName').textContent = shop.name;
@@ -551,14 +533,12 @@
             if (shop.workingHours) {
                 try {
                     const hours = JSON.parse(shop.workingHours);
-                    let hHtml = `<h3 style="margin: 0 0 10px 0; font-size:15px;" id="hoursTitle">${currentLang === 'ru' ? 'Рабочие часы' : 'Ish vaqti'}</h3>`;
-                    const days = currentLang === 'ru' 
-                        ? ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
-                        : ['Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sha', 'Ya'];
+                    let hHtml = `<h3 style="margin: 0 0 10px 0; font-size:15px;" id="hoursTitle">${t('workingHoursTitle')}</h3>`;
+                    const days = t('daysAbbrev');
                     
                     const weekKeys = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
                     weekKeys.forEach((dayKey, idx) => {
-                        const status = hours[dayKey]?.isActive ? `${hours[dayKey].from} - ${hours[dayKey].to}` : (currentLang === 'ru' ? 'Выходной' : 'Yopiq');
+                        const status = hours[dayKey]?.isActive ? `${hours[dayKey].from} - ${hours[dayKey].to}` : t('closedDay');
                         hHtml += `<div style="display:flex; justify-content:space-between; font-size:13px; color:var(--text3); margin-bottom:4px;">
                             <span>${days[idx]}</span>
                             <span>${status}</span>
@@ -569,6 +549,30 @@
             } else {
                 hoursEl.style.display = 'none';
             }
+
+            // Tab About updates
+            if (currentTab === 'about') {
+                const content = getLocalizedText(shop, 'description_ru', 'description');
+                document.getElementById('aboutContent').innerHTML = content.replace(/\n/g, '<br>');
+            }
+        }
+
+        async function initStorefront() {
+            // Load Store profile
+            try {
+                const res = await fetch(`/api/shops/by-slug/${encodeURIComponent(storeSlug)}`);
+                if (!res.ok) throw new Error('Shop not found');
+                const json = await res.json();
+                shop = json.data;
+            } catch (err) {
+                document.body.innerHTML = `<div style="text-align:center; padding:100px 20px;">
+                    <h2>${t('pageNotFound')}</h2>
+                    <p>Проверьте корректность ссылки или вернитесь на <a href="/" style="color:var(--accent)">главную</a>.</p>
+                </div>`;
+                return;
+            }
+
+            renderStorefrontDetails();
 
             // Load Store-specific Custom Categories & Products
             await Promise.all([
@@ -596,9 +600,10 @@
             }).catch(e => {});
         }
 
-
         async function loadStoreSubCategories() {
             const select = document.getElementById('prodCategory');
+            const currentValue = select.value;
+            select.innerHTML = `<option value="all">${t('hammasi')}</option>`;
             try {
                 // Fetch subcategories for the main Category this shop belongs to
                 const res = await fetch(`/api/subcategories?category=${shop.CategoryId}`);
@@ -611,6 +616,7 @@
                     option.textContent = currentLang === 'ru' ? sc.name_ru || sc.name : sc.name || sc.name_ru;
                     select.appendChild(option);
                 });
+                select.value = currentValue;
             } catch(e) {}
         }
 
@@ -652,11 +658,11 @@
                     products.sort((a,b) => parseFloat(b.price || 0) - parseFloat(a.price || 0));
                 }
 
-                document.getElementById('productCount').textContent = `${products.length} ${currentLang === 'ru' ? 'товаров' : 'ta mahsulot'}`;
+                document.getElementById('productCount').textContent = t('productsCountText').replace('{count}', products.length);
 
                 if (products.length === 0) {
                     grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:40px; color:var(--text3);">
-                        <p>${currentLang === 'ru' ? 'Товары не найдены' : 'Mahsulotlar topilmadi'}</p>
+                        <p>${t('notFound')}</p>
                     </div>`;
                     return;
                 }
@@ -668,16 +674,16 @@
                         3D / AR
                     </div>` : '';
 
-                    const stockText = prod.stockStatus === 'In Stock' ? (currentLang === 'ru' ? 'В наличии' : 'Mavjud')
-                                    : prod.stockStatus === 'Out of Stock' ? (currentLang === 'ru' ? 'Нет в наличии' : 'Yopiq')
-                                    : (currentLang === 'ru' ? 'Под заказ' : 'Buyurtma');
+                    const stockText = prod.stockStatus === 'In Stock' ? t('inStockStatus')
+                                    : prod.stockStatus === 'Out of Stock' ? t('outOfStockStatus')
+                                    : t('preorderStatus');
                     const stockClass = prod.stockStatus === 'In Stock' ? 'stock-in'
                                      : prod.stockStatus === 'Out of Stock' ? 'stock-out'
                                      : 'stock-preorder';
 
                     const priceStr = prod.price 
                         ? `${parseFloat(prod.price).toLocaleString()} ${shop.currency || 'UZS'}`
-                        : (currentLang === 'ru' ? 'Цена по запросу' : 'Narx soʻrov boʻyicha');
+                        : t('priceOnRequest');
 
                     return `
                         <a href="/stores/${shop.slug}/products/${prod.slug}" class="product-card">
@@ -699,7 +705,7 @@
 
             } catch (err) {
                 grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:40px; color:var(--red);">
-                    <p>Ошибка загрузки товаров</p>
+                    <p>${t('uploadError')}</p>
                 </div>`;
             }
         }
@@ -727,6 +733,12 @@
         }
 
         document.addEventListener('DOMContentLoaded', initStorefront);
+
+        window.addEventListener('langchange', () => {
+            renderStorefrontDetails();
+            loadStoreSubCategories();
+            fetchStoreProducts();
+        });
     </script>
     
     <!-- Footer -->

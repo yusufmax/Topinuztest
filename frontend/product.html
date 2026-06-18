@@ -401,25 +401,8 @@
             return url.replace(/([?&])fit=crop/g, '$1fit=max');
         }
 
-        async function initProductPage() {
-            try {
-                // Fetch storefront info first
-                const shopRes = await fetch(`/api/shops/by-slug/${encodeURIComponent(storeSlug)}`);
-                if (!shopRes.ok) throw new Error('Shop not found');
-                shop = (await shopRes.json()).data;
-
-                // Fetch product details
-                const prodRes = await fetch(`/api/products/by-shop/${shop.id}/by-slug/${encodeURIComponent(productSlug)}`);
-                if (!prodRes.ok) throw new Error('Product not found');
-                product = (await prodRes.json()).data;
-            } catch (err) {
-                document.body.innerHTML = `<div style="text-align:center; padding:100px 20px;">
-                    <h2>Товар не найден</h2>
-                    <p>Проверьте ссылку или вернитесь на <a href="/" style="color:var(--accent)">главную</a>.</p>
-                </div>`;
-                return;
-            }
-
+        function renderProductDetails() {
+            if (!product || !shop) return;
             // Sync product info
             document.title = `${product.name} | Topin`;
             document.getElementById('productTitle').textContent = product.name;
@@ -441,14 +424,14 @@
             } else if (product.price) {
                 priceRow.innerHTML = `<span class="product-price">${parseFloat(product.price).toLocaleString()} ${currency}</span>`;
             } else {
-                priceRow.innerHTML = `<span class="product-price">${currentLang === 'ru' ? 'Цена по запросу' : 'Narx soʻrov boʻyicha'}</span>`;
+                priceRow.innerHTML = `<span class="product-price">${t('priceOnRequest')}</span>`;
             }
 
             // Setup stock status badge
             const stockBadge = document.getElementById('productStockBadge');
-            const stockText = product.stockStatus === 'In Stock' ? (currentLang === 'ru' ? 'В наличии' : 'Mavjud')
-                            : product.stockStatus === 'Out of Stock' ? (currentLang === 'ru' ? 'Нет в наличии' : 'Yopiq')
-                            : (currentLang === 'ru' ? 'Под заказ' : 'Buyurtma');
+            const stockText = product.stockStatus === 'In Stock' ? t('inStockStatus')
+                            : product.stockStatus === 'Out of Stock' ? t('outOfStockStatus')
+                            : t('preorderStatus');
             const stockClass = product.stockStatus === 'In Stock' ? 'stock-in'
                              : product.stockStatus === 'Out of Stock' ? 'stock-out'
                              : 'stock-preorder';
@@ -466,11 +449,13 @@
             const phoneBtn = document.getElementById('btnContactPhone');
             const tgBtn = document.getElementById('btnContactTelegram');
             if (shop.phone) {
+                phoneBtn.style.display = 'flex';
                 phoneBtn.href = `tel:${shop.phone}`;
             } else {
                 phoneBtn.style.display = 'none';
             }
             if (shop.telegram) {
+                tgBtn.style.display = 'flex';
                 tgBtn.href = shop.telegram;
             } else {
                 tgBtn.style.display = 'none';
@@ -500,6 +485,8 @@
             const has3D = product.glbUrl || product.usdzUrl;
             if (has3D) {
                 document.getElementById('btnAR').style.display = 'flex';
+            } else {
+                document.getElementById('btnAR').style.display = 'none';
             }
             thumbsEl.innerHTML = thumbHtml;
 
@@ -512,6 +499,28 @@
                 <span>/</span>
                 <span>${escHtml(product.name)}</span>
             `;
+        }
+
+        async function initProductPage() {
+            try {
+                // Fetch storefront info first
+                const shopRes = await fetch(`/api/shops/by-slug/${encodeURIComponent(storeSlug)}`);
+                if (!shopRes.ok) throw new Error('Shop not found');
+                shop = (await shopRes.json()).data;
+
+                // Fetch product details
+                const prodRes = await fetch(`/api/products/by-shop/${shop.id}/by-slug/${encodeURIComponent(productSlug)}`);
+                if (!prodRes.ok) throw new Error('Product not found');
+                product = (await prodRes.json()).data;
+            } catch (err) {
+                document.body.innerHTML = `<div style="text-align:center; padding:100px 20px;">
+                    <h2>Товар не найден</h2>
+                    <p>Проверьте ссылку или вернитесь на <a href="/" style="color:var(--accent)">главную</a>.</p>
+                </div>`;
+                return;
+            }
+
+            renderProductDetails();
 
             // Send tracking product_view event
             fetch('/api/analytics/track', {
@@ -622,6 +631,10 @@
         }
 
         document.addEventListener('DOMContentLoaded', initProductPage);
+
+        window.addEventListener('langchange', () => {
+            renderProductDetails();
+        });
     </script>
     
     <!-- Footer -->
