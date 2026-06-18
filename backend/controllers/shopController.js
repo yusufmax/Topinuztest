@@ -304,6 +304,7 @@ exports.createShopReview = async (req, res) => {
 
         // Recalculate combined rating
         await recalculateShopRating(req.params.id);
+        cacheClear();
 
         res.status(201).json({ success: true, data: review });
     } catch (err) {

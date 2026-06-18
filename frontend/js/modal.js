@@ -714,16 +714,18 @@ async function submitModalReview(event) {
         if (icon) icon.textContent = '➕';
 
         // Reload shop in local list to update average rating on shops page
-        const shopRes = await fetch(`/api/shops/by-slug/${_allShops.find(s => s.id === shopId).slug}`);
+        const shopRes = await fetch(`/api/shops/${shopId}`);
         if (shopRes.ok) {
             const updatedShop = (await shopRes.json()).data;
-            const idx = _allShops.findIndex(s => s.id === shopId);
-            if (idx !== -1) {
-                _allShops[idx] = updatedShop;
-            }
-            // Re-render shop listing cards on market directory page if function exists
-            if (typeof renderShops === 'function') {
-                renderShops(_allShops);
+            if (typeof _allShops !== 'undefined' && Array.isArray(_allShops)) {
+                const idx = _allShops.findIndex(s => s.id === shopId);
+                if (idx !== -1) {
+                    _allShops[idx] = updatedShop;
+                }
+                // Re-render shop listing cards on market directory page if function exists
+                if (typeof renderShops === 'function') {
+                    renderShops(_allShops);
+                }
             }
             // Update modal header rating
             const ratingContainer = document.getElementById('modalRatingContainer');
