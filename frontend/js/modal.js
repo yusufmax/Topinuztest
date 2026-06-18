@@ -235,7 +235,10 @@ function openShopModal(shopId) {
       `;
       shareBtn.onclick = async () => {
         const shareCat = shop.Category && shop.Category.slug ? shop.Category.slug : _activeMainCategory;
-        const shareUrl = `${window.location.origin}${window.location.pathname}?category=${shareCat}&shop=${shop.id}`;
+        const origin = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+            ? window.location.origin 
+            : 'https://topin.uz';
+        const shareUrl = `${origin}/shops?category=${shareCat}&shop=${shop.id}`;
         
         let descParts = [];
         if (shop.description_ru || shop.description) {
