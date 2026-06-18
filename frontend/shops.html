@@ -202,8 +202,11 @@
 
                     <!-- Write a review form -->
                     <div class="review-form-container">
-                        <h4 class="review-form-title" id="lblWriteReview">Оставить отзыв</h4>
-                        <form class="review-form" id="modalReviewForm" onsubmit="submitModalReview(event)">
+                        <div class="review-form-header" id="btnToggleModalReviewForm" onclick="toggleModalReviewForm()" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+                            <h4 class="review-form-title" id="lblWriteReview" style="margin: 0;">Оставить отзыв</h4>
+                            <span class="toggle-icon" id="modalReviewToggleIcon" style="font-size: 18px; transition: transform 0.2s; color: var(--accent);">➕</span>
+                        </div>
+                        <form class="review-form" id="modalReviewForm" onsubmit="submitModalReview(event)" style="display: none; margin-top: 16px;">
                             <div class="form-group">
                                 <label for="modalReviewAuthor" id="lblYourName">Ваше имя</label>
                                 <input type="text" id="modalReviewAuthor" class="form-input" placeholder="Введите имя..." required>

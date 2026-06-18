@@ -97,6 +97,7 @@ const i18n = {
     sortNewest: "Yangiliklar",
     sortPriceAsc: "Narx: arzon",
     sortPriceDesc: "Narx: qimmat",
+    sortRatingDesc: "Reyting: yuqori",
     aboutCompany: "Kompaniya haqida",
     workingHoursTitle: "Ish vaqti",
     closedDay: "Yopiq",
@@ -212,6 +213,7 @@ const i18n = {
     sortNewest: "Новинки",
     sortPriceAsc: "Цена: дешевые",
     sortPriceDesc: "Цена: дорогие",
+    sortRatingDesc: "По рейтингу",
     aboutCompany: "О компании",
     workingHoursTitle: "Рабочие часы",
     closedDay: "Выходной",
@@ -406,6 +408,8 @@ function translateStaticElements() {
     if (optPriceAsc) optPriceAsc.textContent = t('sortPriceAsc');
     const optPriceDesc = catalogSort.querySelector('option[value="price-desc"]');
     if (optPriceDesc) optPriceDesc.textContent = t('sortPriceDesc');
+    const optRatingDesc = catalogSort.querySelector('option[value="rating-desc"]');
+    if (optRatingDesc) optRatingDesc.textContent = t('sortRatingDesc');
   }
 
   // Update category select 'all' option in store.html

@@ -276,6 +276,7 @@ function openShopModal(shopId) {
         document.body.style.top = `-${_modalScrollY}px`;
         document.body.style.width = '100%';
         document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
         
         // Reset sheet layout and scroll position
         const sheet = document.getElementById('modalSheet');
@@ -397,6 +398,7 @@ function closeShopModal(immediate = false) {
         document.body.style.top = '';
         document.body.style.width = '';
         document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
         window.scrollTo(0, _modalScrollY);
     };
 
@@ -705,6 +707,12 @@ async function submitModalReview(event) {
 
         showToast(t('reviewSuccess'), 'success');
 
+        // Collapse the form on success
+        const form = document.getElementById('modalReviewForm');
+        const icon = document.getElementById('modalReviewToggleIcon');
+        if (form) form.style.display = 'none';
+        if (icon) icon.textContent = '➕';
+
         // Reload shop in local list to update average rating on shops page
         const shopRes = await fetch(`/api/shops/by-slug/${_allShops.find(s => s.id === shopId).slug}`);
         if (shopRes.ok) {
@@ -712,6 +720,10 @@ async function submitModalReview(event) {
             const idx = _allShops.findIndex(s => s.id === shopId);
             if (idx !== -1) {
                 _allShops[idx] = updatedShop;
+            }
+            // Re-render shop listing cards on market directory page if function exists
+            if (typeof renderShops === 'function') {
+                renderShops(_allShops);
             }
             // Update modal header rating
             const ratingContainer = document.getElementById('modalRatingContainer');
@@ -726,6 +738,18 @@ async function submitModalReview(event) {
     } finally {
         btnSubmit.disabled = false;
         btnSubmit.textContent = t('submitReviewBtn');
+    }
+}
+
+function toggleModalReviewForm() {
+    const form = document.getElementById('modalReviewForm');
+    const icon = document.getElementById('modalReviewToggleIcon');
+    if (form.style.display === 'none') {
+        form.style.display = 'flex';
+        icon.textContent = '➖';
+    } else {
+        form.style.display = 'none';
+        icon.textContent = '➕';
     }
 }
 

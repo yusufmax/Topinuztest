@@ -452,6 +452,7 @@
                         <option value="newest">Новинки</option>
                         <option value="price-asc">Цена: дешевые</option>
                         <option value="price-desc">Цена: дорогие</option>
+                        <option value="rating-desc">По рейтингу</option>
                     </select>
                 </div>
 
@@ -479,8 +480,11 @@
 
                 <!-- Write a review form -->
                 <div class="review-form-container">
-                    <h4 class="review-form-title" id="lblWriteReview">Оставить отзыв</h4>
-                    <form class="review-form" id="reviewForm" onsubmit="submitReview(event)">
+                    <div class="review-form-header" id="btnToggleReviewForm" onclick="toggleReviewForm()" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+                        <h4 class="review-form-title" id="lblWriteReview" style="margin: 0;">Оставить отзыв</h4>
+                        <span class="toggle-icon" id="reviewToggleIcon" style="font-size: 18px; transition: transform 0.2s; color: var(--accent);">➕</span>
+                    </div>
+                    <form class="review-form" id="reviewForm" onsubmit="submitReview(event)" style="display: none; margin-top: 16px;">
                         <div class="form-group">
                             <label for="reviewAuthor" id="lblYourName">Ваше имя</label>
                             <input type="text" id="reviewAuthor" class="form-input" placeholder="Введите имя..." required>
@@ -696,6 +700,8 @@
                     products.sort((a,b) => parseFloat(a.price || 0) - parseFloat(b.price || 0));
                 } else if (sort === 'price-desc') {
                     products.sort((a,b) => parseFloat(b.price || 0) - parseFloat(a.price || 0));
+                } else if (sort === 'rating-desc') {
+                    products.sort((a,b) => parseFloat(b.rating || 0) - parseFloat(a.rating || 0));
                 }
 
                 document.getElementById('productCount').textContent = t('productsCountText').replace('{count}', products.length);
@@ -897,6 +903,12 @@
 
                 showToast(t('reviewSuccess'), 'success');
 
+                // Collapse the form on success
+                const form = document.getElementById('reviewForm');
+                const icon = document.getElementById('reviewToggleIcon');
+                if (form) form.style.display = 'none';
+                if (icon) icon.textContent = '➕';
+
                 // Reload shop info (to update average rating) & reviews list
                 const shopRes = await fetch(`/api/shops/by-slug/${encodeURIComponent(storeSlug)}`);
                 if (shopRes.ok) {
@@ -910,6 +922,18 @@
             } finally {
                 btnSubmit.disabled = false;
                 btnSubmit.textContent = t('submitReviewBtn');
+            }
+        }
+
+        function toggleReviewForm() {
+            const form = document.getElementById('reviewForm');
+            const icon = document.getElementById('reviewToggleIcon');
+            if (form.style.display === 'none') {
+                form.style.display = 'flex';
+                icon.textContent = '➖';
+            } else {
+                form.style.display = 'none';
+                icon.textContent = '➕';
             }
         }
 

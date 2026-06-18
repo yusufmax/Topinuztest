@@ -3939,7 +3939,7 @@ html:not([data-theme="dark"]) .theme-icon-moon { opacity: 1; }
     border-radius: 12px;
     padding: 12px;
     color: var(--text);
-    font-size: 14px;
+    font-size: 16px;
     outline: none;
     font-family: inherit;
     width: 100%;

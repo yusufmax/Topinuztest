@@ -2,10 +2,13 @@ const { Review, Shop, Product } = require('../models');
 
 async function recalculateShopRating(shopId) {
     try {
-        const shop = await Shop.findByPk(shopId);
+        const id = parseInt(shopId);
+        if (isNaN(id)) return;
+
+        const shop = await Shop.findByPk(id);
         if (!shop) return;
 
-        const reviews = await Review.findAll({ where: { ShopId: shopId } });
+        const reviews = await Review.findAll({ where: { ShopId: id } });
         const count = reviews.length;
         const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
 
@@ -25,10 +28,13 @@ async function recalculateShopRating(shopId) {
 
 async function recalculateProductRating(productId) {
     try {
-        const product = await Product.findByPk(productId);
+        const id = parseInt(productId);
+        if (isNaN(id)) return;
+
+        const product = await Product.findByPk(id);
         if (!product) return;
 
-        const reviews = await Review.findAll({ where: { ProductId: productId } });
+        const reviews = await Review.findAll({ where: { ProductId: id } });
         const count = reviews.length;
         const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
 
@@ -50,3 +56,4 @@ module.exports = {
     recalculateShopRating,
     recalculateProductRating
 };
+
