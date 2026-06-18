@@ -237,7 +237,7 @@ function openShopModal(shopId) {
         const shareCat = shop.Category && shop.Category.slug ? shop.Category.slug : _activeMainCategory;
         const shareUrl = `${window.location.origin}${window.location.pathname}?category=${shareCat}&shop=${shop.id}`;
         const shopTitle = shop.name;
-        const shopText = shop.name;
+        const shopText = `${shop.name} - ${currentLang === 'ru' ? 'Смотрите в Topin' : 'Topin-da ko\'ring'}`;
 
         if (navigator.share) {
             try {
@@ -248,16 +248,11 @@ function openShopModal(shopId) {
                 });
             } catch (err) {
                 if (err.name !== 'AbortError') {
-                    console.error('Share error', err);
+                    showCustomShareMenu(shareUrl, shopTitle, shopText);
                 }
             }
         } else {
-            try {
-                await navigator.clipboard.writeText(shareUrl);
-                showToast(t('linkCopied'), 'success');
-            } catch (err) {
-                showToast(t('copyError'), 'error');
-            }
+            showCustomShareMenu(shareUrl, shopTitle, shopText);
         }
       };
     }
@@ -771,3 +766,96 @@ window.addEventListener('langchange', () => {
         openShopModal(window._currentOpenShopId);
     }
 });
+
+function fallbackCopyText(text) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.position = "fixed";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+            showToast(t('linkCopied'), 'success');
+        } else {
+            showToast(t('copyError'), 'error');
+        }
+    } catch (err) {
+        showToast(t('copyError'), 'error');
+    }
+    document.body.removeChild(textArea);
+}
+
+function showCustomShareMenu(url, title, text) {
+    let menu = document.getElementById('customShareMenu');
+    if (menu) {
+        menu.classList.add('show');
+        return;
+    }
+
+    menu = document.createElement('div');
+    menu.id = 'customShareMenu';
+    menu.className = 'custom-share-menu-overlay';
+    
+    const isRu = currentLang === 'ru';
+    
+    menu.innerHTML = `
+        <div class="custom-share-card">
+            <div class="share-card-header">
+                <h4>${isRu ? 'Поделиться' : 'Ulashish'}</h4>
+                <button class="share-card-close" onclick="closeCustomShareMenu()">&times;</button>
+            </div>
+            <div class="share-options">
+                <button class="share-opt-btn copy" id="shareCopyBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    <span>${isRu ? 'Копировать ссылку' : 'Havolani nusxalash'}</span>
+                </button>
+                <a class="share-opt-btn telegram" href="https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title + '\\n' + text)}" target="_blank" onclick="closeCustomShareMenu()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    <span>Telegram</span>
+                </a>
+                <a class="share-opt-btn whatsapp" href="https://api.whatsapp.com/send?text=${encodeURIComponent(title + ' - ' + url)}" target="_blank" onclick="closeCustomShareMenu()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                    <span>WhatsApp</span>
+                </a>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(menu);
+    
+    document.getElementById('shareCopyBtn').addEventListener('click', async () => {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            try {
+                await navigator.clipboard.writeText(url);
+                showToast(isRu ? 'Ссылка скопирована' : 'Havola nusxalandi', 'success');
+            } catch (err) {
+                fallbackCopyText(url);
+            }
+        } else {
+            fallbackCopyText(url);
+        }
+        closeCustomShareMenu();
+    });
+
+    menu.addEventListener('click', (e) => {
+        if (e.target === menu) closeCustomShareMenu();
+    });
+
+    setTimeout(() => menu.classList.add('show'), 10);
+}
+
+window.closeCustomShareMenu = function() {
+    const menu = document.getElementById('customShareMenu');
+    if (menu) {
+        menu.classList.remove('show');
+        setTimeout(() => {
+            if (menu && menu.parentNode) {
+                menu.parentNode.removeChild(menu);
+            }
+        }, 300);
+    }
+}
