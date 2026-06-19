@@ -6,6 +6,7 @@ const { authMiddleware } = require('../middlewares/authMiddleware');
 const { upload } = require('../middlewares/uploadMiddleware');
 
 router.get('/', shopController.getAllShops);
+router.get('/my-location', shopController.getUserLocationFromIp);
 router.get('/by-slug/:slug', shopController.getShopBySlug);
 router.get('/profile', authMiddleware, shopController.getMyShopProfile);
 router.put('/profile', authMiddleware, shopController.updateMyShopProfile);

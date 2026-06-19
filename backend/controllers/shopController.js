@@ -311,3 +311,58 @@ exports.createShopReview = async (req, res) => {
         res.status(500).json({ success: false, message: err.message });
     }
 };
+
+exports.getUserLocationFromIp = async (req, res) => {
+    try {
+        let ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+        if (ip && ip.includes(',')) {
+            ip = ip.split(',')[0].trim();
+        }
+        
+        if (ip === '::1' || ip === '127.0.0.1' || ip.startsWith('192.168.') || ip.startsWith('10.')) {
+            return res.json({ success: true, data: { latitude: 41.311081, longitude: 69.240562, ip: ip, isFallback: true } });
+        }
+        
+        try {
+            const geoRes = await fetch(`https://freeipapi.com/api/json/${ip}`);
+            if (geoRes.ok) {
+                const data = await geoRes.json();
+                if (data && data.latitude && data.longitude) {
+                    return res.json({
+                        success: true,
+                        data: {
+                            latitude: parseFloat(data.latitude),
+                            longitude: parseFloat(data.longitude),
+                            ip: ip
+                        }
+                    });
+                }
+            }
+        } catch (e) {
+            console.error('freeipapi error:', e.message);
+        }
+        
+        try {
+            const geoRes2 = await fetch(`https://ipapi.co/${ip}/json/`);
+            if (geoRes2.ok) {
+                const data2 = await geoRes2.json();
+                if (data2 && data2.latitude && data2.longitude) {
+                    return res.json({
+                        success: true,
+                        data: {
+                            latitude: parseFloat(data2.latitude),
+                            longitude: parseFloat(data2.longitude),
+                            ip: ip
+                        }
+                    });
+                }
+            }
+        } catch (e) {
+            console.error('ipapi error:', e.message);
+        }
+        
+        res.json({ success: true, data: { latitude: 41.311081, longitude: 69.240562, ip: ip, isFallback: true } });
+    } catch (err) {
+        res.json({ success: true, data: { latitude: 41.311081, longitude: 69.240562, isFallback: true, message: err.message } });
+    }
+};

@@ -289,41 +289,25 @@ function getUserLocation(successCallback, errorCallback) {
 }
 
 function getIpCoordsFallback(successCallback, errorCallback) {
-    fetch('https://freeipapi.com/api/json')
+    fetch('/api/shops/my-location')
         .then(res => {
-            if (!res.ok) throw new Error();
+            if (!res.ok) throw new Error('Failed to fetch user location from server proxy');
             return res.json();
         })
-        .then(data => {
-            if (data && data.latitude && data.longitude) {
+        .then(resData => {
+            if (resData && resData.success && resData.data && resData.data.latitude && resData.data.longitude) {
                 successCallback({
                     coords: {
-                        latitude: parseFloat(data.latitude),
-                        longitude: parseFloat(data.longitude)
+                        latitude: parseFloat(resData.data.latitude),
+                        longitude: parseFloat(resData.data.longitude)
                     }
                 });
             } else {
-                throw new Error();
+                throw new Error('Invalid coordinates format returned from proxy');
             }
         })
-        .catch(() => {
-            fetch('https://ipapi.co/json/')
-                .then(res => {
-                    if (!res.ok) throw new Error();
-                    return res.json();
-                })
-                .then(data => {
-                    if (data && data.latitude && data.longitude) {
-                        successCallback({
-                            coords: {
-                                latitude: parseFloat(data.latitude),
-                                longitude: parseFloat(data.longitude)
-                            }
-                        });
-                    } else {
-                        throw new Error();
-                    }
-                })
-                .catch(err => errorCallback(err));
+        .catch(err => {
+            console.error('IP-based fallback via server proxy failed:', err);
+            errorCallback(err);
         });
 }
