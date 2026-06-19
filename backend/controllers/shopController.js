@@ -53,13 +53,27 @@ exports.getAllShops = async (req, res) => {
             ],
         });
 
+        const plainShops = shops.map(shop => {
+            const s = shop.toJSON();
+            if (!s.latitude || !s.longitude) {
+                // Generate deterministic coordinate in Tashkent based on shop ID
+                const angle = (s.id * 0.987654) * 2 * Math.PI;
+                // radius between 0.005 and 0.065 degrees (~0.5km to 7km)
+                const radius = 0.005 + ((s.id * 17) % 100) * 0.0006;
+                s.latitude = 41.311081 + radius * Math.sin(angle);
+                s.longitude = 69.240562 + radius * Math.cos(angle);
+                s.isMockCoords = true;
+            }
+            return s;
+        });
+
         // Shuffle on server so clients don't need to
-        for (let i = shops.length - 1; i > 0; i--) {
+        for (let i = plainShops.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
-            [shops[i], shops[j]] = [shops[j], shops[i]];
+            [plainShops[i], plainShops[j]] = [plainShops[j], plainShops[i]];
         }
 
-        const result = { success: true, data: shops };
+        const result = { success: true, data: plainShops };
         if (!search) cacheSet(cacheKey, result); // don't cache search results
         res.json(result);
     } catch (err) {
@@ -74,7 +88,17 @@ exports.getShopBySlug = async (req, res) => {
             include: shopIncludes
         });
         if (!shop) return res.status(404).json({ success: false, message: 'Shop not found' });
-        res.json({ success: true, data: shop });
+        
+        const shopJson = shop.toJSON();
+        if (!shopJson.latitude || !shopJson.longitude) {
+            const angle = (shopJson.id * 0.987654) * 2 * Math.PI;
+            const radius = 0.005 + ((shopJson.id * 17) % 100) * 0.0006;
+            shopJson.latitude = 41.311081 + radius * Math.sin(angle);
+            shopJson.longitude = 69.240562 + radius * Math.cos(angle);
+            shopJson.isMockCoords = true;
+        }
+        
+        res.json({ success: true, data: shopJson });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
@@ -84,7 +108,17 @@ exports.getShopById = async (req, res) => {
     try {
         const shop = await Shop.findByPk(req.params.id, { include: shopIncludes });
         if (!shop) return res.status(404).json({ success: false, message: 'Shop not found' });
-        res.json({ success: true, data: shop });
+        
+        const shopJson = shop.toJSON();
+        if (!shopJson.latitude || !shopJson.longitude) {
+            const angle = (shopJson.id * 0.987654) * 2 * Math.PI;
+            const radius = 0.005 + ((shopJson.id * 17) % 100) * 0.0006;
+            shopJson.latitude = 41.311081 + radius * Math.sin(angle);
+            shopJson.longitude = 69.240562 + radius * Math.cos(angle);
+            shopJson.isMockCoords = true;
+        }
+        
+        res.json({ success: true, data: shopJson });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
