@@ -41,6 +41,10 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.TEXT,
             allowNull: true
         },
+        zipUrl: {
+            type: DataTypes.TEXT,
+            allowNull: true
+        },
         tags: {
             type: DataTypes.TEXT,
             allowNull: true

@@ -666,6 +666,15 @@
                     <input type="hidden" id="fUsdzUrl">
                     <div class="progress-bar-container" id="usdzProgress"><div class="progress-bar-fill" id="usdzFill"></div></div>
                 </div>
+                <div class="form-group full-width-field">
+                    <label>ZIP модель для дизайнеров (OBJ, FBX, MAX, текстуры)</label>
+                    <div class="drop-zone-dashboard" id="zipDropZone">
+                        <span id="lblZipText">📁 Нажмите для выбора .zip</span>
+                        <input type="file" id="zipFileInput" accept=".zip" onchange="uploadARModel('zip')">
+                    </div>
+                    <input type="hidden" id="fZipUrl">
+                    <div class="progress-bar-container" id="zipProgress"><div class="progress-bar-fill" id="zipFill"></div></div>
+                </div>
                 
                 <!-- SEO overrides -->
                 <div class="form-group">
@@ -818,7 +827,7 @@
 
                 tbody.innerHTML = vendorProducts.map(prod => {
                     const priceStr = prod.price ? `${parseFloat(prod.price).toLocaleString()} ${vendorShop.currency || 'UZS'}` : '–';
-                    const arStatus = (prod.glbUrl ? '🟢 GLB' : '🔴') + ' / ' + (prod.usdzUrl ? '🟢 USDZ' : '🔴');
+                    const arStatus = (prod.glbUrl ? '🟢 GLB' : '🔴') + ' / ' + (prod.usdzUrl ? '🟢 USDZ' : '🔴') + (prod.zipUrl ? ' / 🟢 ZIP' : '');
                     const publishedStatus = prod.isPublished ? '🟢 Активен' : '⚪ Черновик';
                     const stockText = prod.stockStatus === 'In Stock' ? 'В наличии' : 'Под заказ';
 
@@ -938,13 +947,16 @@
             
             document.getElementById('fGlbUrl').value = prod?.glbUrl || '';
             document.getElementById('fUsdzUrl').value = prod?.usdzUrl || '';
+            document.getElementById('fZipUrl').value = prod?.zipUrl || '';
             
             // Clear file input values so onchange triggers properly
             document.getElementById('glbFileInput').value = '';
             document.getElementById('usdzFileInput').value = '';
+            document.getElementById('zipFileInput').value = '';
 
             document.getElementById('lblGlbText').innerHTML = prod?.glbUrl ? `<span style="color:var(--accent)">🟢 3D модель GLB загружена</span>` : `📁 Нажмите для выбора .glb`;
             document.getElementById('lblUsdzText').innerHTML = prod?.usdzUrl ? `<span style="color:var(--accent)">🟢 3D модель USDZ загружена</span>` : `📁 Нажмите для выбора .usdz`;
+            document.getElementById('lblZipText').innerHTML = prod?.zipUrl ? `<span style="color:var(--accent)">🟢 ZIP модель загружена</span>` : `📁 Нажмите для выбора .zip`;
             
             document.getElementById('fProdSeoTitle').value = prod?.seoTitle || '';
             document.getElementById('fProdSeoDesc').value = prod?.seoDescription || '';
@@ -1071,12 +1083,21 @@
                 const json = await res.json();
                 fill.style.width = '100%';
                 
-                const targetInputId = type === 'glb' ? 'fGlbUrl' : 'fUsdzUrl';
-                document.getElementById(targetInputId).value = type === 'glb' ? json.data.glbUrl : json.data.usdzUrl;
+                let targetInputId, labelId;
+                if (type === 'glb') {
+                    targetInputId = 'fGlbUrl';
+                    labelId = 'lblGlbText';
+                } else if (type === 'usdz') {
+                    targetInputId = 'fUsdzUrl';
+                    labelId = 'lblUsdzText';
+                } else if (type === 'zip') {
+                    targetInputId = 'fZipUrl';
+                    labelId = 'lblZipText';
+                }
                 
-                const labelId = type === 'glb' ? 'lblGlbText' : 'lblUsdzText';
-                document.getElementById(labelId).innerHTML = `<span style="color:var(--accent)">🟢 3D модель ${type.toUpperCase()} успешно загружена!</span>`;
-                showToast('3D модель успешно загружена', 'success');
+                document.getElementById(targetInputId).value = type === 'glb' ? json.data.glbUrl : (type === 'usdz' ? json.data.usdzUrl : json.data.zipUrl);
+                document.getElementById(labelId).innerHTML = `<span style="color:var(--accent)">🟢 Файл ${type.toUpperCase()} успешно загружен!</span>`;
+                showToast('Файл успешно загружен', 'success');
             } catch(e) {
                 showToast('Ошибка при загрузке 3D модели: ' + e.message, 'error');
                 fill.style.backgroundColor = 'var(--red)';
@@ -1110,7 +1131,8 @@
                 images: JSON.stringify(productGalleryImages),
                 imageUrl: productGalleryImages.length > 0 ? productGalleryImages[0] : null,
                 glbUrl: document.getElementById('fGlbUrl').value || null,
-                usdzUrl: document.getElementById('fUsdzUrl').value || null
+                usdzUrl: document.getElementById('fUsdzUrl').value || null,
+                zipUrl: document.getElementById('fZipUrl').value || null
             };
 
             const url = pId ? `/api/products/${pId}` : `/api/products`;

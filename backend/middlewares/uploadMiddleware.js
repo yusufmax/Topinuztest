@@ -21,11 +21,11 @@ const uploadModel = multer({
     limits: { fileSize: 50 * 1024 * 1024 }, // 50MB limit
     fileFilter: (req, file, cb) => {
         const ext = file.originalname.split('.').pop().toLowerCase();
-        const allowedExtensions = ['glb', 'usdz'];
+        const allowedExtensions = ['glb', 'usdz', 'zip'];
         if (allowedExtensions.includes(ext)) {
             cb(null, true);
         } else {
-            cb(new Error('Only .glb and .usdz 3D models are allowed'));
+            cb(new Error('Only .glb, .usdz and .zip files are allowed'));
         }
     }
 });

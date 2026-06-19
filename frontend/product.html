@@ -415,6 +415,19 @@
         </div>
     </div>
 
+    <!-- 3D Download Overlay -->
+    <div class="viewer-container-overlay" id="downloadOverlay" style="display: none;">
+        <div class="viewer-modal-content" style="max-height: 480px; height: auto;">
+            <div class="viewer-modal-header">
+                <h3 style="margin:0; font-size:16px;" id="lblDownloadTitle">Скачать 3D модель</h3>
+                <button class="viewer-close-btn" onclick="closeDownloadModal()">✕</button>
+            </div>
+            <div style="padding: 24px; display: flex; flex-direction: column; gap: 16px;" id="downloadLinksContainer">
+                <!-- Links injected dynamically -->
+            </div>
+        </div>
+    </div>
+
     <!-- Toast elements -->
     <div class="toast" id="toast"></div>
 
@@ -524,9 +537,20 @@
             `).join('');
 
             // If product has 3D models, enable the AR trigger button
-            const has3D = product.glbUrl || product.usdzUrl;
+            const has3D = product.glbUrl || product.usdzUrl || product.zipUrl;
             if (has3D) {
                 document.getElementById('btnAR').style.display = 'flex';
+                // If on desktop, change label to "Download 3D"
+                if (!isIOS && !isAndroid) {
+                    const lblViewAR = document.getElementById('lblViewAR');
+                    if (lblViewAR) {
+                        lblViewAR.textContent = currentLang === 'ru' ? 'Скачать 3D модель' : '3D modelni yuklab olish';
+                    }
+                    const svgIcon = document.querySelector('#btnAR svg');
+                    if (svgIcon) {
+                        svgIcon.innerHTML = `<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path><polyline points="7 10 12 15 17 10" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></polyline><line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></line>`;
+                    }
+                }
             } else {
                 document.getElementById('btnAR').style.display = 'none';
             }
@@ -751,6 +775,7 @@
 
             const hasGlb = !!product.glbUrl;
             const hasUsdz = !!product.usdzUrl;
+            const hasZip = !!product.zipUrl;
 
             // Send tracking ar_load event
             fetch('/api/analytics/track', {
@@ -796,12 +821,89 @@
             }
             // Desktop / Fallback handling
             else {
-                if (hasGlb) {
-                    open3DViewer();
-                } else {
-                    showToast('3D модель недоступна для этого устройства', 'error');
-                }
+                openDownloadModal();
             }
+        }
+
+        function openDownloadModal() {
+            if (!product) return;
+            const container = document.getElementById('downloadLinksContainer');
+            container.innerHTML = '';
+            
+            const titleEl = document.getElementById('lblDownloadTitle');
+            if (titleEl) {
+                titleEl.textContent = currentLang === 'ru' ? 'Скачать 3D модель' : '3D modelni yuklab olish';
+            }
+
+            let hasAny = false;
+            const files = [
+                {
+                    key: 'zipUrl',
+                    label: currentLang === 'ru' ? 'ZIP архив для дизайнеров' : 'Dizaynerlar uchun ZIP arxiv',
+                    desc: currentLang === 'ru' ? '3D MAX, OBJ, FBX + текстуры' : '3D MAX, OBJ, FBX + teksturalar',
+                    icon: '📁',
+                    ext: 'ZIP'
+                },
+                {
+                    key: 'glbUrl',
+                    label: currentLang === 'ru' ? '3D модель (GLB)' : '3D model (GLB)',
+                    desc: currentLang === 'ru' ? 'Для Android и веб-браузеров' : 'Android va veb-brauzerlar uchun',
+                    icon: '📦',
+                    ext: 'GLB',
+                    previewable: true
+                },
+                {
+                    key: 'usdzUrl',
+                    label: currentLang === 'ru' ? '3D модель (USDZ)' : '3D model (USDZ)',
+                    desc: currentLang === 'ru' ? 'Для Apple iOS Quick Look' : 'Apple iOS Quick Look uchun',
+                    icon: '📱',
+                    ext: 'USDZ'
+                }
+            ];
+
+            files.forEach(f => {
+                const url = product[f.key];
+                if (url) {
+                    hasAny = true;
+                    
+                    let previewBtn = '';
+                    if (f.previewable) {
+                        previewBtn = `
+                            <button onclick="closeDownloadModal(); open3DViewer();" class="btn-secondary-contact" style="padding:8px 12px; font-size:13px; border-radius:8px; margin-top:6px; width:100%; display:flex; align-items:center; justify-content:center; gap:6px;">
+                                👁️ ${currentLang === 'ru' ? 'Просмотр в 3D' : '3D-da ko\'rish'}
+                            </button>
+                        `;
+                    }
+
+                    container.innerHTML += `
+                        <div style="padding:16px; border-radius:16px; border:1px solid var(--border); background:var(--surface2); display:flex; flex-direction:column; gap:12px;">
+                            <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%;">
+                                <div style="display:flex; align-items:center; gap:12px;">
+                                    <div style="font-size:24px; background:var(--surface); width:44px; height:44px; display:flex; align-items:center; justify-content:center; border-radius:10px; border:1px solid var(--border);">${f.icon}</div>
+                                    <div>
+                                        <div style="font-weight:700; color:var(--text); font-size:14px;">${f.label}</div>
+                                        <div style="font-size:12px; color:var(--text3);">${f.desc}</div>
+                                    </div>
+                                </div>
+                                <a href="${url}" target="_blank" download="${product.slug || 'product'}.${f.ext.toLowerCase()}" class="btn-primary-ar" style="padding:8px 16px; font-size:13px; border-radius:8px; box-shadow:none; text-decoration:none; white-space:nowrap; height:fit-content;">
+                                    ${currentLang === 'ru' ? 'Скачать' : 'Yuklab olish'}
+                                </a>
+                            </div>
+                            ${previewBtn}
+                        </div>
+                    `;
+                }
+            });
+
+            if (!hasAny) {
+                container.innerHTML = `<div style="text-align:center; color:var(--text3); padding:20px;">${currentLang === 'ru' ? 'Файлы недоступны для скачивания' : 'Yuklab olish uchun fayllar mavjud emas'}</div>`;
+            }
+
+            document.getElementById('downloadOverlay').style.display = 'flex';
+        }
+
+        function closeDownloadModal() {
+            document.getElementById('downloadOverlay').style.display = 'none';
         }
 
         function open3DViewer() {

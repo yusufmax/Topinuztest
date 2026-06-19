@@ -55,7 +55,8 @@ exports.getAllProducts = async (req, res) => {
         if (hasAr === 'true') {
             whereClause[Op.or] = [
                 { glbUrl: { [Op.ne]: null } },
-                { usdzUrl: { [Op.ne]: null } }
+                { usdzUrl: { [Op.ne]: null } },
+                { zipUrl: { [Op.ne]: null } }
             ];
         }
 
@@ -228,8 +229,8 @@ exports.uploadProductARModel = async (req, res) => {
         }
 
         const ext = req.file.originalname.split('.').pop().toLowerCase();
-        if (ext !== 'glb' && ext !== 'usdz') {
-            return res.status(400).json({ success: false, message: 'Invalid file extension. Only .glb and .usdz are allowed.' });
+        if (ext !== 'glb' && ext !== 'usdz' && ext !== 'zip') {
+            return res.status(400).json({ success: false, message: 'Invalid file extension. Only .glb, .usdz, and .zip are allowed.' });
         }
 
         const filename = `${product.slug}_${Date.now()}.${ext}`;
@@ -239,10 +240,12 @@ exports.uploadProductARModel = async (req, res) => {
             product.glbUrl = fileUrl;
         } else if (ext === 'usdz') {
             product.usdzUrl = fileUrl;
+        } else if (ext === 'zip') {
+            product.zipUrl = fileUrl;
         }
         
         await product.save();
-        res.json({ success: true, data: { glbUrl: product.glbUrl, usdzUrl: product.usdzUrl } });
+        res.json({ success: true, data: { glbUrl: product.glbUrl, usdzUrl: product.usdzUrl, zipUrl: product.zipUrl } });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }

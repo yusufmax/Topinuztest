@@ -80,6 +80,7 @@ const initDb = async () => {
             try { await sequelize.query("ALTER TABLE Products ADD COLUMN stockStatus VARCHAR(255) DEFAULT 'In Stock';"); } catch (e) {}
             try { await sequelize.query("ALTER TABLE Products ADD COLUMN glbUrl TEXT;"); } catch (e) {}
             try { await sequelize.query("ALTER TABLE Products ADD COLUMN usdzUrl TEXT;"); } catch (e) {}
+            try { await sequelize.query("ALTER TABLE Products ADD COLUMN zipUrl TEXT;"); } catch (e) {}
             try { await sequelize.query("ALTER TABLE Products ADD COLUMN tags TEXT;"); } catch (e) {}
             try { await sequelize.query("ALTER TABLE Products ADD COLUMN seoTitle VARCHAR(255);"); } catch (e) {}
             try { await sequelize.query("ALTER TABLE Products ADD COLUMN seoDescription VARCHAR(255);"); } catch (e) {}
