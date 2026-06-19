@@ -270,3 +270,60 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 function deg2rad(deg) {
     return deg * (Math.PI / 180);
 }
+
+function getUserLocation(successCallback, errorCallback) {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                successCallback(position);
+            },
+            (error) => {
+                console.warn('Browser geolocation failed, attempting IP-based fallback...', error);
+                getIpCoordsFallback(successCallback, errorCallback);
+            },
+            { enableHighAccuracy: true, timeout: 4000 }
+        );
+    } else {
+        getIpCoordsFallback(successCallback, errorCallback);
+    }
+}
+
+function getIpCoordsFallback(successCallback, errorCallback) {
+    fetch('https://freeipapi.com/api/json')
+        .then(res => {
+            if (!res.ok) throw new Error();
+            return res.json();
+        })
+        .then(data => {
+            if (data && data.latitude && data.longitude) {
+                successCallback({
+                    coords: {
+                        latitude: parseFloat(data.latitude),
+                        longitude: parseFloat(data.longitude)
+                    }
+                });
+            } else {
+                throw new Error();
+            }
+        })
+        .catch(() => {
+            fetch('https://ipapi.co/json/')
+                .then(res => {
+                    if (!res.ok) throw new Error();
+                    return res.json();
+                })
+                .then(data => {
+                    if (data && data.latitude && data.longitude) {
+                        successCallback({
+                            coords: {
+                                latitude: parseFloat(data.latitude),
+                                longitude: parseFloat(data.longitude)
+                            }
+                        });
+                    } else {
+                        throw new Error();
+                    }
+                })
+                .catch(err => errorCallback(err));
+        });
+}

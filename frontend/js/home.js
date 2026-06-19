@@ -261,28 +261,26 @@ function setupSearch() {
         if (!btn) return;
         
         if (!window._searchNearMeActive) {
-            if (navigator.geolocation) {
-                showToast(currentLang === 'ru' ? '📍 Определение геопозиции...' : '📍 Geopozitsiyani aniqlash...', 'info');
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        window._userCoords = {
-                            lat: position.coords.latitude,
-                            lng: position.coords.longitude
-                        };
-                        window._searchNearMeActive = true;
-                        btn.style.background = 'var(--accent)';
-                        btn.style.color = '#fff';
-                        
-                        const query = headerInput?.value || heroInput?.value || '';
-                        if (query) performSearch(query);
-                        showToast('✅ Список отсортирован по расстоянию', 'success');
-                    },
-                    (error) => {
-                        console.error(error);
-                        showToast(currentLang === 'ru' ? '❌ Доступ к геопозиции отклонен' : '❌ Geopozitsiyaga ruxsat rad etildi', 'error');
-                    }
-                );
-            }
+            showToast(currentLang === 'ru' ? '📍 Определение геопозиции...' : '📍 Geopozitsiyani aniqlash...', 'info');
+            getUserLocation(
+                (position) => {
+                    window._userCoords = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    window._searchNearMeActive = true;
+                    btn.style.background = 'var(--accent)';
+                    btn.style.color = '#fff';
+                    
+                    const query = headerInput?.value || heroInput?.value || '';
+                    if (query) performSearch(query);
+                    showToast('✅ Список отсортирован по расстоянию', 'success');
+                },
+                (error) => {
+                    console.error(error);
+                    showToast(currentLang === 'ru' ? '❌ Доступ к геопозиции отклонен' : '❌ Geopozitsiyaga ruxsat rad etildi', 'error');
+                }
+            );
         } else {
             window._searchNearMeActive = false;
             btn.style.background = 'var(--surface)';

@@ -334,36 +334,31 @@ function toggleNearMeFilter() {
   if (!btn) return;
   
   if (!_nearMeFilterActive) {
-    if (navigator.geolocation) {
-      showToast(currentLang === 'ru' ? '📍 Определение геопозиции...' : '📍 Geopozitsiyani aniqlash...', 'info');
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          _userCoords = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          };
-          window._userCoords = _userCoords;
-          
-          _nearMeFilterActive = true;
-          btn.style.background = 'var(--accent)';
-          btn.style.color = '#fff';
-          
-          const sorted = getSortedShops(_allShops);
-          renderShops(sorted);
-          if (_currentViewMode === 'map') {
-            initLeafletMap(sorted);
-          }
-          showToast('✅ Список отсортирован по расстоянию', 'success');
-        },
-        (error) => {
-          console.error(error);
-          showToast(currentLang === 'ru' ? '❌ Доступ к геопозиции отклонен или недоступен' : '❌ Geopozitsiyaga ruxsat rad etildi yoki mavjud emas', 'error');
-        },
-        { enableHighAccuracy: true, timeout: 5000 }
-      );
-    } else {
-      showToast('Geolocation is not supported by your browser', 'error');
-    }
+    showToast(currentLang === 'ru' ? '📍 Определение геопозиции...' : '📍 Geopozitsiyani aniqlash...', 'info');
+    getUserLocation(
+      (position) => {
+        _userCoords = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        };
+        window._userCoords = _userCoords;
+        
+        _nearMeFilterActive = true;
+        btn.style.background = 'var(--accent)';
+        btn.style.color = '#fff';
+        
+        const sorted = getSortedShops(_allShops);
+        renderShops(sorted);
+        if (_currentViewMode === 'map') {
+          initLeafletMap(sorted);
+        }
+        showToast('✅ Список отсортирован по расстоянию', 'success');
+      },
+      (error) => {
+        console.error(error);
+        showToast(currentLang === 'ru' ? '❌ Доступ к геопозиции отклонен или недоступен' : '❌ Geopozitsiyaga ruxsat rad etildi yoki mavjud emas', 'error');
+      }
+    );
   } else {
     _nearMeFilterActive = false;
     btn.style.background = 'var(--surface)';
