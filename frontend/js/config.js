@@ -117,7 +117,11 @@ const i18n = {
     reviewSuccess: "Fikr muvaffaqiyatli qo'shildi!",
     inputNamePlaceholder: "Ismingizni kiriting...",
     inputCommentPlaceholder: "Fikringizni yozing...",
-    noReviewsYet: "Fikrlar hali yo'q. Birinchi bo'lib fikr qoldiring!"
+    noReviewsYet: "Fikrlar hali yo'q. Birinchi bo'lib fikr qoldiring!",
+    nearMe: "Yaqin atrofda",
+    listView: "Ro'yxat",
+    mapView: "Xarita",
+    kmAway: "{km} km uzoqlikda"
   },
   ru: {
     home: "Главная",
@@ -233,7 +237,11 @@ const i18n = {
     reviewSuccess: "Отзыв успешно добавлен!",
     inputNamePlaceholder: "Введите имя...",
     inputCommentPlaceholder: "Напишите ваш отзыв...",
-    noReviewsYet: "Отзывов пока нет. Оставьте первый отзыв!"
+    noReviewsYet: "Отзывов пока нет. Оставьте первый отзыв!",
+    nearMe: "Рядом со мной",
+    listView: "Список",
+    mapView: "Карта",
+    kmAway: "в {km} км от вас"
   }
 };
 

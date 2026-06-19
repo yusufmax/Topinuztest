@@ -33,6 +33,14 @@ module.exports = (sequelize, DataTypes) => {
         locationLink: {
             type: DataTypes.STRING
         },
+        latitude: {
+            type: DataTypes.FLOAT,
+            allowNull: true
+        },
+        longitude: {
+            type: DataTypes.FLOAT,
+            allowNull: true
+        },
         website: {
             type: DataTypes.STRING
         },

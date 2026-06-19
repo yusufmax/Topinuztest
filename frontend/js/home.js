@@ -237,6 +237,8 @@ function setupSearch() {
         tabShops.classList.remove('active');
         productsGrid.style.display = 'grid';
         shopsGrid.style.display = 'none';
+        const btnSearch = document.getElementById('btnNearMeSearch');
+        if (btnSearch) btnSearch.style.display = 'none';
     });
 
     tabShops.addEventListener('click', () => {
@@ -244,7 +246,51 @@ function setupSearch() {
         tabProducts.classList.remove('active');
         shopsGrid.style.display = 'grid';
         productsGrid.style.display = 'none';
+        const btnSearch = document.getElementById('btnNearMeSearch');
+        if (btnSearch) btnSearch.style.display = 'flex';
     });
+
+    // Translate search nearMe button on load
+    const btnNearSearchInit = document.getElementById('lblNearMeBtnSearch');
+    if (btnNearSearchInit) btnNearSearchInit.textContent = t('nearMe');
+
+    // Define near me search action
+    window._searchNearMeActive = false;
+    window.toggleNearMeFilterSearch = () => {
+        const btn = document.getElementById('btnNearMeSearch');
+        if (!btn) return;
+        
+        if (!window._searchNearMeActive) {
+            if (navigator.geolocation) {
+                showToast(currentLang === 'ru' ? '📍 Определение геопозиции...' : '📍 Geopozitsiyani aniqlash...', 'info');
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        window._userCoords = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        window._searchNearMeActive = true;
+                        btn.style.background = 'var(--accent)';
+                        btn.style.color = '#fff';
+                        
+                        const query = headerInput?.value || heroInput?.value || '';
+                        if (query) performSearch(query);
+                        showToast('✅ Список отсортирован по расстоянию', 'success');
+                    },
+                    (error) => {
+                        console.error(error);
+                        showToast(currentLang === 'ru' ? '❌ Доступ к геопозиции отклонен' : '❌ Geopozitsiyaga ruxsat rad etildi', 'error');
+                    }
+                );
+            }
+        } else {
+            window._searchNearMeActive = false;
+            btn.style.background = 'var(--surface)';
+            btn.style.color = 'var(--text)';
+            const query = headerInput?.value || heroInput?.value || '';
+            if (query) performSearch(query);
+        }
+    };
 
     window._performSearchGlobal = performSearch;
 
@@ -293,7 +339,21 @@ function setupSearch() {
             const shopJson = await shopRes.json();
             
             const products = prodJson.data || [];
-            const shops = shopJson.data || [];
+            let shops = shopJson.data || [];
+            
+            // Sort by proximity if Near Me filter is active in search
+            if (window._searchNearMeActive && window._userCoords) {
+                shops = [...shops].sort((a, b) => {
+                    const hasA = a.latitude && a.longitude;
+                    const hasB = b.latitude && b.longitude;
+                    if (!hasA && !hasB) return 0;
+                    if (!hasA) return 1;
+                    if (!hasB) return -1;
+                    const distA = calculateDistance(window._userCoords.lat, window._userCoords.lng, a.latitude, a.longitude);
+                    const distB = calculateDistance(window._userCoords.lat, window._userCoords.lng, b.latitude, b.longitude);
+                    return distA - distB;
+                });
+            }
             
             countProductsSpan.textContent = products.length;
             countShopsSpan.textContent = shops.length;
@@ -322,6 +382,16 @@ function setupSearch() {
                             <div style="display:flex; flex-direction:column; gap:4px; flex:1; overflow:hidden;">
                                 <div class="featured-store-name" style="text-align:left; font-size:16px;">${escHtml(shop.name)}</div>
                                 ${renderRatingStarsHtml(shop.rating, shop.reviewsCount)}
+                                ${(() => {
+                                    if (window._userCoords && shop.latitude && shop.longitude) {
+                                        const dist = calculateDistance(window._userCoords.lat, window._userCoords.lng, shop.latitude, shop.longitude);
+                                        if (dist !== null) {
+                                            const text = t('kmAway').replace('{km}', dist.toFixed(1));
+                                            return `<span style="font-size:12px; color:var(--accent); font-weight:700; display:flex; align-items:center; gap:4px; margin-top:4px;">📍 ${text}</span>`;
+                                        }
+                                    }
+                                    return '';
+                                })()}
                                 ${catName ? `<span class="featured-store-cat" style="align-self:flex-start; margin-top:2px;">${escHtml(catName)}</span>` : ''}
                             </div>
                         </div>
@@ -419,6 +489,9 @@ window.addEventListener('langchange', () => {
         loadArProducts();
     }
     const searchView = document.getElementById('searchView');
+    const btnNearSearch = document.getElementById('lblNearMeBtnSearch');
+    if (btnNearSearch) btnNearSearch.textContent = t('nearMe');
+
     if (searchView && searchView.style.display !== 'none' && window._performSearchGlobal) {
         const queryValSpan = document.getElementById('searchQueryVal');
         if (queryValSpan && queryValSpan.textContent) {

@@ -525,6 +525,14 @@
                         <label>Ссылка на геолокацию (Google Maps / Yandex / 2GIS)</label>
                         <input type="url" id="pLocationLink" class="form-control-dashboard">
                     </div>
+                    <div class="form-group">
+                        <label>Широта (Latitude, например: 41.311081)</label>
+                        <input type="number" step="any" id="pLatitude" class="form-control-dashboard" placeholder="41.311081">
+                    </div>
+                    <div class="form-group">
+                        <label>Долгота (Longitude, например: 69.240562)</label>
+                        <input type="number" step="any" id="pLongitude" class="form-control-dashboard" placeholder="69.240562">
+                    </div>
 
                     <div class="form-group">
                         <label>Логотип магазина</label>
@@ -739,8 +747,9 @@
             document.getElementById('pTelegram').value = vendorShop.telegram || '';
             document.getElementById('pInstagram').value = vendorShop.instagram || '';
             document.getElementById('pWebsite').value = vendorShop.website || '';
-            document.getElementById('pAddress').value = vendorShop.location || '';
             document.getElementById('pLocationLink').value = vendorShop.locationLink || '';
+            document.getElementById('pLatitude').value = vendorShop.latitude || '';
+            document.getElementById('pLongitude').value = vendorShop.longitude || '';
             document.getElementById('pDescription').value = vendorShop.description_ru || '';
             document.getElementById('pLogoUrl').value = vendorShop.logoUrl || '';
             document.getElementById('pBannerUrl').value = vendorShop.bannerUrl || '';
@@ -761,6 +770,20 @@
                 loadSubcategoriesFilter(),
                 loadAnalytics()
             ]);
+
+            // Auto-extract coordinates from pasted locationLink helper
+            const locInput = document.getElementById('pLocationLink');
+            if (locInput && !locInput._hasCoordsListener) {
+                locInput._hasCoordsListener = true;
+                locInput.addEventListener('input', (e) => {
+                    const coords = extractCoordsFromLink(e.target.value);
+                    if (coords) {
+                        document.getElementById('pLatitude').value = coords.lat;
+                        document.getElementById('pLongitude').value = coords.lng;
+                        showToast('📍 Координаты автоматически извлечены!', 'success');
+                    }
+                });
+            }
         }
 
 
@@ -877,6 +900,8 @@
                 website: document.getElementById('pWebsite').value.trim(),
                 location: document.getElementById('pAddress').value.trim(),
                 locationLink: document.getElementById('pLocationLink').value.trim(),
+                latitude: document.getElementById('pLatitude').value ? parseFloat(document.getElementById('pLatitude').value) : null,
+                longitude: document.getElementById('pLongitude').value ? parseFloat(document.getElementById('pLongitude').value) : null,
                 description_ru: document.getElementById('pDescription').value.trim(),
                 logoUrl: document.getElementById('pLogoUrl').value.trim(),
                 bannerUrl: document.getElementById('pBannerUrl').value.trim(),

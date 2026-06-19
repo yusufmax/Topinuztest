@@ -3,6 +3,13 @@ let _activeMainCategory = 'all';
 let _activeSubCategory = 'all';
 let _liveSubCategories = [];
 
+// Geolocation & Map state
+let _userCoords = null;
+let _nearMeFilterActive = false;
+let _currentViewMode = 'list'; // 'list' or 'map'
+let _map = null;
+let _mapMarkers = [];
+
 async function initShopsPage() {
   const params = new URLSearchParams(window.location.search);
   const catSlug = params.get('category') || 'all';
@@ -13,6 +20,9 @@ async function initShopsPage() {
 
   const titleEl = document.getElementById('pageTitle');
   if (titleEl) titleEl.textContent = catName;
+
+  const btnNear = document.getElementById('lblNearMeBtn');
+  if (btnNear) btnNear.textContent = t('nearMe');
 
   await Promise.all([
     buildCategoryTabs(_activeMainCategory),
@@ -129,7 +139,12 @@ async function fetchAndRenderShops(activeMainIdOrSlug = 'all', activeSubIdOrSlug
       _allShops = [];
   }
 
-  renderShops(_allShops);
+  const shopsToRender = _nearMeFilterActive ? getSortedShops(_allShops) : _allShops;
+  renderShops(shopsToRender);
+  
+  if (_currentViewMode === 'map') {
+    initLeafletMap(shopsToRender);
+  }
 
   const urlParams = new URLSearchParams(window.location.search);
   const shopIdParam = urlParams.get('shop');
@@ -191,6 +206,16 @@ function renderShops(shops) {
       <div class="market-info">
         <div class="market-name">${escHtml(shop.name)}</div>
         ${renderRatingStarsHtml(shop.rating, shop.reviewsCount)}
+        ${(() => {
+          if (_userCoords && shop.latitude && shop.longitude) {
+            const dist = calculateDistance(_userCoords.lat, _userCoords.lng, shop.latitude, shop.longitude);
+            if (dist !== null) {
+              const text = t('kmAway').replace('{km}', dist.toFixed(1));
+              return `<div class="market-distance" style="font-size:12px; color:var(--accent); font-weight:700; display:flex; align-items:center; gap:4px; margin-top:4px;">📍 ${text}</div>`;
+            }
+          }
+          return '';
+        })()}
         <div class="market-desc" style="margin-top: 4px;">${escHtml((currentLang === 'ru' ? shop.description_ru : shop.description) || '')}</div>
       </div>
 
@@ -282,8 +307,186 @@ async function handleLangChangeMarket() {
   const titleEl = document.getElementById('pageTitle');
   if (titleEl) titleEl.textContent = catName;
 
+  const btnNear = document.getElementById('lblNearMeBtn');
+  if (btnNear) btnNear.textContent = t('nearMe');
+
   await buildCategoryTabs(_activeMainCategory);
-  renderShops(_allShops);
+  const shopsToRender = _nearMeFilterActive ? getSortedShops(_allShops) : _allShops;
+  renderShops(shopsToRender);
+}
+
+function getSortedShops(shopsList) {
+  if (!_userCoords) return [...shopsList];
+  return [...shopsList].sort((a, b) => {
+    const hasA = a.latitude && a.longitude;
+    const hasB = b.latitude && b.longitude;
+    if (!hasA && !hasB) return 0;
+    if (!hasA) return 1;
+    if (!hasB) return -1;
+    const distA = calculateDistance(_userCoords.lat, _userCoords.lng, a.latitude, a.longitude);
+    const distB = calculateDistance(_userCoords.lat, _userCoords.lng, b.latitude, b.longitude);
+    return distA - distB;
+  });
+}
+
+function toggleNearMeFilter() {
+  const btn = document.getElementById('btnNearMe');
+  if (!btn) return;
+  
+  if (!_nearMeFilterActive) {
+    if (navigator.geolocation) {
+      showToast(currentLang === 'ru' ? '📍 Определение геопозиции...' : '📍 Geopozitsiyani aniqlash...', 'info');
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          _userCoords = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          window._userCoords = _userCoords;
+          
+          _nearMeFilterActive = true;
+          btn.style.background = 'var(--accent)';
+          btn.style.color = '#fff';
+          
+          const sorted = getSortedShops(_allShops);
+          renderShops(sorted);
+          if (_currentViewMode === 'map') {
+            initLeafletMap(sorted);
+          }
+          showToast('✅ Список отсортирован по расстоянию', 'success');
+        },
+        (error) => {
+          console.error(error);
+          showToast(currentLang === 'ru' ? '❌ Доступ к геопозиции отклонен или недоступен' : '❌ Geopozitsiyaga ruxsat rad etildi yoki mavjud emas', 'error');
+        },
+        { enableHighAccuracy: true, timeout: 5000 }
+      );
+    } else {
+      showToast('Geolocation is not supported by your browser', 'error');
+    }
+  } else {
+    _nearMeFilterActive = false;
+    btn.style.background = 'var(--surface)';
+    btn.style.color = 'var(--text)';
+    
+    renderShops(_allShops);
+    if (_currentViewMode === 'map') {
+      initLeafletMap(_allShops);
+    }
+  }
+}
+
+function switchViewMode(mode) {
+  _currentViewMode = mode;
+  const listBtn = document.getElementById('btnListView');
+  const mapBtn = document.getElementById('btnMapView');
+  const listGrid = document.getElementById('shopsGrid');
+  const mapDiv = document.getElementById('shopsMap');
+  
+  if (!listBtn || !mapBtn || !listGrid || !mapDiv) return;
+
+  const shopsToRender = _nearMeFilterActive ? getSortedShops(_allShops) : _allShops;
+
+  if (mode === 'map') {
+    listBtn.classList.remove('active');
+    listBtn.style.background = 'transparent';
+    listBtn.style.color = 'var(--text2)';
+    
+    mapBtn.classList.add('active');
+    mapBtn.style.background = 'var(--accent)';
+    mapBtn.style.color = '#fff';
+    
+    listGrid.style.display = 'none';
+    mapDiv.style.display = 'block';
+    
+    initLeafletMap(shopsToRender);
+    setTimeout(() => {
+      if (_map) _map.invalidateSize();
+    }, 100);
+  } else {
+    mapBtn.classList.remove('active');
+    mapBtn.style.background = 'transparent';
+    mapBtn.style.color = 'var(--text2)';
+    
+    listBtn.classList.add('active');
+    listBtn.style.background = 'var(--accent)';
+    listBtn.style.color = '#fff';
+    
+    mapDiv.style.display = 'none';
+    listGrid.style.display = 'grid';
+  }
+}
+
+function initLeafletMap(shops) {
+  if (!_map) {
+    const center = _userCoords ? [_userCoords.lat, _userCoords.lng] : [41.311081, 69.240562];
+    _map = L.map('shopsMap').setView(center, 12);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(_map);
+  }
+  
+  _mapMarkers.forEach(m => _map.removeLayer(m));
+  _mapMarkers = [];
+  
+  const bounds = [];
+  
+  if (_userCoords) {
+    const userLatLng = [_userCoords.lat, _userCoords.lng];
+    bounds.push(userLatLng);
+    
+    const redIcon = L.icon({
+      iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowSize: [41, 41]
+    });
+    
+    const userMarker = L.marker(userLatLng, { icon: redIcon })
+      .addTo(_map)
+      .bindPopup(`<strong style="color:var(--red);">${currentLang === 'ru' ? 'Вы здесь' : 'Siz shu yerdamisiz'}</strong>`);
+    _mapMarkers.push(userMarker);
+  }
+
+  shops.forEach(shop => {
+    if (shop.latitude && shop.longitude) {
+      const latLng = [shop.latitude, shop.longitude];
+      bounds.push(latLng);
+      
+      let distanceText = '';
+      if (_userCoords) {
+        const dist = calculateDistance(_userCoords.lat, _userCoords.lng, shop.latitude, shop.longitude);
+        if (dist !== null) {
+          const text = t('kmAway').replace('{km}', dist.toFixed(1));
+          distanceText = `<div style="font-size:12px;color:var(--accent);font-weight:700;margin-top:4px;">📍 ${text}</div>`;
+        }
+      }
+      
+      const marker = L.marker(latLng)
+        .addTo(_map)
+        .bindPopup(`
+          <div style="font-family:inherit;padding:4px;min-width:180px;text-align:left;">
+            <strong style="font-size:14px;color:var(--text);display:block;margin-bottom:2px;">${escHtml(shop.name)}</strong>
+            <div style="font-size:11px;color:var(--text2);margin-bottom:6px;">${escHtml(shop.location || '')}</div>
+            ${distanceText}
+            <button onclick="openShopModal(${shop.id})" class="btn-primary-ar" style="width:100%;margin-top:8px;padding:6px 12px;font-size:11px;border-radius:6px;box-shadow:none;color:#fff;border:none;cursor:pointer;justify-content:center;display:flex;align-items:center;">
+              ${currentLang === 'ru' ? 'Войти в магазин' : 'Do\'konga kirish'}
+            </button>
+          </div>
+        `);
+      _mapMarkers.push(marker);
+    }
+  });
+
+  if (bounds.length > 0) {
+    _map.fitBounds(bounds, { padding: [50, 50] });
+  } else {
+    const center = _userCoords ? [_userCoords.lat, _userCoords.lng] : [41.311081, 69.240562];
+    _map.setView(center, 12);
+  }
 }
 
 window.addEventListener('langchange', () => {

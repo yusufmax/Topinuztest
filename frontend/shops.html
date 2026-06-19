@@ -14,6 +14,8 @@
     <meta name="apple-mobile-web-app-title" content="Topin">
     <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
     <link rel="stylesheet" href="css/style.css?v=3.1">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('houz_theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));</script>
     <style>
         @media (max-width: 600px) {
@@ -65,12 +67,22 @@
             </div>
 
             <!-- Toolbar -->
-            <div class="markets-toolbar">
+            <div class="markets-toolbar" style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
                 <div class="markets-count" id="shopCount" style="font-weight: 500;">0</div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <button class="btn-outline-small" id="btnNearMe" onclick="toggleNearMeFilter()" style="display: flex; align-items: center; gap: 6px; padding: 6px 12px; font-size: 13px; font-weight: 600; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; transition: all 0.2s;">
+                        📍 <span id="lblNearMeBtn">Near Me</span>
+                    </button>
+                    <div class="view-toggle-group" style="display: flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--surface2);">
+                        <button class="view-toggle-btn active" id="btnListView" onclick="switchViewMode('list')" style="padding: 6px 12px; border: none; background: var(--accent); color: #fff; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s;">List</button>
+                        <button class="view-toggle-btn" id="btnMapView" onclick="switchViewMode('map')" style="padding: 6px 12px; border: none; background: transparent; color: var(--text2); cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s;">Map</button>
+                    </div>
+                </div>
             </div>
 
             <!-- Shops Grid -->
             <div class="shops-wrap">
+                <div id="shopsMap" style="display: none; height: 480px; width: 100%; border-radius: 16px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); z-index: 1; margin-bottom: 20px;"></div>
                 <div class="shops-grid" id="shopsGrid">
                     <div class="loader" id="shopLoader"></div>
                 </div>
@@ -84,9 +96,14 @@
                 <button class="close-search-btn" id="closeSearchBtn">✕ Закрыть поиск</button>
             </div>
             
-            <div class="search-tabs" style="margin-top: 20px;">
-                <button class="search-tab-btn active" id="searchTabProducts">Товары (<span id="searchCountProducts">0</span>)</button>
-                <button class="search-tab-btn" id="searchTabShops">Магазины (<span id="searchCountShops">0</span>)</button>
+            <div class="search-tabs" style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <div style="display: flex; gap: 8px;">
+                    <button class="search-tab-btn active" id="searchTabProducts">Товары (<span id="searchCountProducts">0</span>)</button>
+                    <button class="search-tab-btn" id="searchTabShops">Магазины (<span id="searchCountShops">0</span>)</button>
+                </div>
+                <button class="btn-outline-small" id="btnNearMeSearch" onclick="toggleNearMeFilterSearch()" style="display: none; align-items: center; gap: 6px; padding: 6px 12px; font-size: 13px; font-weight: 600; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; transition: all 0.2s;">
+                    📍 <span id="lblNearMeBtnSearch">Near Me</span>
+                </button>
             </div>
             
             <div class="search-results-content" style="margin-top: 20px;">

@@ -107,6 +107,8 @@ function openShopForm(shop = null) {
   document.getElementById('fName').value = shop?.name || '';
   document.getElementById('fLocation').value = shop?.location || '';
   document.getElementById('fLocationLink').value = shop?.locationLink || '';
+  document.getElementById('fLatitude').value = shop?.latitude || '';
+  document.getElementById('fLongitude').value = shop?.longitude || '';
   document.getElementById('fPhone').value = shop?.phone || '';
   document.getElementById('fWebsite').value = shop?.website || '';
   document.getElementById('fInstagram').value = shop?.instagram || '';
@@ -181,6 +183,20 @@ function openShopForm(shop = null) {
       }
       e.target.value = '';
     };
+  }
+
+  // Auto-extract coordinates from fLocationLink
+  const linkInput = document.getElementById('fLocationLink');
+  if (linkInput && !linkInput._hasCoordsListener) {
+    linkInput._hasCoordsListener = true;
+    linkInput.addEventListener('input', (e) => {
+        const coords = extractCoordsFromLink(e.target.value);
+        if (coords) {
+            document.getElementById('fLatitude').value = coords.lat;
+            document.getElementById('fLongitude').value = coords.lng;
+            showToast('📍 Координаты автоматически извлечены!', 'success');
+        }
+    });
   }
 
   title.textContent = shop ? t('editShopTitle') : t('addShopTitle');
@@ -280,6 +296,8 @@ async function saveShop() {
     name,
     location:    document.getElementById('fLocation').value.trim(),
     locationLink: document.getElementById('fLocationLink').value.trim(),
+    latitude:     document.getElementById('fLatitude').value ? parseFloat(document.getElementById('fLatitude').value) : null,
+    longitude:    document.getElementById('fLongitude').value ? parseFloat(document.getElementById('fLongitude').value) : null,
     phone:       document.getElementById('fPhone').value.trim(),
     website:     document.getElementById('fWebsite').value.trim(),
     instagram:   document.getElementById('fInstagram').value.trim(),

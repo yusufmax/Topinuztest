@@ -232,3 +232,41 @@ function renderRatingStarsHtml(rating, count = 0) {
         </div>
     `;
 }
+
+function extractCoordsFromLink(url) {
+    if (!url) return null;
+    let match = url.match(/@([0-9]{2}\.[0-9]+),([0-9]{2}\.[0-9]+)/);
+    if (match) return { lat: parseFloat(match[1]), lng: parseFloat(match[2]) };
+
+    match = url.match(/(?:place|q|query)=([0-9]{2}\.[0-9]+),([0-9]{2}\.[0-9]+)/i);
+    if (match) return { lat: parseFloat(match[1]), lng: parseFloat(match[2]) };
+
+    match = url.match(/ll=([0-9]{2}\.[0-9]+)(?:%2C|,)([0-9]{2}\.[0-9]+)/i);
+    if (match) {
+        return { lat: parseFloat(match[2]), lng: parseFloat(match[1]) };
+    }
+
+    match = url.match(/([0-9]{2}\.[0-9]+)\s*,\s*([0-9]{2}\.[0-9]+)/);
+    if (match) return { lat: parseFloat(match[1]), lng: parseFloat(match[2]) };
+
+    return null;
+}
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    if (!lat1 || !lon1 || !lat2 || !lon2) return null;
+    const R = 6371; // Radius of the earth in km
+    const dLat = deg2rad(lat2 - lat1);
+    const dLon = deg2rad(lon2 - lon1);
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2)
+        ;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const d = R * c; // Distance in km
+    return d;
+}
+
+function deg2rad(deg) {
+    return deg * (Math.PI / 180);
+}

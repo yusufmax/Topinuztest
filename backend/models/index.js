@@ -71,6 +71,8 @@ const initDb = async () => {
             try { await sequelize.query("ALTER TABLE Shops ADD COLUMN bannerUrl TEXT;"); } catch (e) {}
             try { await sequelize.query("ALTER TABLE Shops ADD COLUMN workingHours TEXT;"); } catch (e) {}
             try { await sequelize.query("ALTER TABLE Shops ADD COLUMN currency VARCHAR(255) DEFAULT 'UZS';"); } catch (e) {}
+            try { await sequelize.query("ALTER TABLE Shops ADD COLUMN latitude REAL;"); } catch (e) {}
+            try { await sequelize.query("ALTER TABLE Shops ADD COLUMN longitude REAL;"); } catch (e) {}
             
             // Product catalogue columns
             try { await sequelize.query("ALTER TABLE Products ADD COLUMN slug VARCHAR(255);"); } catch (e) {}
