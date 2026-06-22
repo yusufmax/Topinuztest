@@ -111,7 +111,7 @@ window.showAdminShopsView = (categoryId, categoryName) => {
       <td>${shop.isActive !== false ? '<span style="color:var(--green);font-weight:600;">Активен</span>' : '<span style="color:var(--red);font-weight:600;">Приостановлен</span>'}</td>
       <td>
         <div class="action-btns" style="display:flex; gap:8px;">
-          <button class="btn-edit" onclick="impersonateShop(${shop.id})" style="background:var(--blue); color:white; border:none; padding:4px 8px; border-radius:6px; cursor:pointer;">Войти</button>
+          ${shop.storeEnabled ? `<button class="btn-edit" onclick="impersonateShop(${shop.id})" style="background:var(--blue); color:white; border:none; padding:4px 8px; border-radius:6px; cursor:pointer;">Войти</button>` : ''}
           <button class="btn-edit" onclick="editShop(${shop.id})">${t('edit')}</button>
           <button class="btn-delete" onclick="deleteShop(${shop.id}, '${escHtml(shop.name)}')">${t('delete')}</button>
         </div>

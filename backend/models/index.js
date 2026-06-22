@@ -99,6 +99,11 @@ const initDb = async () => {
             try { await sequelize.query("ALTER TABLE Shops ADD COLUMN rating REAL DEFAULT 5.0;"); } catch (e) {}
             try { await sequelize.query("ALTER TABLE Shops ADD COLUMN reviewsCount INTEGER DEFAULT 0;"); } catch (e) {}
 
+            // Store enabled and vendor login fields
+            try { await sequelize.query("ALTER TABLE Shops ADD COLUMN storeEnabled BOOLEAN DEFAULT 0;"); } catch (e) {}
+            try { await sequelize.query("ALTER TABLE Shops ADD COLUMN vendorUsername VARCHAR(255);"); } catch (e) {}
+            try { await sequelize.query("ALTER TABLE Shops ADD COLUMN vendorPassword VARCHAR(255);"); } catch (e) {}
+
             try { await sequelize.query("ALTER TABLE Products ADD COLUMN baseRating REAL DEFAULT 5.0;"); } catch (e) {}
             try { await sequelize.query("ALTER TABLE Products ADD COLUMN baseRatingCount INTEGER DEFAULT 1;"); } catch (e) {}
             try { await sequelize.query("ALTER TABLE Products ADD COLUMN rating REAL DEFAULT 5.0;"); } catch (e) {}
@@ -126,14 +131,15 @@ const initDb = async () => {
         // Auto-seed missing vendor accounts for existing shops
         const allShops = await Shop.findAll();
         for (const shop of allShops) {
-            const hasUser = await User.findOne({ where: { ShopId: shop.id } });
+            let hasUser = await User.findOne({ where: { ShopId: shop.id } });
+            const vendorUsername = `${shop.slug}_admin`;
+            const vendorPassword = `${shop.slug}_pass2026`;
+
             if (!hasUser) {
-                const vendorUsername = `${shop.slug}_admin`;
                 const existingUserByUsername = await User.findOne({ where: { username: vendorUsername } });
                 if (!existingUserByUsername) {
-                    const vendorPassword = `${shop.slug}_pass2026`;
                     const hashedPassword = await bcrypt.hash(vendorPassword, 12);
-                    await User.create({
+                    hasUser = await User.create({
                         username: vendorUsername,
                         password: hashedPassword,
                         role: 'vendor',
@@ -145,7 +151,28 @@ const initDb = async () => {
                         existingUserByUsername.ShopId = shop.id;
                         await existingUserByUsername.save();
                         console.log(`Linked existing user "${vendorUsername}" to shop "${shop.name}"`);
+                        hasUser = existingUserByUsername;
                     }
+                }
+            }
+
+            // Sync storeEnabled and credentials for existing/seeded users
+            if (hasUser) {
+                let updated = false;
+                if (!shop.storeEnabled) {
+                    shop.storeEnabled = true;
+                    updated = true;
+                }
+                if (!shop.vendorUsername) {
+                    shop.vendorUsername = hasUser.username;
+                    updated = true;
+                }
+                if (!shop.vendorPassword) {
+                    shop.vendorPassword = vendorPassword; // default seeded password representation
+                    updated = true;
+                }
+                if (updated) {
+                    await shop.save();
                 }
             }
         }

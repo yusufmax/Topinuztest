@@ -11,6 +11,47 @@ const shopIncludes = [
     { model: ShopImage, attributes: ['id', 'url', 'order'] }
 ];
 
+const bcrypt = require('bcryptjs');
+
+const syncShopVendorAccount = async (shop, storeEnabled) => {
+    const isEnabled = storeEnabled === true || storeEnabled === 'true' || storeEnabled === 1 || storeEnabled === '1';
+    if (isEnabled) {
+        let user = await User.findOne({ where: { ShopId: shop.id, role: 'vendor' } });
+        if (!user) {
+            const vendorUsername = `${shop.slug}_admin`;
+            const vendorPassword = `${shop.slug}_pass2026`;
+            const hashedPassword = await bcrypt.hash(vendorPassword, 12);
+
+            user = await User.create({
+                username: vendorUsername,
+                password: hashedPassword,
+                role: 'vendor',
+                ShopId: shop.id
+            });
+            
+            await shop.update({
+                vendorUsername: vendorUsername,
+                vendorPassword: vendorPassword
+            });
+            console.log(`Generated vendor account for ${shop.name}: ${vendorUsername} / ${vendorPassword}`);
+        } else {
+            const updates = {};
+            if (!shop.vendorUsername) updates.vendorUsername = user.username;
+            if (!shop.vendorPassword) updates.vendorPassword = `${shop.slug}_pass2026`;
+            if (Object.keys(updates).length > 0) {
+                await shop.update(updates);
+            }
+        }
+    } else {
+        await User.destroy({ where: { ShopId: shop.id, role: 'vendor' } });
+        await shop.update({
+            vendorUsername: null,
+            vendorPassword: null
+        });
+        console.log(`Deleted vendor account for shop ${shop.id}`);
+    }
+};
+
 // Simple in-memory cache for shop list queries
 const _cache = new Map();
 const CACHE_TTL = 60_000; // 60 seconds
@@ -140,26 +181,13 @@ exports.createShop = async (req, res) => {
             await shop.setSubCategories(subCats);
         }
 
-        // Auto-create vendor account
-        const bcrypt = require('bcryptjs');
-        const vendorUsername = `${shop.slug}_admin`;
-        const vendorPassword = `${shop.slug}_pass2026`;
-        const hashedPassword = await bcrypt.hash(vendorPassword, 12);
-        
-        await User.create({
-            username: vendorUsername,
-            password: hashedPassword,
-            role: 'vendor',
-            ShopId: shop.id
-        });
-        console.log(`Auto-created vendor account for ${shop.name}: Username: ${vendorUsername}, Password: ${vendorPassword}`);
+        await syncShopVendorAccount(shop, req.body.storeEnabled);
 
         cacheClear();
         const updatedShop = await Shop.findByPk(shop.id, { include: shopIncludes });
         res.json({ 
             success: true, 
-            data: updatedShop,
-            credentials: { username: vendorUsername, password: vendorPassword }
+            data: updatedShop
         });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
@@ -184,6 +212,8 @@ exports.updateShop = async (req, res) => {
         if (subCats) {
             await shop.setSubCategories(subCats);
         }
+
+        await syncShopVendorAccount(shop, req.body.storeEnabled);
 
         cacheClear();
         const updatedShop = await Shop.findByPk(shop.id, { include: shopIncludes });

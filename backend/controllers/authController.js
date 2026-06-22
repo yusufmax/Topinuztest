@@ -17,6 +17,14 @@ exports.login = async (req, res) => {
             return res.status(401).json({ success: false, message: 'Invalid credentials' });
         }
 
+        if (user.role === 'vendor') {
+            const { Shop } = require('../models');
+            const shop = await Shop.findByPk(user.ShopId);
+            if (!shop || !shop.storeEnabled) {
+                return res.status(401).json({ success: false, message: 'Store dashboard login is disabled for this store' });
+            }
+        }
+
         const token = jwt.sign(
             { id: user.id, username: user.username, role: user.role },
             JWT_SECRET,

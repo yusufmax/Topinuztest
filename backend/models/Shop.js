@@ -87,6 +87,18 @@ module.exports = (sequelize, DataTypes) => {
         isActive: {
             type: DataTypes.BOOLEAN,
             defaultValue: true
+        },
+        storeEnabled: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false
+        },
+        vendorUsername: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        vendorPassword: {
+            type: DataTypes.STRING,
+            allowNull: true
         }
     });
 };

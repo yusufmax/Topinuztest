@@ -117,6 +117,29 @@ function openShopForm(shop = null) {
   document.getElementById('fDescription').value = shop?.description || '';
   document.getElementById('fIsActive').checked = shop ? (shop.isActive !== false) : true;
 
+  const storeEnabledCheckbox = document.getElementById('fStoreEnabled');
+  const credentialsSection = document.getElementById('vendorCredentialsSection');
+  if (storeEnabledCheckbox) {
+    storeEnabledCheckbox.checked = shop ? !!shop.storeEnabled : false;
+    
+    const updateCredsDisplay = () => {
+      if (storeEnabledCheckbox.checked && shop?.vendorUsername) {
+        document.getElementById('lblVendorUsername').textContent = shop.vendorUsername;
+        document.getElementById('lblVendorPassword').textContent = shop.vendorPassword || '–';
+        credentialsSection.style.display = 'block';
+      } else if (storeEnabledCheckbox.checked && !shop?.vendorUsername) {
+        document.getElementById('lblVendorUsername').textContent = '(будет создан при сохранении)';
+        document.getElementById('lblVendorPassword').textContent = '(будет создан при сохранении)';
+        credentialsSection.style.display = 'block';
+      } else {
+        credentialsSection.style.display = 'none';
+      }
+    };
+
+    updateCredsDisplay();
+    storeEnabledCheckbox.onchange = updateCredsDisplay;
+  }
+
   // Handle Dynamic Custom Links
   const linksContainer = document.getElementById('customLinksContainer');
   if (linksContainer) {
@@ -307,6 +330,7 @@ async function saveShop() {
     description: document.getElementById('fDescription').value.trim(),
     description_ru: document.getElementById('fDescriptionRu') ? document.getElementById('fDescriptionRu').value.trim() : '',
     isActive:    document.getElementById('fIsActive').checked,
+    storeEnabled: document.getElementById('fStoreEnabled') ? document.getElementById('fStoreEnabled').checked : false,
     CategoryId:  categoryId,
     subCategoryIds: subCategoryIds,
   };
