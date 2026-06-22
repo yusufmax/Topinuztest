@@ -117,8 +117,8 @@ async function seedFurnitureProducts() {
         // Fetch subcategories for mapping
         const subcategories = await SubCategory.findAll({ where: { CategoryId: category.id } });
 
-        // Let's seed products for the first 5 shops to give a good distribution
-        const targetShops = shops.slice(0, 5);
+        // Let's seed products for only the first shop (Kuka Home Mebel)
+        const targetShops = shops.slice(0, 1);
         let productsCreated = 0;
 
         for (const shop of targetShops) {
