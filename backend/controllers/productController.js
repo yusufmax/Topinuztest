@@ -1,4 +1,4 @@
-const { Product, Shop, Category, SubCategory, Review, sequelize } = require('../models');
+const { Product, Shop, Category, SubCategory, Review, User, sequelize } = require('../models');
 const { Op } = require('sequelize');
 const sharp = require('sharp');
 const crypto = require('crypto');
@@ -113,6 +113,14 @@ exports.getProductBySlug = async (req, res) => {
 // POST /api/products
 exports.createProduct = async (req, res) => {
     try {
+        if (req.user.role === 'vendor') {
+            const user = await User.findByPk(req.user.id);
+            if (!user || !user.ShopId) {
+                return res.status(403).json({ success: false, message: 'Forbidden: No shop associated with this user' });
+            }
+            req.body.ShopId = user.ShopId;
+        }
+
         if (req.body.name && !req.body.slug) {
             req.body.slug = slugify(req.body.name);
         } else if (req.body.slug) {
@@ -133,6 +141,13 @@ exports.updateProduct = async (req, res) => {
     try {
         const product = await Product.findByPk(req.params.id);
         if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
+
+        if (req.user.role === 'vendor') {
+            const user = await User.findByPk(req.user.id);
+            if (!user || user.ShopId !== product.ShopId) {
+                return res.status(403).json({ success: false, message: 'Forbidden: You do not own this product' });
+            }
+        }
 
         if (req.body.slug) {
             req.body.slug = slugify(req.body.slug);
@@ -155,6 +170,13 @@ exports.deleteProduct = async (req, res) => {
         const product = await Product.findByPk(req.params.id);
         if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
 
+        if (req.user.role === 'vendor') {
+            const user = await User.findByPk(req.user.id);
+            if (!user || user.ShopId !== product.ShopId) {
+                return res.status(403).json({ success: false, message: 'Forbidden: You do not own this product' });
+            }
+        }
+
         await product.destroy();
         res.json({ success: true, message: 'Product deleted successfully' });
     } catch (err) {
@@ -167,6 +189,13 @@ exports.uploadProductImages = async (req, res) => {
     try {
         const product = await Product.findByPk(req.params.id);
         if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
+
+        if (req.user.role === 'vendor') {
+            const user = await User.findByPk(req.user.id);
+            if (!user || user.ShopId !== product.ShopId) {
+                return res.status(403).json({ success: false, message: 'Forbidden: You do not own this product' });
+            }
+        }
 
         if (!req.files || req.files.length === 0) {
             return res.status(400).json({ success: false, message: 'No files uploaded' });
@@ -218,6 +247,13 @@ exports.uploadProductARModel = async (req, res) => {
     try {
         const product = await Product.findByPk(req.params.id);
         if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
+
+        if (req.user.role === 'vendor') {
+            const user = await User.findByPk(req.user.id);
+            if (!user || user.ShopId !== product.ShopId) {
+                return res.status(403).json({ success: false, message: 'Forbidden: You do not own this product' });
+            }
+        }
 
         if (!req.file) {
             return res.status(400).json({ success: false, message: 'No file uploaded' });
