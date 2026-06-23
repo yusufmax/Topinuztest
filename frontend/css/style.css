@@ -111,10 +111,17 @@ button {
     -webkit-tap-highlight-color: transparent;
 }
 
-*:focus,
-*:focus-visible {
+*:focus {
     outline: none !important;
-    box-shadow: none !important;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid var(--accent) !important;
+    outline-offset: 2px !important;
 }
 
 input,
@@ -4083,4 +4090,118 @@ html:not([data-theme="dark"]) .theme-icon-moon { opacity: 1; }
 }
 .share-opt-btn.whatsapp svg {
     color: #25d366;
+}
+
+/* ─── UI/UX Pro Max Premium Enhancements (Color-Preserved) ─── */
+
+/* 1. Global Spring Transition for Interactive Elements */
+button,
+a,
+input,
+select,
+textarea,
+.cat-tab,
+.theme-toggle-btn,
+.lang-switch-btn,
+.btn-modal-share,
+.btn-modal-primary,
+.btn-login,
+.btn-logout,
+.btn-back,
+.btn-add,
+.btn-edit,
+.btn-delete,
+.btn-cancel,
+.btn-save,
+.btn-submit-review,
+.action-icon-btn,
+.product-card,
+.shop-card,
+.category-card,
+.share-opt-btn {
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), 
+                background-color 0.2s ease, 
+                border-color 0.2s ease,
+                color 0.2s ease !important;
+}
+
+/* 2. Tactile Press Feedback (Scale Down on Click) */
+button:active,
+a.btn:active,
+.btn-modal-share:active,
+.btn-modal-primary:active,
+.btn-login:active,
+.btn-logout:active,
+.btn-back:active,
+.btn-add:active,
+.btn-edit:active,
+.btn-delete:active,
+.btn-cancel:active,
+.btn-save:active,
+.btn-submit-review:active,
+.action-icon-btn:active,
+.cat-tab:active,
+.theme-toggle-btn:active,
+.lang-switch-btn:active,
+.share-opt-btn:active,
+.product-card:active,
+.shop-card:active,
+.category-card:active {
+    transform: scale(0.96) !important;
+}
+
+/* 3. Smooth Visual Hover Lift & Advanced Shadows for Cards */
+.product-card:hover,
+.shop-card:hover,
+.category-card:hover {
+    transform: translateY(-6px) scale(1.01) !important;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.06), 0 4px 12px rgba(0, 0, 0, 0.02) !important;
+}
+
+[data-theme="dark"] .product-card:hover,
+[data-theme="dark"] .shop-card:hover,
+[data-theme="dark"] .category-card:hover {
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35), 0 4px 16px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* 4. Enhanced Glassmorphism Blending & Micro-interactivity for Category Tabs */
+.cat-tab:hover {
+    transform: translateY(-2px);
+}
+.cat-tab.active:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(20, 184, 166, 0.45) !important;
+}
+
+/* 5. Smooth Entrance Animation for Grids and Content Sections */
+.products-grid,
+.shops-grid,
+.home-grid,
+.categories-section,
+.detail-grid {
+    animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* 6. Form Fields Micro-Focus Transition */
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="tel"]:focus,
+textarea:focus,
+select:focus {
+    box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.12) !important;
+    transform: translateY(-1px);
+}
+
+/* 7. Image scale & hover improvements */
+.product-card-img-wrap img,
+.shop-card-img-wrap img,
+.store-gallery-item img {
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.product-card:hover .product-card-img-wrap img,
+.shop-card:hover .shop-card-img-wrap img,
+.store-gallery-item:hover img {
+    transform: scale(1.05) !important;
 }
