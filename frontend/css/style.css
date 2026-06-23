@@ -832,6 +832,13 @@ select {
         border-radius: var(--radius-lg);
         animation: slideUp 0.3s cubic-bezier(.4, 0, .2, 1);
         max-height: 90vh;
+        max-width: 720px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .modal-sheet {
+        max-width: 880px;
     }
 }
 

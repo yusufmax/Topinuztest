@@ -76,32 +76,21 @@
             object-fit: cover;
         }
         .store-title-block {
-            margin-top: 10px;
-            margin-bottom: 0;
+            grid-column: 1 / -1;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 16px;
+            margin-bottom: 4px;
         }
         .store-name {
             font-size: 32px;
             font-weight: 800;
             margin: 0 0 6px 0;
-            color: #ffffff;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+            color: var(--text);
         }
         .store-tagline {
             font-size: 15px;
-            color: rgba(255, 255, 255, 0.85);
+            color: var(--text2);
             margin: 0;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
-        }
-        .store-title-block .rating-stars-container {
-            margin: 4px 0 8px 0;
-        }
-        .store-title-block .rating-stars-container .rating-value {
-            color: #ffffff !important;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
-        }
-        .store-title-block .rating-stars-container .rating-count {
-            color: rgba(255, 255, 255, 0.75) !important;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
         }
         .store-details-grid {
             background: var(--surface);
@@ -360,23 +349,8 @@
                 text-align: center;
             }
             .store-title-block {
+                text-align: center;
                 margin-top: 0;
-            }
-            .store-name {
-                color: var(--text);
-                text-shadow: none;
-            }
-            .store-tagline {
-                color: var(--text2);
-                text-shadow: none;
-            }
-            .store-title-block .rating-stars-container .rating-value {
-                color: var(--text) !important;
-                text-shadow: none;
-            }
-            .store-title-block .rating-stars-container .rating-count {
-                color: var(--text3) !important;
-                text-shadow: none;
             }
             .store-logo-box {
                 width: 100px;
@@ -433,14 +407,14 @@
     <div class="store-header-content">
         <div class="store-identity">
             <div class="store-logo-box" id="storeLogo">🏪</div>
+        </div>
+
+        <div class="store-details-grid">
             <div class="store-title-block">
                 <h1 class="store-name" id="storeName">–</h1>
                 <div id="storeRatingContainer" style="margin-bottom: 8px;"></div>
                 <p class="store-tagline" id="storeTagline">–</p>
             </div>
-        </div>
-
-        <div class="store-details-grid">
             <div class="store-info-col">
                 <div id="storeContacts" style="display: flex; flex-direction: column; gap: 16px;">
                     <!-- Filled dynamically -->
