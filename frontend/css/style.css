@@ -4212,3 +4212,18 @@ select:focus {
 .store-gallery-item:hover img {
     transform: scale(1.05) !important;
 }
+
+/* --- HIDE REVIEWS AND RATINGS (TEMPORARY TOGGLE BLOCK) --- */
+/* To restore reviews and ratings, simply comment out or delete this block. */
+.rating-stars-container,
+.reviews-section,
+.review-form-container,
+#tabReviews,
+#reviewsView,
+.empty-reviews,
+#storeRatingContainer,
+#productRatingContainer,
+#modalReviewsList,
+.star-rating-selector {
+    display: none !important;
+}

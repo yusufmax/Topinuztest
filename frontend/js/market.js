@@ -316,17 +316,41 @@ async function handleLangChangeMarket() {
 }
 
 function getSortedShops(shopsList) {
-  if (!_userCoords) return [...shopsList];
-  return [...shopsList].sort((a, b) => {
-    const hasA = a.latitude && a.longitude;
-    const hasB = b.latitude && b.longitude;
-    if (!hasA && !hasB) return 0;
-    if (!hasA) return 1;
-    if (!hasB) return -1;
-    const distA = calculateDistance(_userCoords.lat, _userCoords.lng, a.latitude, a.longitude);
-    const distB = calculateDistance(_userCoords.lat, _userCoords.lng, b.latitude, b.longitude);
-    return distA - distB;
-  });
+  let list = [...shopsList];
+  const sortVal = document.getElementById('shopSort')?.value || 'default';
+  
+  if (sortVal === 'name-asc') {
+    list.sort((a, b) => (a.name || '').localeCompare(b.name || '', currentLang === 'ru' ? 'ru' : 'uz'));
+  } else if (_nearMeFilterActive && _userCoords) {
+    list.sort((a, b) => {
+      const hasA = a.latitude && a.longitude;
+      const hasB = b.latitude && b.longitude;
+      if (!hasA && !hasB) return 0;
+      if (!hasA) return 1;
+      if (!hasB) return -1;
+      const distA = calculateDistance(_userCoords.lat, _userCoords.lng, a.latitude, a.longitude);
+      const distB = calculateDistance(_userCoords.lat, _userCoords.lng, b.latitude, b.longitude);
+      return distA - distB;
+    });
+  }
+  return list;
+}
+
+function handleShopSortChange() {
+  const sortVal = document.getElementById('shopSort')?.value || 'default';
+  if (sortVal === 'name-asc' && _nearMeFilterActive) {
+    _nearMeFilterActive = false;
+    const btn = document.getElementById('btnNearMe');
+    if (btn) {
+      btn.style.background = 'var(--surface)';
+      btn.style.color = 'var(--text)';
+    }
+  }
+  const sorted = getSortedShops(_allShops);
+  renderShops(sorted);
+  if (_currentViewMode === 'map') {
+    initLeafletMap(sorted);
+  }
 }
 
 function toggleNearMeFilter() {
@@ -347,6 +371,9 @@ function toggleNearMeFilter() {
         btn.style.background = 'var(--accent)';
         btn.style.color = '#fff';
         
+        const shopSort = document.getElementById('shopSort');
+        if (shopSort) shopSort.value = 'default';
+        
         const sorted = getSortedShops(_allShops);
         renderShops(sorted);
         if (_currentViewMode === 'map') {
@@ -364,9 +391,10 @@ function toggleNearMeFilter() {
     btn.style.background = 'var(--surface)';
     btn.style.color = 'var(--text)';
     
-    renderShops(_allShops);
+    const sorted = getSortedShops(_allShops);
+    renderShops(sorted);
     if (_currentViewMode === 'map') {
-      initLeafletMap(_allShops);
+      initLeafletMap(sorted);
     }
   }
 }

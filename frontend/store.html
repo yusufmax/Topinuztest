@@ -478,6 +478,7 @@
                         <option value="price-asc">Цена: дешевые</option>
                         <option value="price-desc">Цена: дорогие</option>
                         <option value="rating-desc">По рейтингу</option>
+                        <option value="name-asc">А-Я (A-Z)</option>
                     </select>
                 </div>
 
@@ -746,6 +747,8 @@
                     products.sort((a,b) => parseFloat(b.price || 0) - parseFloat(a.price || 0));
                 } else if (sort === 'rating-desc') {
                     products.sort((a,b) => parseFloat(b.rating || 0) - parseFloat(a.rating || 0));
+                } else if (sort === 'name-asc') {
+                    products.sort((a,b) => (a.name || '').localeCompare(b.name || '', currentLang === 'ru' ? 'ru' : 'uz'));
                 }
 
                 document.getElementById('productCount').textContent = t('productsCountText').replace('{count}', products.length);

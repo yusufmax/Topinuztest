@@ -218,6 +218,8 @@ const i18n = {
     sortPriceAsc: "Цена: дешевые",
     sortPriceDesc: "Цена: дорогие",
     sortRatingDesc: "По рейтингу",
+    sortDefault: "По умолчанию",
+    sortAlphabetical: "А-Я (A-Z)",
     aboutCompany: "О компании",
     workingHoursTitle: "Рабочие часы",
     closedDay: "Выходной",
@@ -418,6 +420,17 @@ function translateStaticElements() {
     if (optPriceDesc) optPriceDesc.textContent = t('sortPriceDesc');
     const optRatingDesc = catalogSort.querySelector('option[value="rating-desc"]');
     if (optRatingDesc) optRatingDesc.textContent = t('sortRatingDesc');
+    const optNameAsc = catalogSort.querySelector('option[value="name-asc"]');
+    if (optNameAsc) optNameAsc.textContent = t('sortAlphabetical');
+  }
+
+  // Update option values in shopSort dropdown
+  const shopSort = document.getElementById('shopSort');
+  if (shopSort) {
+    const optShopDefault = shopSort.querySelector('option[value="default"]');
+    if (optShopDefault) optShopDefault.textContent = t('sortDefault');
+    const optShopNameAsc = shopSort.querySelector('option[value="name-asc"]');
+    if (optShopNameAsc) optShopNameAsc.textContent = t('sortAlphabetical');
   }
 
   // Update category select 'all' option in store.html
