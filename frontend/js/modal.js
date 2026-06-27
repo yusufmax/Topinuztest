@@ -162,7 +162,13 @@ function openShopModal(shopId) {
     const storeBtn = document.getElementById('modalStoreBtn');
     const storeBtnText = document.getElementById('modalStoreBtnText');
     if (storeBtn && shop.slug) {
-      storeBtn.href = `/stores/${shop.slug}`;
+      let storeUrl = `/stores/${shop.slug}`;
+      const params = new URLSearchParams(window.location.search);
+      const catParam = params.get('category') || (typeof _activeMainCategory !== 'undefined' ? _activeMainCategory : null);
+      if (catParam && catParam !== 'all') {
+        storeUrl += `?fromCategory=${encodeURIComponent(catParam)}`;
+      }
+      storeBtn.href = storeUrl;
       storeBtn.style.display = 'flex';
       if (storeBtnText) {
         storeBtnText.textContent = t('goToStore');

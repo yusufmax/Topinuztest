@@ -646,6 +646,20 @@
         }
 
         async function initStorefront() {
+            // Set dynamic back button href
+            const urlParams = new URLSearchParams(window.location.search);
+            const fromCat = urlParams.get('fromCategory');
+            const backBtn = document.querySelector('.back-btn');
+            if (backBtn) {
+                if (fromCat && fromCat !== 'all') {
+                    backBtn.href = `/shops.html?category=${encodeURIComponent(fromCat)}`;
+                } else if (document.referrer && document.referrer.includes('/shops.html')) {
+                    backBtn.href = document.referrer;
+                } else {
+                    backBtn.href = '/';
+                }
+            }
+
             // Load Store profile
             try {
                 const res = await fetch(`/api/shops/by-slug/${encodeURIComponent(storeSlug)}`);
