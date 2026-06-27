@@ -324,3 +324,57 @@ exports.createProductReview = async (req, res) => {
         res.status(500).json({ success: false, message: err.message });
     }
 };
+
+// Temp uploads (without product ID)
+exports.uploadTempProductImages = async (req, res) => {
+    try {
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({ success: false, message: 'No files uploaded' });
+        }
+
+        if (req.files.length > 10) {
+            return res.status(400).json({ success: false, message: 'Max 10 images allowed' });
+        }
+
+        const uploadPromises = req.files.map(async (file) => {
+            const processedBuffer = await sharp(file.buffer)
+                .resize(1200, 1200, { fit: 'inside', withoutEnlargement: true })
+                .jpeg({ quality: 80 })
+                .toBuffer();
+
+            const ext = file.originalname.split('.').pop().toLowerCase() || 'jpg';
+            const filename = `${crypto.randomUUID()}.${ext}`;
+            return uploadBuffer(processedBuffer, 'topin_products_gallery', filename, 'image');
+        });
+
+        const uploadedUrls = await Promise.all(uploadPromises);
+        res.json({ success: true, data: uploadedUrls });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+exports.uploadTempProductARModel = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ success: false, message: 'No file uploaded' });
+        }
+
+        // Limit check (50 MB)
+        if (req.file.size > 50 * 1024 * 1024) {
+            return res.status(400).json({ success: false, message: 'File size exceeds 50 MB limit' });
+        }
+
+        const ext = req.file.originalname.split('.').pop().toLowerCase();
+        if (ext !== 'glb' && ext !== 'usdz' && ext !== 'zip') {
+            return res.status(400).json({ success: false, message: 'Invalid file extension. Only .glb, .usdz, and .zip are allowed.' });
+        }
+
+        const filename = `temp_${crypto.randomUUID()}.${ext}`;
+        const fileUrl = await uploadBuffer(req.file.buffer, 'topin_ar_models', filename, 'raw');
+
+        res.json({ success: true, data: { fileUrl, type: ext } });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};

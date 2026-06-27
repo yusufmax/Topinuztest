@@ -1030,21 +1030,22 @@
             const files = document.getElementById('prodGalleryInput').files;
             if (files.length === 0) return;
 
+            const pId = document.getElementById('productId').value;
+            if (!pId && productGalleryImages.length + files.length > 10) {
+                showToast('Максимум 10 изображений для одного товара', 'warning');
+                return;
+            }
+
             const formData = new FormData();
             for (let i = 0; i < files.length; i++) {
                 formData.append('images', files[i]);
             }
 
-            const pId = document.getElementById('productId').value;
-            if (!pId) {
-                showToast('Сначала создайте и сохраните товар, чтобы добавлять к нему фотографии.', 'warning');
-                return;
-            }
-
             showToast('⏳ Загрузка фото...', 'info');
 
             try {
-                const res = await fetch(`/api/products/${pId}/images`, {
+                const url = pId ? `/api/products/${pId}/images` : '/api/products/temp-upload/images';
+                const res = await fetch(url, {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${token}` },
                     body: formData
@@ -1058,7 +1059,11 @@
                     throw new Error(errMsg);
                 }
                 const json = await res.json();
-                productGalleryImages = json.data;
+                if (pId) {
+                    productGalleryImages = json.data;
+                } else {
+                    productGalleryImages.push(...json.data);
+                }
                 renderProductGallerySlots();
                 showToast('Фото добавлены в галерею', 'success');
             } catch(e) { showToast(e.message, 'error'); }
@@ -1075,10 +1080,6 @@
             if (!file) return;
 
             const pId = document.getElementById('productId').value;
-            if (!pId) {
-                showToast('Сначала создайте и сохраните товар, чтобы загрузить к нему 3D модель.', 'warning');
-                return;
-            }
 
             const progressContainer = document.getElementById(`${type}Progress`);
             const fill = document.getElementById(`${type}Fill`);
@@ -1089,7 +1090,8 @@
             formData.append('model', file);
 
             try {
-                const res = await fetch(`/api/products/${pId}/ar-models`, {
+                const url = pId ? `/api/products/${pId}/ar-models` : `/api/products/temp-upload/ar-model`;
+                const res = await fetch(url, {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${token}` },
                     body: formData
@@ -1120,7 +1122,8 @@
                     labelId = 'lblZipText';
                 }
                 
-                document.getElementById(targetInputId).value = type === 'glb' ? json.data.glbUrl : (type === 'usdz' ? json.data.usdzUrl : json.data.zipUrl);
+                const fileUrl = pId ? (type === 'glb' ? json.data.glbUrl : (type === 'usdz' ? json.data.usdzUrl : json.data.zipUrl)) : json.data.fileUrl;
+                document.getElementById(targetInputId).value = fileUrl;
                 document.getElementById(labelId).innerHTML = `<span style="color:var(--accent)">🟢 Файл ${type.toUpperCase()} успешно загружен!</span>`;
                 showToast('Файл успешно загружен', 'success');
             } catch(e) {

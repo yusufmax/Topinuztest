@@ -19,6 +19,8 @@ router.put('/:id', authMiddleware, productController.updateProduct);
 router.delete('/:id', authMiddleware, productController.deleteProduct);
 
 // Media uploads
+router.post('/temp-upload/images', authMiddleware, upload.array('images', 10), productController.uploadTempProductImages);
+router.post('/temp-upload/ar-model', authMiddleware, uploadModel.single('model'), productController.uploadTempProductARModel);
 router.post('/:id/images', authMiddleware, upload.array('images', 10), productController.uploadProductImages);
 router.post('/:id/ar-models', authMiddleware, uploadModel.single('model'), productController.uploadProductARModel);
 
